@@ -88,8 +88,8 @@
       var icon = L.divIcon({
         className: 'decoration-marker',
         html: '<span class="decoration-marker-pin">' + char + '</span>',
-        iconSize: [28, 28],
-        iconAnchor: [14, 28]
+        iconSize: [24, 24],
+        iconAnchor: [12, 24]
       });
       var marker = L.marker([lat, lng], { icon: icon }).addTo(state.map);
       marker._decorationChar = char;
