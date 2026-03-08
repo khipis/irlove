@@ -1,0 +1,196 @@
+/**
+ * Lokalizacje – etykiety UI. Łatwo dodać nowy język: skopiuj obiekt pl lub en i przetłumacz wartości.
+ */
+(function () {
+  'use strict';
+
+  var STORAGE_KEY = 'spacerek_lang';
+
+  var LOCALES = {
+    pl: {
+      // Ekran startowy
+      app_title: 'Spacerek – spacer w ciemno',
+      start_tagline: 'Odkryj miejsce w okolicy – spacer w ciemno',
+      start_instruction_distance: 'Wybierz zasięg spaceru:',
+      start_instruction_attractions: 'Liczba atrakcji do zebrania:',
+      start_instruction_map_style: 'Styl mapy:',
+      start_btn_start: 'Rozpocznij spacer',
+      start_btn_experience: '🏆 Twoje doświadczenie',
+      start_btn_experience_title: 'Twoje doświadczenie',
+      start_style_noir_title: 'Czarno-biała',
+      start_style_vaporwave_title: 'Vaporwave',
+
+      // Map / status
+      map_status_loading: 'Ładowanie lokalizacji…',
+      map_style_label: 'Styl:',
+      map_style_select_title: 'Zmień styl mapy',
+      map_loading_searching: 'Szukam miejsca w okolicy…',
+
+      // Spacer / walking
+      walk_hint_collected: 'Zebrane: {count}/{total}',
+      walk_walking_hint: 'Spaceruj w kierunku celu. Gdy dojdziesz, miejsce się ujawni.',
+      walk_hint_distance: 'Odległość do celu: – m',
+      walk_hint_distance_value: 'Odległość do celu: {m} m',
+      walk_hint_distance_to_goal: 'Do najbliższej atrakcji: {m} m',
+      walk_hint_all_collected: 'Wszystkie zebrane!',
+      walk_btn_experience_title: 'Twoje doświadczenie',
+      walk_btn_simulate_title: 'Symuluj dojście do celu (test)',
+      walk_btn_simulate_label: '📍 Symuluj dojście',
+      walk_btn_debug_title: 'Pokaż/ukryj debug',
+
+      // Debug
+      debug_summary_empty: 'Brak wyszukania (rozpocznij spacer).',
+      debug_summary_found: 'Znaleziono: {n} miejsc. Atrakcji: {m}, zebrane: {c}/{m}.',
+
+      // Dojście / arrival
+      arrival_title: 'Dotarłeś!',
+      arrival_subtitle: 'Odkrywamy to miejsce…',
+
+      // Karta miejsca / reveal
+      reveal_title: 'Oto Twoje miejsce',
+      reveal_ciekawostka: 'Ciekawostka',
+      reveal_btn_next: 'Następna atrakcja',
+      reveal_btn_back: 'Wróć do mapy',
+      reveal_btn_end: 'Zakończ spacer',
+      reveal_desc_placeholder: 'Brak opisu.',
+
+      // Panel doświadczenia
+      experience_title: '🏆 Twoje doświadczenie',
+      experience_btn_close_title: 'Zamknij',
+      experience_level_prefix: 'Poziom ',
+      experience_btn_clear_title: 'Usuń wszystkie zapisane dane',
+      experience_btn_clear_label: '🗑️ Wyczyść dane (localStorage)',
+      experience_empty: 'Jeszcze nie odwiedziłeś żadnego miejsca. Rozpocznij spacer!',
+
+      // Statusy (setStatus)
+      status_getting_location: 'Pobieram Twoją lokalizację…',
+      status_no_geolocation: 'Twoja przeglądarka nie obsługuje geolokalizacji.',
+      status_location_denied: 'Potrzebujemy zgody na lokalizację.',
+      status_location_error: 'Brak dostępu do lokalizacji. Włącz GPS i odśwież.',
+      status_map_load_error: 'Błąd ładowania mapy',
+      status_searching: 'Szukam miejsc w okolicy…',
+      status_no_places: 'Brak ciekawych miejsc w tym zasięgu. Spróbuj większego dystansu.',
+      status_all_on_map: 'Wszystkie atrakcje na mapie. Podejdź do dowolnej – sama się ujawni.',
+      status_search_error: 'Błąd wyszukiwania miejsc. Sprawdź internet i spróbuj ponownie.',
+      status_go_to_next: 'Podejdź do kolejnej atrakcji.',
+      status_position_error: 'Błąd odświeżania pozycji.',
+      status_all_collected: 'Wszystkie atrakcje już zebrane.',
+
+      // Tooltipy i rangi
+      tooltip_you: 'Ty – tu jesteś',
+      tooltip_you_short: 'Ty',
+      tooltip_visited: ' (odwiedzone)',
+      tier_casual: 'Spacerowy',
+      tier_epic: 'Epicki',
+      tier_legendary: 'Legendarny',
+
+      // Symulacja
+      simulate_distance: 'Odległość do celu: {m} m (symulacja…)'
+    },
+
+    en: {
+      app_title: 'Spacerek – blind walk',
+      start_tagline: 'Discover a place nearby – a walk in the dark',
+      start_instruction_distance: 'Choose walk distance:',
+      start_instruction_attractions: 'Number of places to find:',
+      start_instruction_map_style: 'Map style:',
+      start_btn_start: 'Start walk',
+      start_btn_experience: '🏆 Your experience',
+      start_btn_experience_title: 'Your experience',
+      start_style_noir_title: 'Black & white',
+      start_style_vaporwave_title: 'Vaporwave',
+
+      map_status_loading: 'Loading location…',
+      map_style_label: 'Style:',
+      map_style_select_title: 'Change map style',
+      map_loading_searching: 'Searching for places…',
+
+      walk_hint_collected: 'Collected: {count}/{total}',
+      walk_walking_hint: 'Walk towards the goal. When you get there, the place will be revealed.',
+      walk_hint_distance: 'Distance to goal: – m',
+      walk_hint_distance_value: 'Distance to goal: {m} m',
+      walk_hint_distance_to_goal: 'To nearest place: {m} m',
+      walk_hint_all_collected: 'All collected!',
+      walk_btn_experience_title: 'Your experience',
+      walk_btn_simulate_title: 'Simulate arrival (test)',
+      walk_btn_simulate_label: '📍 Simulate arrival',
+      walk_btn_debug_title: 'Show/hide debug',
+
+      debug_summary_empty: 'No search yet (start a walk).',
+      debug_summary_found: 'Found: {n} places. Targets: {m}, collected: {c}/{m}.',
+
+      arrival_title: "You've arrived!",
+      arrival_subtitle: 'Revealing this place…',
+
+      reveal_title: "Here's your place",
+      reveal_ciekawostka: 'Did you know',
+      reveal_btn_next: 'Next place',
+      reveal_btn_back: 'Back to map',
+      reveal_btn_end: 'End walk',
+      reveal_desc_placeholder: 'No description.',
+
+      experience_title: '🏆 Your experience',
+      experience_btn_close_title: 'Close',
+      experience_level_prefix: 'Level ',
+      experience_btn_clear_title: 'Delete all saved data',
+      experience_btn_clear_label: '🗑️ Clear data (localStorage)',
+      experience_empty: "You haven't visited any place yet. Start a walk!",
+
+      status_getting_location: 'Getting your location…',
+      status_no_geolocation: 'Your browser does not support geolocation.',
+      status_location_denied: 'We need your consent for location.',
+      status_location_error: 'No access to location. Enable GPS and refresh.',
+      status_map_load_error: 'Map loading error',
+      status_searching: 'Searching for places…',
+      status_no_places: 'No interesting places in this range. Try a longer distance.',
+      status_all_on_map: 'All places on the map. Walk to any – it will reveal itself.',
+      status_search_error: 'Search error. Check your connection and try again.',
+      status_go_to_next: 'Walk to the next place.',
+      status_position_error: 'Error updating position.',
+      status_all_collected: 'All places already collected.',
+
+      tooltip_you: "You – you're here",
+      tooltip_you_short: 'You',
+      tooltip_visited: ' (visited)',
+      tier_casual: 'Casual',
+      tier_epic: 'Epic',
+      tier_legendary: 'Legendary',
+
+      simulate_distance: 'Distance to goal: {m} m (simulation…)'
+    }
+  };
+
+  function getStoredLang() {
+    try {
+      var stored = localStorage.getItem(STORAGE_KEY);
+      return stored && LOCALES[stored] ? stored : 'pl';
+    } catch (e) {
+      return 'pl';
+    }
+  }
+
+  function setStoredLang(lang) {
+    try {
+      localStorage.setItem(STORAGE_KEY, lang);
+    } catch (e) {}
+  }
+
+  function t(key, replacements) {
+    var lang = window.CURRENT_LOCALE || getStoredLang();
+    var dict = LOCALES[lang] || LOCALES.pl;
+    var value = dict[key];
+    if (value == null) value = LOCALES.pl[key] || key;
+    if (replacements && typeof value === 'string') {
+      Object.keys(replacements).forEach(function (k) {
+        value = value.replace(new RegExp('\\{' + k + '\\}', 'g'), String(replacements[k]));
+      });
+    }
+    return value;
+  }
+
+  window.LOCALES = LOCALES;
+  window.CURRENT_LOCALE = getStoredLang();
+  window.t = t;
+  window.getStoredLang = getStoredLang;
+  window.setStoredLang = setStoredLang;
+})();

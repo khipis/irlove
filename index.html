@@ -14,107 +14,108 @@
     <section id="screen-start" class="screen active">
       <div class="start-content">
         <h1>Spacerek</h1>
-        <p class="tagline">Odkryj miejsce w okolicy – spacer w ciemno</p>
-        <p class="instruction">Wybierz zasięg spaceru:</p>
+        <p class="tagline" data-i18n="start_tagline">Odkryj miejsce w okolicy – spacer w ciemno</p>
+        <p class="instruction" data-i18n="start_instruction_distance">Wybierz zasięg spaceru:</p>
         <div class="distance-buttons">
           <button type="button" class="btn-distance" data-km="1">1 km</button>
           <button type="button" class="btn-distance" data-km="1.9">2 km</button>
           <button type="button" class="btn-distance" data-km="3">3 km</button>
         </div>
-        <p class="instruction instruction-map-style">Liczba atrakcji do zebrania:</p>
+        <p class="instruction instruction-map-style" data-i18n="start_instruction_attractions">Liczba atrakcji do zebrania:</p>
         <div class="attractions-row">
           <input type="range" id="num-attractions" class="attractions-slider" min="1" max="10" value="5" />
           <span id="num-attractions-value" class="attractions-value">5</span>
         </div>
-        <p class="instruction instruction-map-style">Styl mapy:</p>
+        <p class="instruction instruction-map-style" data-i18n="start_instruction_map_style">Styl mapy:</p>
         <div class="map-style-buttons">
-          <button type="button" class="btn-map-style" data-style="standard" title="Zwykła mapa">Standard</button>
-          <button type="button" class="btn-map-style" data-style="noir" title="Czarno-biała">Noir</button>
+          <button type="button" class="btn-map-style" data-style="noir" data-i18n-title="start_style_noir_title" title="Czarno-biała">Noir</button>
+          <button type="button" class="btn-map-style" data-style="vaporwave" data-i18n-title="start_style_vaporwave_title" title="Vaporwave">Vaporwave</button>
         </div>
-        <button type="button" id="btn-start" class="btn-primary" disabled>Rozpocznij spacer</button>
-        <button type="button" id="btn-experience" class="btn-experience" title="Twoje doświadczenie">🏆 Twoje doświadczenie</button>
+        <button type="button" id="btn-start" class="btn-primary" disabled data-i18n="start_btn_start">Rozpocznij spacer</button>
+        <button type="button" id="btn-experience" class="btn-experience" data-i18n-title="start_btn_experience_title" data-i18n="start_btn_experience" title="Twoje doświadczenie">🏆 Twoje doświadczenie</button>
+        <div class="lang-switcher" role="group" aria-label="Język">
+          <button type="button" class="btn-lang selected" data-lang="pl" title="Polski">PL</button>
+          <button type="button" class="btn-lang" data-lang="en" title="English">EN</button>
+        </div>
       </div>
     </section>
 
     <!-- Ekran mapy i spaceru -->
     <section id="screen-walk" class="screen">
-      <div id="map-container" class="map-container map-style-standard"></div>
+      <div id="map-container" class="map-container map-style-noir"></div>
       <div id="map-overlay">
         <div id="status-bar">
-          <span id="status-text">Ładowanie lokalizacji…</span>
+          <span id="status-text" data-i18n="map_status_loading">Ładowanie lokalizacji…</span>
           <span id="distance-text"></span>
         </div>
         <div id="map-style-bar" class="map-style-bar hidden">
-          <span class="map-style-label">Styl:</span>
-          <select id="map-style-select" class="map-style-select" title="Zmień styl mapy">
-            <option value="standard">Standard</option>
+          <span class="map-style-label" data-i18n="map_style_label">Styl:</span>
+          <select id="map-style-select" class="map-style-select" data-i18n-title="map_style_select_title" title="Zmień styl mapy">
             <option value="noir">Noir</option>
+            <option value="vaporwave">Vaporwave</option>
           </select>
         </div>
         <div id="loading-place" class="loading-box hidden">
           <div class="spinner"></div>
-          <p>Szukam miejsca w okolicy…</p>
+          <p data-i18n="map_loading_searching">Szukam miejsca w okolicy…</p>
         </div>
         <div id="walking-info" class="hidden">
           <p id="hint-attraction-num" class="hint-attraction-num">Zebrane: 0/5</p>
-          <p>Spaceruj w kierunku celu. Gdy dojdziesz, miejsce się ujawni.</p>
+          <p data-i18n="walk_walking_hint">Spaceruj w kierunku celu. Gdy dojdziesz, miejsce się ujawni.</p>
           <p id="hint-distance">Odległość do celu: – m</p>
         </div>
       </div>
-      <button type="button" id="btn-experience-map" class="btn-experience-fab hidden" title="Twoje doświadczenie">🏆</button>
-      <!-- Przycisk symulacji dojścia – lewy dolny róg, nad mapą -->
-      <button type="button" id="btn-simulate-arrival" class="btn-simulate-arrival-fab hidden" title="Symuluj dojście do celu (test)">📍 Symuluj dojście</button>
-      <!-- Okienko debuggera -->
+      <button type="button" id="btn-experience-map" class="btn-experience-fab hidden" data-i18n-title="walk_btn_experience_title" title="Twoje doświadczenie">🏆</button>
+      <button type="button" id="btn-simulate-arrival" class="btn-simulate-arrival-fab hidden" data-i18n-title="walk_btn_simulate_title" data-i18n="walk_btn_simulate_label" title="Symuluj dojście do celu (test)">📍 Symuluj dojście</button>
       <div id="debug-panel" class="debug-panel">
-        <button type="button" id="btn-debug-toggle" class="debug-toggle" title="Pokaż/ukryj debug">🐛 Debug</button>
+        <button type="button" id="btn-debug-toggle" class="debug-toggle" data-i18n-title="walk_btn_debug_title" title="Pokaż/ukryj debug">🐛 Debug</button>
         <div class="debug-content">
-          <p id="debug-summary" class="debug-summary">Brak wyszukania (rozpocznij spacer).</p>
+          <p id="debug-summary" class="debug-summary" data-i18n="debug_summary_empty">Brak wyszukania (rozpocznij spacer).</p>
           <div id="debug-panel-body" class="debug-list"></div>
         </div>
       </div>
-      <!-- Animacja dojścia (krótki ekran "Dotarłeś!") -->
       <div id="arrival-overlay" class="arrival-overlay hidden" data-display="flex">
         <div class="arrival-content">
           <div class="arrival-icon">✓</div>
-          <h2 class="arrival-title">Dotarłeś!</h2>
-          <p class="arrival-subtitle">Odkrywamy to miejsce…</p>
+          <h2 class="arrival-title" data-i18n="arrival_title">Dotarłeś!</h2>
+          <p class="arrival-subtitle" data-i18n="arrival_subtitle">Odkrywamy to miejsce…</p>
         </div>
       </div>
-      <!-- Overlay po dojściu – karta z miejscem, ciekawostkami i zdjęciem -->
       <div id="reveal-overlay" class="reveal-overlay hidden" data-display="flex">
         <div class="reveal-card">
-          <h2>Oto Twoje miejsce</h2>
+          <h2 data-i18n="reveal_title">Oto Twoje miejsce</h2>
           <div id="reveal-photo" class="reveal-photo"></div>
           <h3 id="reveal-name"></h3>
           <p id="reveal-desc" class="reveal-desc"></p>
           <div id="reveal-ciekawostki" class="reveal-ciekawostki hidden">
-            <h4>Ciekawostka</h4>
+            <h4 data-i18n="reveal_ciekawostka">Ciekawostka</h4>
             <p id="reveal-funfact"></p>
           </div>
-          <button type="button" id="btn-reveal-action" class="btn-primary">Następna atrakcja</button>
+          <button type="button" id="btn-reveal-action" class="btn-primary" data-i18n="reveal_btn_next">Następna atrakcja</button>
         </div>
       </div>
     </section>
 
-    <!-- Panel Twoje doświadczenie (gamifikacja) -->
+    <!-- Panel Twoje doświadczenie -->
     <div id="experience-overlay" class="experience-overlay hidden" data-display="flex">
       <div class="experience-panel">
         <div class="experience-header">
-          <h2>🏆 Twoje doświadczenie</h2>
-          <button type="button" id="btn-experience-close" class="btn-experience-close" title="Zamknij">×</button>
+          <h2 data-i18n="experience_title">🏆 Twoje doświadczenie</h2>
+          <button type="button" id="btn-experience-close" class="btn-experience-close" data-i18n-title="experience_btn_close_title" title="Zamknij">×</button>
         </div>
         <div class="experience-stats">
           <p class="experience-total"><span id="experience-total-xp">0</span> XP</p>
-          <p class="experience-level">Poziom <span id="experience-level-num">1</span></p>
+          <p class="experience-level"><span data-i18n="experience_level_prefix"></span><span id="experience-level-num">1</span></p>
         </div>
         <ul id="experience-list" class="experience-list"></ul>
         <div class="experience-actions">
-          <button type="button" id="btn-clear-storage" class="btn-clear-storage" title="Usuń wszystkie zapisane dane">🗑️ Wyczyść dane (localStorage)</button>
+          <button type="button" id="btn-clear-storage" class="btn-clear-storage" data-i18n-title="experience_btn_clear_title" data-i18n="experience_btn_clear_label" title="Usuń wszystkie zapisane dane">🗑️ Wyczyść dane (localStorage)</button>
         </div>
       </div>
     </div>
   </div>
 
+  <script src="locales.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
   <script src="app.js" defer></script>
 </body>

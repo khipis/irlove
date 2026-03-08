@@ -5,15 +5,69 @@
   var ARRIVAL_METERS = 50;
   var STORAGE_KEY = 'spacerek_experience';
 
+  function t(key, replacements) {
+    return window.t ? window.t(key, replacements) : key;
+  }
+
+  function applyLocale() {
+    var lang = window.CURRENT_LOCALE || 'pl';
+    document.documentElement.lang = lang === 'en' ? 'en' : 'pl';
+    if (document.title !== undefined) document.title = t('app_title');
+    document.querySelectorAll('[data-i18n]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n');
+      if (key) el.textContent = t(key);
+    });
+    document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n-title');
+      if (key) el.title = t(key);
+    });
+    refreshDynamicLabels();
+  }
+
+  function refreshDynamicLabels() {
+    var userEl = document.querySelector('.user-marker-fun');
+    if (userEl) userEl.title = t('tooltip_you_short');
+    if (state.userMarker) {
+      var userTip = state.userMarker.getTooltip && state.userMarker.getTooltip();
+      if (userTip) userTip.setContent(t('tooltip_you'));
+    }
+    if (state.targetMarkers && state.targetMarkers.length) {
+      state.targetMarkers.forEach(function (m) {
+        var tip = m.getTooltip && m.getTooltip();
+        var tierKey = m._tier ? 'tier_' + m._tier : 'tier_epic';
+        if (tip) tip.setContent(t(tierKey));
+      });
+    }
+    if (state.visitedMarkers && state.visitedMarkers.length) {
+      state.visitedMarkers.forEach(function (m) {
+        var tip = m.getTooltip && m.getTooltip();
+        if (tip && m._placeName) tip.setContent(m._placeName + t('tooltip_visited'));
+      });
+    }
+    if (typeof updateDistanceHint === 'function') updateDistanceHint();
+    if (typeof updateDebugPanel === 'function') updateDebugPanel();
+    if (typeof updateRevealButton === 'function') updateRevealButton();
+    if (typeof renderExperiencePanel === 'function') renderExperiencePanel();
+  }
+
   var XP_TIERS = {
     casual: { xp: 10, label: 'Casual' },
     epic: { xp: 50, label: 'Epic' },
     legendary: { xp: 100, label: 'Legendary' }
   };
 
+  /** Tier na podstawie wybranego zasięgu (np. do wyświetlania prognozy). */
   function getTierFromKm(km) {
     if (km <= 1) return 'casual';
     if (km <= 2) return 'epic';
+    return 'legendary';
+  }
+
+  /** Tier na podstawie rzeczywistej odległości do miejsca (w metrach) – im dalej, tym wyższy tier. */
+  function getTierFromDistanceMeters(meters) {
+    var km = meters / 1000;
+    if (km <= 0.6) return 'casual';
+    if (km <= 1.5) return 'epic';
     return 'legendary';
   }
 
@@ -78,14 +132,14 @@
       var tierClass = 'exp-tier-' + (entry.tier || 'casual');
       li.innerHTML =
         '<span class="exp-place-name">' + escapeHtml(entry.name) + '</span>' +
-        '<span class="exp-tier ' + tierClass + '">' + (XP_TIERS[entry.tier] ? XP_TIERS[entry.tier].label : 'Casual') + '</span>' +
+        '<span class="exp-tier ' + tierClass + '">' + t('tier_' + (entry.tier || 'casual')) + '</span>' +
         '<span class="exp-xp">+' + (entry.xp || 0) + ' XP</span>';
       listEl.appendChild(li);
     });
     if (list.length === 0) {
       var empty = document.createElement('li');
       empty.className = 'exp-empty';
-      empty.textContent = 'Jeszcze nie odwiedziłeś żadnego miejsca. Rozpocznij spacer!';
+      empty.textContent = t('experience_empty');
       listEl.appendChild(empty);
     }
   }
@@ -100,8 +154,13 @@
   }
 
   var MAP_STYLE_FILTERS = {
-    standard: 'none',
-    noir: 'grayscale(1) contrast(1.35) brightness(0.9)'
+    noir: 'grayscale(1) contrast(1.35) brightness(0.9)',
+    vaporwave: 'hue-rotate(-75deg) saturate(1.6) contrast(1.05) brightness(1.02)'
+  };
+
+  var MAP_STYLE_ICONS = {
+    noir: { user: '🦇', attraction: '?', visited: '✔' },
+    vaporwave: { user: '🐰', attraction: '❤️', visited: '💜' }
   };
 
   var state = {
@@ -158,9 +217,38 @@
     return R * c;
   }
 
+  function getStyleIcons(style) {
+    return MAP_STYLE_ICONS[style] || MAP_STYLE_ICONS.noir;
+  }
+
+  function updateMarkerIcons() {
+    var style = state.mapStyle || 'noir';
+    var icons = getStyleIcons(style);
+    var container = document.getElementById('map-container');
+    if (!container) return;
+    var userEl = container.querySelector('.user-marker-fun');
+    if (userEl) userEl.textContent = icons.user;
+    container.querySelectorAll('.attraction-marker-pin').forEach(function (el) {
+      el.textContent = icons.attraction;
+    });
+    container.querySelectorAll('.visited-marker-pin').forEach(function (el) {
+      el.textContent = icons.visited;
+    });
+  }
+
+  function applyTheme() {
+    var style = state.mapStyle || 'noir';
+    if (document.body) document.body.setAttribute('data-theme', style);
+  }
+
   function applyMapStyle() {
-    var style = state.mapStyle || 'standard';
-    var filter = MAP_STYLE_FILTERS[style] || 'none';
+    var style = state.mapStyle || 'noir';
+    applyTheme();
+    var filter = MAP_STYLE_FILTERS[style] || MAP_STYLE_FILTERS.noir;
+    var container = document.getElementById('map-container');
+    if (container) {
+      container.className = 'map-container map-style-' + style;
+    }
     if (state.map && state.map.getPanes) {
       var tilePane = state.map.getPanes().tilePane;
       if (tilePane) {
@@ -168,6 +256,7 @@
         tilePane.style.filter = filter;
       }
     }
+    updateMarkerIcons();
     var sel = document.getElementById('map-style-select');
     if (sel) sel.value = style;
   }
@@ -214,8 +303,9 @@
     }
     styleButtons.forEach(function (btn) {
       btn.addEventListener('click', function () {
-        state.mapStyle = btn.getAttribute('data-style') || 'standard';
+        state.mapStyle = btn.getAttribute('data-style') || 'noir';
         updateMapStyleSelection();
+        applyTheme();
       });
     });
     updateMapStyleSelection();
@@ -246,9 +336,9 @@
   }
 
   function startWalk() {
-    setStatus('Pobieram Twoją lokalizację…', '');
+    setStatus(t('status_getting_location'), '');
     if (!navigator.geolocation) {
-      setStatus('Twoja przeglądarka nie obsługuje geolokalizacji.', '');
+      setStatus(t('status_no_geolocation'), '');
       return;
     }
 
@@ -259,8 +349,7 @@
         initMapAndSearch();
       },
       function (err) {
-        var msg = 'Brak dostępu do lokalizacji. Włącz GPS i odśwież.';
-        if (err.code === 1) msg = 'Potrzebujemy zgody na lokalizację.';
+        var msg = err.code === 1 ? t('status_location_denied') : t('status_location_error');
         setStatus(msg, '');
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
@@ -274,7 +363,7 @@
         searchAndPickPlace();
       })
       .catch(function (err) {
-        setStatus(err.message || 'Błąd ładowania mapy', '');
+        setStatus(err.message || t('status_map_load_error'), '');
       });
   }
 
@@ -290,17 +379,19 @@
     applyMapStyle();
     var styleSelect = document.getElementById('map-style-select');
     if (styleSelect) {
-      styleSelect.value = state.mapStyle || 'standard';
+      styleSelect.value = state.mapStyle || 'noir';
     }
 
+    var userIconChar = getStyleIcons(state.mapStyle || 'noir').user;
+    var userTitle = t('tooltip_you_short').replace(/"/g, '&quot;');
     var userIcon = L.divIcon({
       className: 'user-marker',
-      html: '<span class="user-marker-fun" title="Ty">🚶</span>',
+      html: '<span class="user-marker-fun" title="' + userTitle + '">' + userIconChar + '</span>',
       iconSize: [36, 36],
       iconAnchor: [18, 18]
     });
     state.userMarker = L.marker([center.lat, center.lng], { icon: userIcon }).addTo(state.map);
-    state.userMarker.bindTooltip('Ty – tu jesteś', { permanent: false });
+    state.userMarker.bindTooltip(t('tooltip_you'), { permanent: false });
   }
 
   function fetchPlacesFromOverpass(lat, lng, radiusMeters) {
@@ -348,7 +439,7 @@
   function searchAndPickPlace() {
     show($('loading-place'), true);
     show($('walking-info'), false);
-    setStatus('Szukam miejsc w okolicy…', '');
+    setStatus(t('status_searching'), '');
 
     var radiusMeters = Math.round(state.selectedKm * 1000);
     var lat = state.userPosition.lat;
@@ -367,7 +458,7 @@
           state.targetPlaces = [];
           updateDebugPanel();
           show($('loading-place'), false);
-          setStatus('Brak ciekawych miejsc w tym zasięgu. Spróbuj większego dystansu.', '');
+          setStatus(t('status_no_places'), '');
           return;
         }
         state.debugFoundPlaces = withCoords.map(function (el) {
@@ -400,7 +491,7 @@
         show($('walking-info'), true);
         show($('map-style-bar'), true);
         show($('btn-simulate-arrival'), true);
-        setStatus('Wszystkie atrakcje na mapie. Podejdź do dowolnej – sama się ujawni.', '');
+        setStatus(t('status_all_on_map'), '');
         show($('btn-experience-map'), true);
         startWatching();
       })
@@ -410,7 +501,7 @@
         state.targetPlaces = [];
         updateDebugPanel();
         show($('loading-place'), false);
-        setStatus('Błąd wyszukiwania miejsc. Sprawdź internet i spróbuj ponownie.', '');
+        setStatus(t('status_search_error'), '');
       });
   }
 
@@ -419,7 +510,7 @@
     var distHint = $('hint-distance');
     if (!state.targetPlaces.length) return;
     var collected = Object.keys(state.collectedIndices).length;
-    if (hint) hint.textContent = 'Zebrane: ' + collected + '/' + state.targetPlaces.length;
+    if (hint) hint.textContent = t('walk_hint_collected', { count: collected, total: state.targetPlaces.length });
     if (distHint && state.userPosition) {
       var nearest = Infinity;
       for (var i = 0; i < state.targetPlaces.length; i++) {
@@ -427,7 +518,7 @@
         var d = haversine(state.userPosition.lat, state.userPosition.lng, state.targetPlaces[i].lat, state.targetPlaces[i].lng);
         if (d < nearest) nearest = d;
       }
-      distHint.textContent = nearest === Infinity ? 'Wszystkie zebrane!' : 'Do najbliższej atrakcji: ' + Math.round(nearest) + ' m';
+      distHint.textContent = nearest === Infinity ? t('walk_hint_all_collected') : t('walk_hint_distance_to_goal', { m: Math.round(nearest) });
     }
   }
 
@@ -436,13 +527,13 @@
     var summary = $('debug-summary');
     if (!panel || !summary) return;
     if (state.debugFoundPlaces.length === 0) {
-      summary.textContent = 'Brak wyszukania (rozpocznij spacer).';
+      summary.textContent = t('debug_summary_empty');
       panel.innerHTML = '';
       return;
     }
     var n = state.targetPlaces.length;
     var collected = Object.keys(state.collectedIndices).length;
-    summary.textContent = 'Znaleziono: ' + state.debugFoundPlaces.length + ' miejsc. Atrakcji: ' + n + ', zebrane: ' + collected + '/' + n + '.';
+    summary.textContent = t('debug_summary_found', { n: state.debugFoundPlaces.length, m: n, c: collected });
     panel.innerHTML = '';
     var currentTarget = state.targetPlace;
     state.debugFoundPlaces.forEach(function (place, i) {
@@ -501,7 +592,7 @@
         checkDistances();
       },
       function () {
-        setStatus('Błąd odświeżania pozycji.', '');
+        setStatus(t('status_position_error'), '');
       },
       { enableHighAccuracy: true, maximumAge: 0 }
     );
@@ -521,17 +612,21 @@
     });
     state.visitedMarkers = [];
 
+    var attractionChar = getStyleIcons(state.mapStyle || 'noir').attraction;
     state.targetPlaces.forEach(function (place, i) {
       var num = i + 1;
+      var distM = state.userPosition ? haversine(state.userPosition.lat, state.userPosition.lng, place.lat, place.lng) : 0;
+      var tier = getTierFromDistanceMeters(distM);
       var icon = L.divIcon({
         className: 'attraction-marker',
-        html: '<span class="attraction-marker-pin" data-num="' + num + '">⭐</span>',
+        html: '<span class="attraction-marker-pin" data-num="' + num + '">' + attractionChar + '</span>',
         iconSize: [32, 32],
         iconAnchor: [16, 32]
       });
       var marker = L.marker([place.lat, place.lng], { icon: icon }).addTo(state.map);
-      marker.bindTooltip(place.name, { permanent: false });
       marker._placeIndex = i;
+      marker._tier = tier;
+      marker.bindTooltip(t('tier_' + tier), { permanent: false });
       state.targetMarkers.push(marker);
     });
 
@@ -554,14 +649,16 @@
 
   function addVisitedMarker(place) {
     if (!state.map || !place) return;
+    var visitedChar = getStyleIcons(state.mapStyle || 'noir').visited;
     var icon = L.divIcon({
       className: 'visited-marker',
-      html: '<span class="visited-marker-pin">✓</span>',
+      html: '<span class="visited-marker-pin">' + visitedChar + '</span>',
       iconSize: [24, 24],
       iconAnchor: [12, 24]
     });
     var marker = L.marker([place.lat, place.lng], { icon: icon }).addTo(state.map);
-    marker.bindTooltip(place.name + ' (odwiedzone)', { permanent: false });
+    marker._placeName = place.name;
+    marker.bindTooltip(place.name + t('tooltip_visited'), { permanent: false });
     state.visitedMarkers.push(marker);
   }
 
@@ -606,9 +703,9 @@
     var collected = Object.keys(state.collectedIndices).length;
     var total = state.targetPlaces.length;
     if (collected < total) {
-      btn.textContent = 'Wróć do mapy';
+      btn.textContent = t('reveal_btn_back');
     } else {
-      btn.textContent = 'Zakończ spacer';
+      btn.textContent = t('reveal_btn_end');
     }
   }
 
@@ -625,7 +722,7 @@
     show($('walking-info'), true);
     show($('map-style-bar'), true);
     show($('btn-simulate-arrival'), true);
-    setStatus('Podejdź do kolejnej atrakcji.', '');
+    setStatus(t('status_go_to_next'), '');
     startWatching();
   }
 
@@ -654,7 +751,7 @@
     var ciekawostkiEl = document.getElementById('reveal-ciekawostki');
     var funfactEl = document.getElementById('reveal-funfact');
     if (nameEl) nameEl.textContent = state.targetPlace.name;
-    if (descEl) descEl.textContent = state.targetPlace.desc || 'Brak opisu.';
+    if (descEl) descEl.textContent = state.targetPlace.desc || t('reveal_desc_placeholder');
     if (photoEl) {
       photoEl.innerHTML = '';
       photoEl.classList.add('no-photo');
@@ -663,7 +760,9 @@
 
     updateRevealButton();
 
-    saveExperienceEntry(state.targetPlace, getTierFromKm(state.selectedKm));
+    var distanceM = state.userPosition ? haversine(state.userPosition.lat, state.userPosition.lng, state.targetPlace.lat, state.targetPlace.lng) : 0;
+    var tier = getTierFromDistanceMeters(distanceM);
+    saveExperienceEntry(state.targetPlace, tier);
 
     fetchWikipediaCiekawostki(state.targetPlace.lat, state.targetPlace.lng, state.targetPlace.name, function (extract, imgUrl) {
       if (imgUrl && photoEl) {
@@ -753,22 +852,22 @@
     var startTime = performance.now();
 
     function tick(now) {
-      var t = (now - startTime) / SIMULATE_WALK_MS;
-      if (t >= 1) {
+      var progress = (now - startTime) / SIMULATE_WALK_MS;
+      if (progress >= 1) {
         state.userPosition = { lat: endLat, lng: endLng };
         state.userMarker.setLatLng([endLat, endLng]);
         state.map.panTo([endLat, endLng]);
         if (doneCallback) doneCallback();
         return;
       }
-      var ease = t * t * (3 - 2 * t);
+      var ease = progress * progress * (3 - 2 * progress);
       var lat = startLat + (endLat - startLat) * ease;
       var lng = startLng + (endLng - startLng) * ease;
       state.userPosition = { lat: lat, lng: lng };
       state.userMarker.setLatLng([lat, lng]);
       var dist = haversine(lat, lng, endLat, endLng);
       var hint = document.getElementById('hint-distance');
-      if (hint) hint.textContent = 'Odległość do celu: ' + Math.round(dist) + ' m (symulacja…)';
+      if (hint) hint.textContent = t('simulate_distance', { m: Math.round(dist) });
       state.map.panTo([lat, lng]);
       requestAnimationFrame(tick);
     }
@@ -781,7 +880,7 @@
       if (!state.collectedIndices[i]) indices.push(i);
     }
     if (indices.length === 0) {
-      setStatus('Wszystkie atrakcje już zebrane.', '');
+      setStatus(t('status_all_collected'), '');
       return;
     }
     var idx = indices[Math.floor(Math.random() * indices.length)];
@@ -801,6 +900,24 @@
   }
 
   function init() {
+    applyLocale();
+    applyTheme();
+    document.querySelectorAll('.btn-lang').forEach(function (b) {
+      b.classList.toggle('selected', b.getAttribute('data-lang') === (window.CURRENT_LOCALE || 'pl'));
+    });
+    document.querySelectorAll('.btn-lang').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var lang = this.getAttribute('data-lang');
+        if (!lang || !window.LOCALES || !window.LOCALES[lang]) return;
+        window.CURRENT_LOCALE = lang;
+        if (window.setStoredLang) window.setStoredLang(lang);
+        applyLocale();
+        document.querySelectorAll('.btn-lang').forEach(function (b) {
+          b.classList.toggle('selected', b.getAttribute('data-lang') === lang);
+        });
+      });
+    });
+
     var btnReveal = $('btn-reveal-action');
     if (btnReveal) btnReveal.addEventListener('click', function () {
       var collected = Object.keys(state.collectedIndices).length;
@@ -822,7 +939,7 @@
     var styleSelect = document.getElementById('map-style-select');
     if (styleSelect) {
       styleSelect.addEventListener('change', function () {
-        state.mapStyle = styleSelect.value || 'standard';
+        state.mapStyle = styleSelect.value || 'noir';
         applyMapStyle();
       });
     }
