@@ -1,0 +1,79 @@
+/**
+ * Persystencja: motyw (tryb) oraz doświadczenie per tryb.
+ */
+(function () {
+  'use strict';
+  var Sp = window.Spacerek;
+  var state = Sp.state;
+  var config = Sp.config;
+  var getCurrentMode = Sp.getCurrentMode;
+
+  function getStoredTheme() {
+    try {
+      var s = localStorage.getItem(config.STORAGE_KEY_THEME);
+      return config.VALID_STYLES.indexOf(s) >= 0 ? s : 'noir';
+    } catch (e) { return 'noir'; }
+  }
+
+  function setStoredTheme(theme) {
+    try {
+      localStorage.setItem(config.STORAGE_KEY_THEME, theme);
+    } catch (e) {}
+  }
+
+  function getExperienceRaw() {
+    try {
+      var raw = localStorage.getItem(config.STORAGE_KEY);
+      if (!raw) return {};
+      var data = JSON.parse(raw);
+      if (Array.isArray(data)) {
+        return { spacerek: data, przygoda: [] };
+      }
+      return data;
+    } catch (e) {
+      return {};
+    }
+  }
+
+  function getExperience(mode) {
+    var data = getExperienceRaw();
+    var m = mode || getCurrentMode();
+    return Array.isArray(data[m]) ? data[m] : [];
+  }
+
+  function saveExperienceEntry(place, tier, xpConfig) {
+    var data = getExperienceRaw();
+    var m = getCurrentMode();
+    if (!Array.isArray(data[m])) data[m] = [];
+    var cfg = xpConfig || { xp: 10 };
+    data[m].push({
+      name: place.name,
+      desc: place.desc || '',
+      lat: place.lat,
+      lng: place.lng,
+      tier: tier,
+      xp: cfg.xp,
+      collectedAt: new Date().toISOString()
+    });
+    try {
+      localStorage.setItem(config.STORAGE_KEY, JSON.stringify(data));
+    } catch (e) {}
+  }
+
+  function clearStorage(renderExperiencePanel) {
+    try {
+      var data = getExperienceRaw();
+      var m = getCurrentMode();
+      data[m] = [];
+      localStorage.setItem(config.STORAGE_KEY, JSON.stringify(data));
+      if (typeof renderExperiencePanel === 'function') renderExperiencePanel();
+    } catch (e) {}
+  }
+
+  Sp.getStoredTheme = getStoredTheme;
+  Sp.setStoredTheme = setStoredTheme;
+  Sp.getExperienceRaw = getExperienceRaw;
+  Sp.getExperience = getExperience;
+  Sp.saveExperienceEntry = saveExperienceEntry;
+  Sp.clearStorage = clearStorage;
+})();

@@ -2,8 +2,10 @@
 <html lang="pl">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#1a1a2e" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <title>Spacerek – spacer w ciemno</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="styles.css" />
@@ -15,7 +17,7 @@
       <div class="start-content">
         <h1>Spacerek</h1>
         <p class="tagline" data-i18n="start_tagline">Odkryj miejsce w okolicy – spacer w ciemno</p>
-        <p class="instruction" data-i18n="start_instruction_distance">Wybierz zasięg spaceru:</p>
+        <p class="instruction" id="instruction-distance">Wybierz zasięg spaceru:</p>
         <div class="distance-buttons">
           <button type="button" class="btn-distance" data-km="0.5">500 m</button>
           <button type="button" class="btn-distance" data-km="1">1 km</button>
@@ -26,10 +28,10 @@
           <input type="range" id="num-attractions" class="attractions-slider" min="1" max="10" value="5" />
           <span id="num-attractions-value" class="attractions-value">5</span>
         </div>
-        <p class="instruction instruction-map-style" data-i18n="start_instruction_map_style">Styl mapy:</p>
+        <p class="instruction instruction-map-style" data-i18n="start_instruction_map_style">Tryb:</p>
         <div class="map-style-buttons">
-          <button type="button" class="btn-map-style" data-style="noir" data-i18n-title="start_style_noir_title" title="Czarno-biała">Noir</button>
-          <button type="button" class="btn-map-style" data-style="vaporwave" data-i18n-title="start_style_vaporwave_title" title="Vaporwave">Vaporwave</button>
+          <button type="button" class="btn-map-style" data-style="noir" data-i18n="mode_noir" data-i18n-title="mode_noir" title="Przygoda">Przygoda</button>
+          <button type="button" class="btn-map-style" data-style="vaporwave" data-i18n="mode_vaporwave" data-i18n-title="mode_vaporwave" title="Spacerek">Spacerek</button>
         </div>
         <button type="button" id="btn-start" class="btn-primary" disabled data-i18n="start_btn_start">Rozpocznij spacer</button>
         <button type="button" id="btn-experience" class="btn-experience" data-i18n-title="start_btn_experience_title" data-i18n="start_btn_experience" title="Twoje doświadczenie">🏆 Twoje doświadczenie</button>
@@ -49,10 +51,10 @@
           <span id="distance-text"></span>
         </div>
         <div id="map-style-bar" class="map-style-bar hidden">
-          <span class="map-style-label" data-i18n="map_style_label">Styl:</span>
-          <select id="map-style-select" class="map-style-select" data-i18n-title="map_style_select_title" title="Zmień styl mapy">
-            <option value="noir">Noir</option>
-            <option value="vaporwave">Vaporwave</option>
+          <span class="map-style-label" data-i18n="map_style_label">Tryb:</span>
+          <select id="map-style-select" class="map-style-select" data-i18n-title="map_style_select_title" title="Zmień tryb">
+            <option value="noir">Przygoda</option>
+            <option value="vaporwave">Spacerek</option>
           </select>
         </div>
         <div id="loading-place" class="loading-box hidden">
@@ -101,6 +103,7 @@
       <div class="experience-panel">
         <div class="experience-header">
           <h2 data-i18n="experience_title">🏆 Twoje doświadczenie</h2>
+          <p class="experience-mode-name" id="experience-mode-name" aria-hidden="true"></p>
           <button type="button" id="btn-experience-close" class="btn-experience-close" data-i18n-title="experience_btn_close_title" title="Zamknij">×</button>
         </div>
         <div class="experience-stats">
@@ -116,7 +119,18 @@
   </div>
 
   <script src="locales.js"></script>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
-  <script src="app.js" defer></script>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
+  <script src="js/config.js"></script>
+  <script src="js/state.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/experience.js"></script>
+  <script src="js/mapStyle.js"></script>
+  <script src="js/locale.js"></script>
+  <script src="js/places.js"></script>
+  <script src="js/wiki.js"></script>
+  <script src="js/map.js"></script>
+  <script src="js/walk.js"></script>
+  <script src="js/simulate.js"></script>
+  <script src="js/main.js"></script>
 </body>
 </html>

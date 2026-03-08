@@ -446,6 +446,9 @@ body[data-theme="vaporwave"] #btn-simulate-arrival.btn-simulate-arrival-fab:hove
 #status-text {
   font-size: 0.9rem;
   color: var(--text);
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 #distance-text {
@@ -842,6 +845,12 @@ body[data-theme="vaporwave"] .btn-experience-fab:hover {
 .experience-header h2 {
   font-size: 1.25rem;
   color: var(--text);
+}
+
+.experience-mode-name {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 2px 0 0 0;
 }
 
 .btn-experience-close {

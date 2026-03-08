@@ -1,0 +1,395 @@
+/**
+ * Spacer: geolokacja, śledzenie odległości, dojście, odkrywanie miejsca, Wikipedia.
+ */
+(function () {
+  'use strict';
+  var Sp = window.Spacerek;
+  var state = Sp.state;
+  var config = Sp.config;
+  var $ = Sp.$;
+  var show = Sp.show;
+  var showScreen = Sp.showScreen;
+  var haversine = Sp.haversine;
+  var escapeHtml = Sp.escapeHtml;
+  var fetchPlacesFromOverpass = Sp.fetchPlacesFromOverpass;
+  var shuffleArray = Sp.shuffleArray;
+  var loadLeaflet = Sp.loadLeaflet;
+  var initMap = Sp.initMap;
+  var addAllTargetMarkers = Sp.addAllTargetMarkers;
+  var removeTargetMarkerAt = Sp.removeTargetMarkerAt;
+  var addVisitedMarker = Sp.addVisitedMarker;
+  var getTierFromDistanceMeters = Sp.getTierFromDistanceMeters;
+  var XP_TIERS = Sp.XP_TIERS;
+  var saveExperienceEntry = Sp.saveExperienceEntry;
+  var fetchWikipediaCiekawostki = Sp.fetchWikipediaCiekawostki;
+
+  function t(key, replacements) {
+    return window.t ? window.t(key, replacements) : key;
+  }
+
+  function isInsecureContext() {
+    return (typeof location !== 'undefined' && location.protocol === 'http:' &&
+      location.hostname !== 'localhost' && location.hostname !== '127.0.0.1');
+  }
+
+  function isIOS() {
+    return typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent || '');
+  }
+
+  function setStatus(text, distanceText) {
+    var st = $('status-text');
+    var dt = $('distance-text');
+    if (st) st.textContent = text;
+    if (dt) dt.textContent = distanceText || '';
+  }
+
+  function updateDistanceHint() {
+    var hint = $('hint-attraction-num');
+    var distHint = $('hint-distance');
+    if (!state.targetPlaces.length) return;
+    var collected = Object.keys(state.collectedIndices).length;
+    if (hint) hint.textContent = t('walk_hint_collected', { count: collected, total: state.targetPlaces.length });
+    if (distHint && state.userPosition) {
+      var nearest = Infinity;
+      for (var i = 0; i < state.targetPlaces.length; i++) {
+        if (state.collectedIndices[i]) continue;
+        var d = haversine(state.userPosition.lat, state.userPosition.lng, state.targetPlaces[i].lat, state.targetPlaces[i].lng);
+        if (d < nearest) nearest = d;
+      }
+      distHint.textContent = nearest === Infinity ? t('walk_hint_all_collected') : t('walk_hint_distance_to_goal', { m: Math.round(nearest) });
+    }
+  }
+
+  function updateDebugPanel() {
+    var panel = $('debug-panel-body');
+    var summary = $('debug-summary');
+    if (!panel || !summary) return;
+    if (state.debugFoundPlaces.length === 0) {
+      summary.textContent = t('debug_summary_empty');
+      panel.innerHTML = '';
+      return;
+    }
+    var n = state.targetPlaces.length;
+    var collected = Object.keys(state.collectedIndices).length;
+    summary.textContent = t('debug_summary_found', { n: state.debugFoundPlaces.length, m: n, c: collected });
+    panel.innerHTML = '';
+    var currentTarget = state.targetPlace;
+    state.debugFoundPlaces.forEach(function (place, i) {
+      var isCurrent = currentTarget && place.lat === currentTarget.lat && place.lon === currentTarget.lng;
+      var row = document.createElement('div');
+      row.className = 'debug-row' + (isCurrent ? ' debug-chosen' : '');
+      row.innerHTML = '<span class="debug-num">' + (i + 1) + '.</span> ' +
+        '<strong>' + escapeHtml(place.name) + '</strong> ' +
+        '<span class="debug-type">(' + escapeHtml(place.type) + ')</span> ' +
+        '<span class="debug-coords">' + place.lat.toFixed(5) + ', ' + place.lon.toFixed(5) + '</span>';
+      panel.appendChild(row);
+    });
+  }
+
+  function startWatching() {
+    if (state.watchId != null) return;
+
+    function checkDistances() {
+      if (!state.userPosition || !state.targetPlaces.length) return;
+      for (var i = 0; i < state.targetPlaces.length; i++) {
+        if (state.collectedIndices[i]) continue;
+        var place = state.targetPlaces[i];
+        var dist = haversine(
+          state.userPosition.lat,
+          state.userPosition.lng,
+          place.lat,
+          place.lng
+        );
+        if (dist < config.ARRIVAL_METERS) {
+          state.targetPlace = place;
+          state.targetPlaceIndex = i;
+          state.collectedIndices[i] = true;
+          removeTargetMarkerAt(i);
+          addVisitedMarker(place);
+          navigator.geolocation.clearWatch(state.watchId);
+          state.watchId = null;
+          revealPlace();
+          return;
+        }
+      }
+      updateDistanceHint();
+    }
+
+    state.watchId = navigator.geolocation.watchPosition(
+      function (pos) {
+        state.userPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        if (state.userMarker) {
+          state.userMarker.setLatLng([state.userPosition.lat, state.userPosition.lng]);
+        }
+        checkDistances();
+      },
+      function () {
+        setStatus(t('status_position_error'), '');
+      },
+      { enableHighAccuracy: true, maximumAge: 0 }
+    );
+
+    updateDistanceHint();
+  }
+
+  function searchAndPickPlace() {
+    show($('loading-place'), true);
+    show($('walking-info'), false);
+    setStatus(t('status_searching'), '');
+
+    var radiusMeters = Math.round(state.selectedKm * 1000);
+    var lat = state.userPosition.lat;
+    var lng = state.userPosition.lng;
+    var wanted = Math.min(state.numAttractions, 10);
+
+    fetchPlacesFromOverpass(lat, lng, radiusMeters)
+      .then(function (data) {
+        var elements = data.elements || [];
+        var withCoords = elements.filter(function (el) {
+          return el.lat != null && el.lon != null && el.tags && el.tags.name;
+        });
+        if (withCoords.length === 0) {
+          state.debugFoundPlaces = [];
+          state.debugChosenIndex = -1;
+          state.targetPlaces = [];
+          updateDebugPanel();
+          show($('loading-place'), false);
+          setStatus(t('status_no_places'), '');
+          return;
+        }
+        state.debugFoundPlaces = withCoords.map(function (el) {
+          var tag = el.tags || {};
+          return {
+            name: tag.name || '(bez nazwy)',
+            lat: el.lat,
+            lon: el.lon,
+            type: [tag.tourism, tag.amenity, tag.leisure, tag.historic].filter(Boolean).join(', ') || '–'
+          };
+        });
+        var shuffled = shuffleArray(withCoords);
+        var take = Math.min(wanted, shuffled.length);
+        state.targetPlaces = shuffled.slice(0, take).map(function (el) {
+          var tags = el.tags || {};
+          return {
+            lat: el.lat,
+            lng: el.lon,
+            name: tags.name || 'Miejsce',
+            desc: [tags.tourism, tags.amenity, tags.leisure, tags.historic].filter(Boolean).join(' • ') || tags.addr_street || 'OpenStreetMap'
+          };
+        });
+        state.targetPlaceIndex = 0;
+        state.targetPlace = null;
+        state.debugChosenIndex = withCoords.indexOf(shuffled[0]);
+        updateDebugPanel();
+        addAllTargetMarkers();
+        updateDistanceHint();
+        show($('loading-place'), false);
+        show($('walking-info'), true);
+        show($('map-style-bar'), true);
+        show($('btn-simulate-arrival'), true);
+        setStatus(t('status_all_on_map'), '');
+        show($('btn-experience-map'), true);
+        startWatching();
+      })
+      .catch(function () {
+        state.debugFoundPlaces = [];
+        state.debugChosenIndex = -1;
+        state.targetPlaces = [];
+        updateDebugPanel();
+        show($('loading-place'), false);
+        setStatus(t('status_search_error'), '');
+      });
+  }
+
+  function updateRevealButton() {
+    var btn = $('btn-reveal-action');
+    if (!btn) return;
+    var collected = Object.keys(state.collectedIndices).length;
+    var total = state.targetPlaces.length;
+    if (collected < total) {
+      btn.textContent = t('reveal_btn_back');
+    } else {
+      btn.textContent = t('reveal_btn_end');
+    }
+  }
+
+  function backToMap() {
+    var ro = document.getElementById('reveal-overlay');
+    if (ro) {
+      ro.classList.add('hidden');
+      ro.style.display = 'none';
+      ro.style.visibility = 'hidden';
+    }
+    state.targetPlace = null;
+    updateDebugPanel();
+    updateDistanceHint();
+    show($('walking-info'), true);
+    show($('map-style-bar'), true);
+    show($('btn-simulate-arrival'), true);
+    setStatus(t('status_go_to_next'), '');
+    startWatching();
+  }
+
+  function revealPlace() {
+    show($('btn-simulate-arrival'), false);
+    show($('map-style-bar'), false);
+    state.map.panTo([state.targetPlace.lat, state.targetPlace.lng]);
+
+    var arrivalEl = document.getElementById('arrival-overlay');
+    var revealEl = document.getElementById('reveal-overlay');
+    if (revealEl) {
+      revealEl.classList.add('hidden');
+      revealEl.style.display = 'none';
+      revealEl.style.visibility = 'hidden';
+    }
+    if (arrivalEl) {
+      arrivalEl.classList.remove('hidden');
+      arrivalEl.style.display = 'flex';
+      arrivalEl.style.visibility = 'visible';
+      arrivalEl.style.zIndex = '99999';
+    }
+
+    var nameEl = document.getElementById('reveal-name');
+    var descEl = document.getElementById('reveal-desc');
+    var photoEl = document.getElementById('reveal-photo');
+    var ciekawostkiEl = document.getElementById('reveal-ciekawostki');
+    var funfactEl = document.getElementById('reveal-funfact');
+    if (nameEl) nameEl.textContent = state.targetPlace.name;
+    if (descEl) descEl.textContent = state.targetPlace.desc || t('reveal_desc_placeholder');
+    if (photoEl) {
+      photoEl.innerHTML = '';
+      photoEl.classList.add('no-photo');
+    }
+    if (ciekawostkiEl) { ciekawostkiEl.classList.add('hidden'); }
+
+    updateRevealButton();
+
+    var distanceM = state.userPosition ? haversine(state.userPosition.lat, state.userPosition.lng, state.targetPlace.lat, state.targetPlace.lng) : 0;
+    var tier = getTierFromDistanceMeters(distanceM);
+    var xpConfig = XP_TIERS[tier] || XP_TIERS.casual;
+    saveExperienceEntry(state.targetPlace, tier, xpConfig);
+
+    fetchWikipediaCiekawostki(state.targetPlace.lat, state.targetPlace.lng, state.targetPlace.name, function (extract, imgUrl) {
+      if (imgUrl && photoEl) {
+        photoEl.classList.remove('no-photo');
+        photoEl.innerHTML = '<img src="' + imgUrl.replace(/^http:/, 'https:') + '" alt="" loading="lazy" />';
+      }
+      if (extract && funfactEl && ciekawostkiEl) {
+        funfactEl.textContent = extract;
+        ciekawostkiEl.classList.remove('hidden');
+      }
+    });
+
+    setTimeout(function () {
+      var a = document.getElementById('arrival-overlay');
+      var r = document.getElementById('reveal-overlay');
+      if (a) {
+        a.classList.add('hidden');
+        a.style.display = 'none';
+        a.style.visibility = 'hidden';
+      }
+      if (r) {
+        r.classList.remove('hidden');
+        r.style.display = 'flex';
+        r.style.visibility = 'visible';
+        r.style.zIndex = '99998';
+      }
+    }, 1400);
+  }
+
+  function resetWalk() {
+    if (state.watchId != null) {
+      navigator.geolocation.clearWatch(state.watchId);
+      state.watchId = null;
+    }
+    state.targetPlace = null;
+    state.targetPlaces = [];
+    state.targetPlaceIndex = 0;
+    state.collectedIndices = {};
+    state.userPosition = null;
+    state.targetMarkers.forEach(function (m) {
+      if (state.map && state.map.hasLayer(m)) state.map.removeLayer(m);
+    });
+    state.targetMarkers = [];
+    state.visitedMarkers.forEach(function (m) {
+      if (state.map && state.map.hasLayer(m)) state.map.removeLayer(m);
+    });
+    state.visitedMarkers = [];
+    var ro = document.getElementById('reveal-overlay');
+    var ao = document.getElementById('arrival-overlay');
+    if (ro) { ro.classList.add('hidden'); ro.style.display = 'none'; ro.style.visibility = 'hidden'; }
+    if (ao) { ao.classList.add('hidden'); ao.style.display = 'none'; ao.style.visibility = 'hidden'; }
+    show($('loading-place'), false);
+    show($('walking-info'), false);
+    show($('map-style-bar'), false);
+    show($('btn-simulate-arrival'), false);
+    show($('btn-experience-map'), false);
+    state.debugFoundPlaces = [];
+    state.debugChosenIndex = -1;
+    updateDebugPanel();
+    showScreen('screen-start');
+    setStatus('', '');
+    document.querySelectorAll('.btn-distance').forEach(function (b) {
+      b.classList.remove('selected');
+      if (parseFloat(b.getAttribute('data-km')) === 1.9) b.classList.add('selected');
+    });
+    var numInput = document.getElementById('num-attractions');
+    var numValue = document.getElementById('num-attractions-value');
+    if (numInput && numValue) {
+      numInput.value = state.numAttractions;
+      numValue.textContent = state.numAttractions;
+    }
+    $('btn-start').disabled = false;
+    state.selectedKm = 1.9;
+  }
+
+  function startWalk() {
+    setStatus(t('status_getting_location'), '');
+    if (!navigator.geolocation) {
+      setStatus(t('status_no_geolocation'), '');
+      return;
+    }
+    if (isInsecureContext() && isIOS()) {
+      setStatus(t('ios_https_hint'), '');
+      return;
+    }
+
+    var timeoutMs = (isIOS() ? 18 : 10) * 1000;
+    navigator.geolocation.getCurrentPosition(
+      function (pos) {
+        state.userPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        showScreen('screen-walk');
+        initMapAndSearch();
+      },
+      function (err) {
+        var msg = (isInsecureContext() && isIOS()) ? t('ios_https_hint') : (err.code === 1 ? t('status_location_denied') : t('status_location_error'));
+        setStatus(msg, '');
+      },
+      { enableHighAccuracy: true, timeout: timeoutMs, maximumAge: 0 }
+    );
+  }
+
+  function initMapAndSearch() {
+    loadLeaflet()
+      .then(function () {
+        initMap();
+        searchAndPickPlace();
+      })
+      .catch(function (err) {
+        var msg = err && err.message === 'MAP_LOAD_TIMEOUT'
+          ? t('safari_use_server')
+          : (t('status_map_load_error') || err.message);
+        setStatus(msg, '');
+      });
+  }
+
+  Sp.setStatus = setStatus;
+  Sp.updateDistanceHint = updateDistanceHint;
+  Sp.updateDebugPanel = updateDebugPanel;
+  Sp.updateRevealButton = updateRevealButton;
+  Sp.backToMap = backToMap;
+  Sp.revealPlace = revealPlace;
+  Sp.resetWalk = resetWalk;
+  Sp.startWalk = startWalk;
+  Sp.initMapAndSearch = initMapAndSearch;
+})();
