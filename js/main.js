@@ -93,7 +93,7 @@
     }
     styleButtons.forEach(function (btn) {
       btn.addEventListener('click', function () {
-        state.mapStyle = btn.getAttribute('data-style') || 'noir';
+        state.mapStyle = btn.getAttribute('data-style') || 'adventure';
         setStoredTheme(state.mapStyle);
         updateMapStyleSelection();
         applyTheme();
@@ -167,7 +167,7 @@
     var styleSelect = document.getElementById('map-style-select');
     if (styleSelect) {
       styleSelect.addEventListener('change', function () {
-        state.mapStyle = styleSelect.value || 'noir';
+        state.mapStyle = styleSelect.value || 'adventure';
         setStoredTheme(state.mapStyle);
         applyMapStyle();
       });

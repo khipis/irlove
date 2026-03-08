@@ -13,7 +13,7 @@
   function updateDistanceInstruction() {
     var el = document.getElementById('instruction-distance');
     if (!el) return;
-    el.textContent = (state.mapStyle === 'noir' ? t('start_instruction_world_size') : t('start_instruction_distance'));
+    el.textContent = (state.mapStyle === 'adventure' ? t('start_instruction_world_size') : t('start_instruction_distance'));
   }
 
   function applyLocale(refreshDynamicLabels) {

@@ -30,8 +30,8 @@
         </div>
         <p class="instruction instruction-map-style" data-i18n="start_instruction_map_style">Tryb:</p>
         <div class="map-style-buttons">
-          <button type="button" class="btn-map-style" data-style="noir" data-i18n="mode_noir" data-i18n-title="mode_noir" title="Przygoda">Przygoda</button>
-          <button type="button" class="btn-map-style" data-style="vaporwave" data-i18n="mode_vaporwave" data-i18n-title="mode_vaporwave" title="Spacerek">Spacerek</button>
+          <button type="button" class="btn-map-style" data-style="adventure" data-i18n="mode_adventure" data-i18n-title="mode_adventure" title="Przygoda">Przygoda</button>
+          <button type="button" class="btn-map-style" data-style="stroll" data-i18n="mode_stroll" data-i18n-title="mode_stroll" title="Spacerek">Spacerek</button>
         </div>
         <button type="button" id="btn-start" class="btn-primary" disabled data-i18n="start_btn_start">Rozpocznij spacer</button>
         <button type="button" id="btn-experience" class="btn-experience" data-i18n-title="start_btn_experience_title" data-i18n="start_btn_experience" title="Twoje doświadczenie">🏆 Twoje doświadczenie</button>
@@ -44,7 +44,7 @@
 
     <!-- Ekran mapy i spaceru -->
     <section id="screen-walk" class="screen">
-      <div id="map-container" class="map-container map-style-noir"></div>
+      <div id="map-container" class="map-container map-style-adventure"></div>
       <div id="map-overlay">
         <div id="status-bar">
           <span id="status-text" data-i18n="map_status_loading">Ładowanie lokalizacji…</span>
@@ -53,8 +53,8 @@
         <div id="map-style-bar" class="map-style-bar hidden">
           <span class="map-style-label" data-i18n="map_style_label">Tryb:</span>
           <select id="map-style-select" class="map-style-select" data-i18n-title="map_style_select_title" title="Zmień tryb">
-            <option value="noir">Przygoda</option>
-            <option value="vaporwave">Spacerek</option>
+            <option value="adventure">Przygoda</option>
+            <option value="stroll">Spacerek</option>
           </select>
         </div>
         <div id="loading-place" class="loading-box hidden">

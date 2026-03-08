@@ -18,8 +18,8 @@
       start_btn_start: 'Rozpocznij spacer',
       start_btn_experience: '🏆 Twoje doświadczenie',
       start_btn_experience_title: 'Twoje doświadczenie',
-      mode_noir: 'Przygoda',
-      mode_vaporwave: 'Spacerek',
+      mode_adventure: 'Przygoda',
+      mode_stroll: 'Spacerek',
 
       // Map / status
       map_status_loading: 'Ładowanie lokalizacji…',
@@ -102,8 +102,8 @@
       start_btn_start: 'Start walk',
       start_btn_experience: '🏆 Your experience',
       start_btn_experience_title: 'Your experience',
-      mode_noir: 'Adventure',
-      mode_vaporwave: 'Stroll',
+      mode_adventure: 'Adventure',
+      mode_stroll: 'Stroll',
 
       map_status_loading: 'Loading location…',
       map_style_label: 'Mode:',

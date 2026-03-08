@@ -49,10 +49,10 @@
     applyMapStyle();
     var styleSelect = document.getElementById('map-style-select');
     if (styleSelect) {
-      styleSelect.value = state.mapStyle || 'noir';
+      styleSelect.value = state.mapStyle || 'adventure';
     }
 
-    var userIconChar = getStyleIcons(state.mapStyle || 'noir').user;
+    var userIconChar = getStyleIcons(state.mapStyle || 'adventure').user;
     var userTitle = t('tooltip_you_short').replace(/"/g, '&quot;');
     var userIcon = L.divIcon({
       className: 'user-marker',
@@ -77,7 +77,7 @@
     });
     state.visitedMarkers = [];
 
-    var attractionChar = getStyleIcons(state.mapStyle || 'noir').attraction;
+    var attractionChar = getStyleIcons(state.mapStyle || 'adventure').attraction;
     state.targetPlaces.forEach(function (place, i) {
       var num = i + 1;
       var distM = state.userPosition ? haversine(state.userPosition.lat, state.userPosition.lng, place.lat, place.lng) : 0;
@@ -115,7 +115,7 @@
   function addVisitedMarker(place) {
     if (!state.map || !place) return;
     var L = window.L;
-    var visitedChar = getStyleIcons(state.mapStyle || 'noir').visited;
+    var visitedChar = getStyleIcons(state.mapStyle || 'adventure').visited;
     var icon = L.divIcon({
       className: 'visited-marker',
       html: '<span class="visited-marker-pin">' + visitedChar + '</span>',

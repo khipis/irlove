@@ -13,7 +13,7 @@
     ARRIVAL_METERS: 50,
     STORAGE_KEY: 'spacerek_experience',
     STORAGE_KEY_THEME: 'spacerek_theme',
-    VALID_STYLES: ['noir', 'vaporwave'],
+    VALID_STYLES: ['adventure', 'stroll'],
     WIKI_API: 'https://pl.wikipedia.org/w/api.php',
     WIKI_MAX_DIST_M: 120,
     SIMULATE_WALK_MS: 2500

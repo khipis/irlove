@@ -11,8 +11,10 @@
   function getStoredTheme() {
     try {
       var s = localStorage.getItem(config.STORAGE_KEY_THEME);
-      return config.VALID_STYLES.indexOf(s) >= 0 ? s : 'noir';
-    } catch (e) { return 'noir'; }
+      if (s === 'noir') return 'adventure';
+      if (s === 'vaporwave') return 'stroll';
+      return config.VALID_STYLES.indexOf(s) >= 0 ? s : 'adventure';
+    } catch (e) { return 'adventure'; }
   }
 
   function setStoredTheme(theme) {

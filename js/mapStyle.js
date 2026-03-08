@@ -11,21 +11,21 @@
   }
 
   var MAP_STYLE_FILTERS = {
-    noir: 'grayscale(1) contrast(1.35) brightness(0.9)',
-    vaporwave: 'hue-rotate(-75deg) saturate(1.6) contrast(1.05) brightness(1.02)'
+    adventure: 'grayscale(1) contrast(1.35) brightness(0.9)',
+    stroll: 'hue-rotate(-75deg) saturate(1.6) contrast(1.05) brightness(1.02)'
   };
 
   var MAP_STYLE_ICONS = {
-    noir: { user: '🧙', attraction: '?', visited: '✔' },
-    vaporwave: { user: '🐰', attraction: '❤️', visited: '💜' }
+    adventure: { user: '🦸', attraction: '?', visited: '✔' },
+    stroll: { user: '🐰', attraction: '❤️', visited: '💜' }
   };
 
   function getStyleIcons(style) {
-    return MAP_STYLE_ICONS[style] || MAP_STYLE_ICONS.noir;
+    return MAP_STYLE_ICONS[style] || MAP_STYLE_ICONS.adventure;
   }
 
   function updateMarkerIcons() {
-    var style = state.mapStyle || 'noir';
+    var style = state.mapStyle || 'adventure';
     var icons = getStyleIcons(style);
     var container = document.getElementById('map-container');
     if (!container) return;
@@ -40,14 +40,14 @@
   }
 
   function applyTheme() {
-    var style = state.mapStyle || 'noir';
+    var style = state.mapStyle || 'adventure';
     if (document.body) document.body.setAttribute('data-theme', style);
   }
 
   function applyMapStyle() {
-    var style = state.mapStyle || 'noir';
+    var style = state.mapStyle || 'adventure';
     applyTheme();
-    var filter = MAP_STYLE_FILTERS[style] || MAP_STYLE_FILTERS.noir;
+    var filter = MAP_STYLE_FILTERS[style] || MAP_STYLE_FILTERS.adventure;
     var container = document.getElementById('map-container');
     if (container) {
       container.className = 'map-container map-style-' + style;

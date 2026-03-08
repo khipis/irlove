@@ -3,7 +3,7 @@
 
 /* ========== NOIR (domyślny) ========== */
 :root,
-body[data-theme="noir"] {
+body[data-theme="adventure"] {
   --bg: #0f0f14;
   --bg-card: #1a1a22;
   --bg-card-hover: #22222e;
@@ -28,7 +28,7 @@ body[data-theme="noir"] {
 }
 
 /* ========== VAPORWAVE ========== */
-body[data-theme="vaporwave"] {
+body[data-theme="stroll"] {
   --bg: #0d0a14;
   --bg-card: #1a1225;
   --bg-card-hover: #251a35;
@@ -331,7 +331,7 @@ body {
   background: var(--bg-card);
 }
 
-body[data-theme="vaporwave"] .map-container.map-style-vaporwave::after {
+body[data-theme="stroll"] .map-container.map-style-stroll::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -396,7 +396,7 @@ body[data-theme="vaporwave"] .map-container.map-style-vaporwave::after {
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-body[data-theme="vaporwave"] #btn-simulate-arrival.btn-simulate-arrival-fab {
+body[data-theme="stroll"] #btn-simulate-arrival.btn-simulate-arrival-fab {
   background: rgba(1, 205, 254, 0.25);
   border-color: #01cdfe;
   color: #01cdfe;
@@ -410,7 +410,7 @@ body[data-theme="vaporwave"] #btn-simulate-arrival.btn-simulate-arrival-fab {
   box-shadow: var(--shadow-lg);
 }
 
-body[data-theme="vaporwave"] #btn-simulate-arrival.btn-simulate-arrival-fab:hover {
+body[data-theme="stroll"] #btn-simulate-arrival.btn-simulate-arrival-fab:hover {
   background: #01cdfe;
   color: var(--bg);
   box-shadow: 0 0 24px rgba(1, 205, 254, 0.5);
@@ -593,15 +593,17 @@ body[data-theme="vaporwave"] #btn-simulate-arrival.btn-simulate-arrival-fab:hove
   box-shadow: var(--shadow);
 }
 
-/* Ikony per styl mapy (noir / vaporwave) – pozostawione jak były */
-.map-style-noir .user-marker-fun {
-  background: linear-gradient(145deg, #2d2d2d 0%, #1a1a1a 100%);
-  color: #e0e0e0;
-  border-color: #444;
-  border-width: 3px;
+/* Ikony per styl mapy (adventure / stroll) */
+.map-style-adventure .user-marker-fun {
+  background: linear-gradient(145deg, #2a2520 0%, #1a1612 100%);
+  color: #e8e0d8;
+  border: 3px solid #8b7355;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.8), 0 0 16px rgba(180, 140, 80, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  font-size: 28px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
 }
 
-.map-style-noir .attraction-marker-pin {
+.map-style-adventure .attraction-marker-pin {
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 22px;
   font-weight: bold;
@@ -612,20 +614,20 @@ body[data-theme="vaporwave"] #btn-simulate-arrival.btn-simulate-arrival-fab:hove
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.7));
 }
 
-.map-style-noir .visited-marker-pin {
+.map-style-adventure .visited-marker-pin {
   background: #444;
   color: #ccc;
   border-color: #666;
 }
 
-.map-style-vaporwave .user-marker-fun {
+.map-style-stroll .user-marker-fun {
   background: linear-gradient(145deg, #ff71ce 0%, #01cdfe 100%);
   color: #fff;
   border: 3px solid var(--bg);
   box-shadow: 0 0 16px rgba(255, 113, 206, 0.8), 0 0 0 2px rgba(0, 0, 0, 0.5);
 }
 
-.map-style-vaporwave .attraction-marker-pin {
+.map-style-stroll .attraction-marker-pin {
   font-size: 22px;
   line-height: 1;
   color: #ff1744;
@@ -636,7 +638,7 @@ body[data-theme="vaporwave"] #btn-simulate-arrival.btn-simulate-arrival-fab:hove
   filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.8));
 }
 
-.map-style-vaporwave .visited-marker-pin {
+.map-style-stroll .visited-marker-pin {
   background: linear-gradient(145deg, #b967ff 0%, #ff71ce 100%);
   color: #fff;
   border: 3px solid var(--bg);
@@ -718,7 +720,7 @@ body[data-theme="vaporwave"] #btn-simulate-arrival.btn-simulate-arrival-fab:hove
   color: var(--text);
 }
 
-body[data-theme="vaporwave"] .debug-row.debug-chosen {
+body[data-theme="stroll"] .debug-row.debug-chosen {
   background: rgba(1, 205, 254, 0.15);
   border-color: #01cdfe;
 }
@@ -759,7 +761,7 @@ body[data-theme="vaporwave"] .debug-row.debug-chosen {
   color: var(--accent-hover);
 }
 
-body[data-theme="vaporwave"] .btn-experience:hover {
+body[data-theme="stroll"] .btn-experience:hover {
   background: rgba(1, 205, 254, 0.15);
   color: #01cdfe;
 }
@@ -785,7 +787,7 @@ body[data-theme="vaporwave"] .btn-experience:hover {
   transition: background 0.2s ease, box-shadow 0.2s ease;
 }
 
-body[data-theme="vaporwave"] .btn-experience-fab {
+body[data-theme="stroll"] .btn-experience-fab {
   border-color: #01cdfe;
   color: #01cdfe;
   box-shadow: 0 0 16px rgba(1, 205, 254, 0.2);
@@ -799,7 +801,7 @@ body[data-theme="vaporwave"] .btn-experience-fab {
   background: var(--bg-card-hover);
 }
 
-body[data-theme="vaporwave"] .btn-experience-fab:hover {
+body[data-theme="stroll"] .btn-experience-fab:hover {
   box-shadow: 0 0 24px rgba(1, 205, 254, 0.35);
 }
 
@@ -941,7 +943,7 @@ body[data-theme="vaporwave"] .btn-experience-fab:hover {
   color: var(--bg);
 }
 
-body[data-theme="vaporwave"] .exp-tier-legendary {
+body[data-theme="stroll"] .exp-tier-legendary {
   background: linear-gradient(135deg, #ff71ce, #01cdfe);
   color: var(--bg);
 }

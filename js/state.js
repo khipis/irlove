@@ -19,7 +19,7 @@
     watchId: null,
     debugFoundPlaces: [],
     debugChosenIndex: -1,
-    mapStyle: 'noir'
+    mapStyle: 'adventure'
   };
 
   function $(id) {
@@ -66,8 +66,8 @@
 
   function getCurrentMode() {
     var state = window.Spacerek.state;
-    var style = state.mapStyle || 'noir';
-    if (style === 'noir') return 'przygoda';
+    var style = state.mapStyle || 'adventure';
+    if (style === 'adventure') return 'przygoda';
     return 'spacerek';
   }
 

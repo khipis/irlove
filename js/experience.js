@@ -54,7 +54,7 @@
     var levelEl = $('experience-level-num');
     var listEl = $('experience-list');
     var modeEl = $('experience-mode-name');
-    if (modeEl) modeEl.textContent = t('experience_mode_prefix') + t('mode_' + (state.mapStyle || 'noir'));
+    if (modeEl) modeEl.textContent = t('experience_mode_prefix') + t('mode_' + (state.mapStyle || 'adventure'));
     if (totalEl) totalEl.textContent = totalXp;
     if (levelEl) levelEl.textContent = level;
     if (!listEl) return;
