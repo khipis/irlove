@@ -1,0 +1,14 @@
+# System
+.DS_Store
+Thumbs.db
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Env (jeśli kiedyś dodasz)
+.env
+.env.local

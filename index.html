@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#1a1a2e" />
+  <title>Spacerek – spacer w ciemno</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div id="app">
+    <!-- Ekran startowy -->
+    <section id="screen-start" class="screen active">
+      <div class="start-content">
+        <h1>Spacerek</h1>
+        <p class="tagline">Odkryj miejsce w okolicy – spacer w ciemno</p>
+        <p class="instruction">Wybierz zasięg spaceru:</p>
+        <div class="distance-buttons">
+          <button type="button" class="btn-distance" data-km="1">1 km</button>
+          <button type="button" class="btn-distance" data-km="1.9">2 km</button>
+          <button type="button" class="btn-distance" data-km="3">3 km</button>
+        </div>
+        <p class="instruction instruction-map-style">Liczba atrakcji do zebrania:</p>
+        <div class="attractions-row">
+          <input type="range" id="num-attractions" class="attractions-slider" min="1" max="10" value="5" />
+          <span id="num-attractions-value" class="attractions-value">5</span>
+        </div>
+        <p class="instruction instruction-map-style">Styl mapy:</p>
+        <div class="map-style-buttons">
+          <button type="button" class="btn-map-style" data-style="standard" title="Zwykła mapa">Standard</button>
+          <button type="button" class="btn-map-style" data-style="wildwest" title="Dziki Zachód">Dziki Zachód</button>
+          <button type="button" class="btn-map-style" data-style="noir" title="Czarno-biała">Noir</button>
+        </div>
+        <button type="button" id="btn-start" class="btn-primary" disabled>Rozpocznij spacer</button>
+        <button type="button" id="btn-experience" class="btn-experience" title="Twoje doświadczenie">🏆 Twoje doświadczenie</button>
+      </div>
+    </section>
+
+    <!-- Ekran mapy i spaceru -->
+    <section id="screen-walk" class="screen">
+      <div id="map-container" class="map-container map-style-standard"></div>
+      <div id="map-overlay">
+        <div id="status-bar">
+          <span id="status-text">Ładowanie lokalizacji…</span>
+          <span id="distance-text"></span>
+        </div>
+        <div id="map-style-bar" class="map-style-bar hidden">
+          <span class="map-style-label">Styl:</span>
+          <select id="map-style-select" class="map-style-select" title="Zmień styl mapy">
+            <option value="standard">Standard</option>
+            <option value="wildwest">Dziki Zachód</option>
+            <option value="noir">Noir</option>
+          </select>
+        </div>
+        <div id="loading-place" class="loading-box hidden">
+          <div class="spinner"></div>
+          <p>Szukam miejsca w okolicy…</p>
+        </div>
+        <div id="walking-info" class="hidden">
+          <p id="hint-attraction-num" class="hint-attraction-num">Zebrane: 0/5</p>
+          <p>Spaceruj w kierunku celu. Gdy dojdziesz, miejsce się ujawni.</p>
+          <p id="hint-distance">Odległość do celu: – m</p>
+        </div>
+      </div>
+      <button type="button" id="btn-experience-map" class="btn-experience-fab hidden" title="Twoje doświadczenie">🏆</button>
+      <!-- Przycisk symulacji dojścia – lewy dolny róg, nad mapą -->
+      <button type="button" id="btn-simulate-arrival" class="btn-simulate-arrival-fab hidden" title="Symuluj dojście do celu (test)">📍 Symuluj dojście</button>
+      <!-- Okienko debuggera -->
+      <div id="debug-panel" class="debug-panel">
+        <button type="button" id="btn-debug-toggle" class="debug-toggle" title="Pokaż/ukryj debug">🐛 Debug</button>
+        <div class="debug-content">
+          <p id="debug-summary" class="debug-summary">Brak wyszukania (rozpocznij spacer).</p>
+          <div id="debug-panel-body" class="debug-list"></div>
+        </div>
+      </div>
+      <!-- Animacja dojścia (krótki ekran "Dotarłeś!") -->
+      <div id="arrival-overlay" class="arrival-overlay hidden" data-display="flex">
+        <div class="arrival-content">
+          <div class="arrival-icon">✓</div>
+          <h2 class="arrival-title">Dotarłeś!</h2>
+          <p class="arrival-subtitle">Odkrywamy to miejsce…</p>
+        </div>
+      </div>
+      <!-- Overlay po dojściu – karta z miejscem, ciekawostkami i zdjęciem -->
+      <div id="reveal-overlay" class="reveal-overlay hidden" data-display="flex">
+        <div class="reveal-card">
+          <h2>Oto Twoje miejsce</h2>
+          <div id="reveal-photo" class="reveal-photo"></div>
+          <h3 id="reveal-name"></h3>
+          <p id="reveal-desc" class="reveal-desc"></p>
+          <div id="reveal-ciekawostki" class="reveal-ciekawostki hidden">
+            <h4>Ciekawostka</h4>
+            <p id="reveal-funfact"></p>
+          </div>
+          <button type="button" id="btn-reveal-action" class="btn-primary">Następna atrakcja</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Panel Twoje doświadczenie (gamifikacja) -->
+    <div id="experience-overlay" class="experience-overlay hidden" data-display="flex">
+      <div class="experience-panel">
+        <div class="experience-header">
+          <h2>🏆 Twoje doświadczenie</h2>
+          <button type="button" id="btn-experience-close" class="btn-experience-close" title="Zamknij">×</button>
+        </div>
+        <div class="experience-stats">
+          <p class="experience-total"><span id="experience-total-xp">0</span> XP</p>
+          <p class="experience-level">Poziom <span id="experience-level-num">1</span></p>
+        </div>
+        <ul id="experience-list" class="experience-list"></ul>
+        <div class="experience-actions">
+          <button type="button" id="btn-clear-storage" class="btn-clear-storage" title="Usuń wszystkie zapisane dane">🗑️ Wyczyść dane (localStorage)</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin="" defer></script>
+  <script src="app.js" defer></script>
+</body>
+</html>
