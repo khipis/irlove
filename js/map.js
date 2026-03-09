@@ -84,12 +84,24 @@
     state.decorationMarkers = [];
   }
 
-  function pickRandomName(type, lang) {
+  function shuffleArray(arr) {
+    var a = arr.slice();
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var tmp = a[i];
+      a[i] = a[j];
+      a[j] = tmp;
+    }
+    return a;
+  }
+
+  /** Returns up to `count` unique names (no repeats), shuffled. */
+  function getUniqueNames(type, lang, count) {
     var names = (window.Spacerek && window.Spacerek.decorationNames) || {};
     var langKey = (lang === 'en' || lang === 'pl') ? lang : 'pl';
     var list = type === 'monster' ? (names.monsters && names.monsters[langKey]) : (names.animals && names.animals[langKey]);
-    if (!list || !list.length) return type === 'monster' ? '?' : '…';
-    return list[Math.floor(Math.random() * list.length)];
+    if (!list || !list.length) return [];
+    return shuffleArray(list).slice(0, Math.min(count, list.length));
   }
 
   function addDecorationMarkers(style, bounds) {
@@ -102,6 +114,12 @@
     var east = bounds.getEast();
     var lang = (typeof window.getStoredLang === 'function' && window.getStoredLang()) || 'pl';
     state.decorationMarkers = [];
+    var monsterCount = icons.filter(function (item) { return (item.type || 'monster') === 'monster'; }).length;
+    var animalCount = icons.filter(function (item) { return (item.type || '') === 'animal'; }).length;
+    var monsterNames = getUniqueNames('monster', lang, monsterCount);
+    var animalNames = getUniqueNames('animal', lang, animalCount);
+    var monsterIdx = 0;
+    var animalIdx = 0;
     icons.forEach(function (item, i) {
       var char = item.char || item;
       var type = item.type || 'monster';
@@ -109,9 +127,9 @@
       if (type === 'carrot') {
         name = t('carrot_name');
       } else if (type === 'monster') {
-        name = pickRandomName('monster', lang);
+        name = monsterNames[monsterIdx++] || '?';
       } else {
-        name = pickRandomName('animal', lang);
+        name = animalNames[animalIdx++] || '…';
       }
       var lat = south + Math.random() * (north - south);
       var lng = west + Math.random() * (east - west);
