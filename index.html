@@ -160,21 +160,29 @@
 
   <script src="locales.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <script src="js/config.js"></script>
-  <script src="js/state.js"></script>
-  <script src="js/character-data.js"></script>
-  <script src="js/monster-names.js"></script>
-  <script src="js/animal-names.js"></script>
-  <script src="js/artifact-names.js"></script>
-  <script src="js/storage.js"></script>
-  <script src="js/experience.js"></script>
-  <script src="js/mapStyle.js"></script>
-  <script src="js/locale.js"></script>
-  <script src="js/places.js"></script>
-  <script src="js/wiki.js"></script>
-  <script src="js/map.js"></script>
-  <script src="js/walk.js"></script>
-  <script src="js/simulate.js"></script>
+  <!-- core: config, state -->
+  <script src="js/core/config.js"></script>
+  <script src="js/core/state.js"></script>
+  <!-- data: character, monster, animal, artifact names -->
+  <script src="js/data/character-data.js"></script>
+  <script src="js/data/monster-names.js"></script>
+  <script src="js/data/animal-names.js"></script>
+  <script src="js/data/artifact-names.js"></script>
+  <!-- storage -->
+  <script src="js/storage/storage.js"></script>
+  <!-- ui: experience (XP panel), locale -->
+  <script src="js/ui/experience.js"></script>
+  <script src="js/ui/locale.js"></script>
+  <!-- map: style, map + markers + decorations -->
+  <script src="js/map/mapStyle.js"></script>
+  <script src="js/map/map.js"></script>
+  <!-- services: Overpass, Wikipedia -->
+  <script src="js/services/places.js"></script>
+  <script src="js/services/wiki.js"></script>
+  <!-- walk: simulate, walk flow -->
+  <script src="js/walk/simulate.js"></script>
+  <script src="js/walk/walk.js"></script>
+  <!-- entry -->
   <script src="js/main.js"></script>
 </body>
 </html>
