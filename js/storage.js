@@ -23,6 +23,27 @@
     } catch (e) {}
   }
 
+  function getStoredCharactersRaw() {
+    try {
+      var raw = localStorage.getItem(config.STORAGE_KEY_CHARACTERS);
+      if (!raw) return {};
+      return JSON.parse(raw);
+    } catch (e) { return {}; }
+  }
+
+  function getStoredCharacter(mode) {
+    var data = getStoredCharactersRaw();
+    return data[mode] || null;
+  }
+
+  function setStoredCharacter(mode, character) {
+    try {
+      var data = getStoredCharactersRaw();
+      data[mode] = character;
+      localStorage.setItem(config.STORAGE_KEY_CHARACTERS, JSON.stringify(data));
+    } catch (e) {}
+  }
+
   function getExperienceRaw() {
     try {
       var raw = localStorage.getItem(config.STORAGE_KEY);
@@ -91,6 +112,9 @@
 
   Sp.getStoredTheme = getStoredTheme;
   Sp.setStoredTheme = setStoredTheme;
+  Sp.getStoredCharactersRaw = getStoredCharactersRaw;
+  Sp.getStoredCharacter = getStoredCharacter;
+  Sp.setStoredCharacter = setStoredCharacter;
   Sp.getExperienceRaw = getExperienceRaw;
   Sp.getExperience = getExperience;
   Sp.saveExperienceEntry = saveExperienceEntry;

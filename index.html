@@ -34,6 +34,21 @@
           <button type="button" class="btn-map-style" data-style="adventure" data-i18n="mode_adventure" data-i18n-title="mode_adventure" title="Przygoda">Przygoda</button>
           <button type="button" class="btn-map-style" data-style="cute" data-i18n="mode_cute" data-i18n-title="mode_cute" title="Cute">Cute</button>
         </div>
+        <div id="character-card" class="character-card hidden">
+          <p class="character-label" data-i18n="character_label">Twoja postać</p>
+          <div class="character-preview">
+            <span id="character-emoji" class="character-emoji" aria-hidden="true">🧙</span>
+            <div class="character-info">
+              <span id="character-name" class="character-name">—</span>
+              <p id="character-stats" class="character-stats">Poziom 1</p>
+              <input type="text" id="character-name-input" class="character-name-input hidden" maxlength="24" placeholder="Imię" />
+            </div>
+          </div>
+          <div class="character-actions">
+            <button type="button" id="btn-character-reroll" class="btn-character" data-i18n="character_reroll" data-i18n-title="character_reroll_title">🎲 Losuj</button>
+            <button type="button" id="btn-character-rename" class="btn-character" data-i18n="character_rename" data-i18n-title="character_rename_title">✏️ Zmień imię</button>
+          </div>
+        </div>
         <button type="button" id="btn-start" class="btn-primary" disabled data-i18n="start_btn_start">Rozpocznij spacer</button>
         <button type="button" id="btn-experience" class="btn-experience" data-i18n-title="start_btn_experience_title" data-i18n="start_btn_experience" title="Twoje doświadczenie">🏆 Twoje doświadczenie</button>
         <div class="lang-switcher" role="group" aria-label="Język">
@@ -136,6 +151,7 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
   <script src="js/config.js"></script>
   <script src="js/state.js"></script>
+  <script src="js/character-data.js"></script>
   <script src="js/monster-names.js"></script>
   <script src="js/animal-names.js"></script>
   <script src="js/artifact-names.js"></script>

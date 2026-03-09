@@ -265,6 +265,98 @@ body {
   box-shadow: var(--glow);
 }
 
+/* Character card (Adventure / Cute) */
+.character-card {
+  width: 100%;
+  margin-top: 1rem;
+  padding: 12px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.character-card.hidden {
+  display: none !important;
+}
+
+.character-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin: 0 0 8px 0;
+}
+
+.character-preview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+
+.character-emoji {
+  font-size: 2.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.character-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.character-name {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text);
+  display: block;
+}
+
+.character-stats {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  margin: 2px 0 0 0;
+}
+
+.character-name-input {
+  width: 100%;
+  margin-top: 4px;
+  padding: 6px 10px;
+  font-size: 1rem;
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+  color: var(--text);
+}
+
+.character-name-input.hidden {
+  display: none !important;
+}
+
+.character-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.btn-character {
+  padding: 8px 14px;
+  font-size: 0.85rem;
+  border: 2px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-card-hover);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.btn-character:hover,
+.btn-character:focus {
+  border-color: var(--accent);
+  background: var(--bg-card);
+}
+
 /* Language switcher */
 .lang-switcher {
   display: flex;

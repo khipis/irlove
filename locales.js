@@ -21,6 +21,12 @@
       mode_adventure: 'Przygoda',
       mode_stroll: 'Spacer',
       mode_cute: 'Słodki',
+      character_label: 'Twoja postać',
+      character_reroll: '🎲 Losuj',
+      character_reroll_title: 'Wylosuj nową postać',
+      character_rename: '✏️ Zmień imię',
+      character_rename_title: 'Zmień imię postaci',
+      character_level: 'Poziom {level}',
 
       // Map and status
       map_status_loading: 'Ładowanie lokalizacji…',
@@ -121,6 +127,12 @@
       mode_adventure: 'Adventure',
       mode_stroll: 'Walk',
       mode_cute: 'Cute',
+      character_label: 'Your character',
+      character_reroll: '🎲 Reroll',
+      character_reroll_title: 'Roll a new character',
+      character_rename: '✏️ Change name',
+      character_rename_title: 'Change character name',
+      character_level: 'Level {level}',
 
       map_status_loading: 'Loading location…',
       map_style_label: 'Mode:',

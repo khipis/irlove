@@ -20,6 +20,8 @@
   var $ = Sp.$;
   var getStoredTheme = Sp.getStoredTheme;
   var setStoredTheme = Sp.setStoredTheme;
+  var getStoredCharacter = Sp.getStoredCharacter;
+  var setStoredCharacter = Sp.setStoredCharacter;
   var clearStorage = Sp.clearStorage;
   var applyLocale = Sp.applyLocale;
   var updateDistanceInstruction = Sp.updateDistanceInstruction;
@@ -39,6 +41,72 @@
 
   function t(key, replacements) {
     return window.t ? window.t(key, replacements) : key;
+  }
+
+  function ensureCharacter(mode) {
+    if (mode !== 'adventure' && mode !== 'cute') return null;
+    var cur = getStoredCharacter(mode);
+    if (cur && cur.name && cur.emoji) return cur;
+    var data = window.Spacerek.characterData && window.Spacerek.characterData[mode];
+    if (!data) return null;
+    var lang = (typeof window.getStoredLang === 'function' && window.getStoredLang()) || 'pl';
+    var names = data.names && data.names[lang];
+    var emojis = data.emojis || [];
+    var name = (names && names.length) ? names[Math.floor(Math.random() * names.length)] : (mode === 'adventure' ? 'Bohater' : 'Przyjaciel');
+    var emoji = emojis.length ? emojis[Math.floor(Math.random() * emojis.length)] : (mode === 'adventure' ? '🧙' : '🐰');
+    var character = { name: name, emoji: emoji, stats: { level: 1 } };
+    setStoredCharacter(mode, character);
+    return character;
+  }
+
+  function renderCharacterCard(mode) {
+    var card = $('character-card');
+    var emojiEl = $('character-emoji');
+    var nameEl = $('character-name');
+    var statsEl = $('character-stats');
+    var inputEl = $('character-name-input');
+    if (!card) return;
+    if (mode !== 'adventure' && mode !== 'cute') {
+      card.classList.add('hidden');
+      return;
+    }
+    card.classList.remove('hidden');
+    var char = ensureCharacter(mode);
+    if (char) {
+      if (emojiEl) emojiEl.textContent = char.emoji;
+      if (nameEl) nameEl.textContent = char.name;
+      if (statsEl) statsEl.textContent = t('character_level', { level: (char.stats && char.stats.level) || 1 });
+      if (inputEl) {
+        inputEl.value = char.name;
+        inputEl.classList.add('hidden');
+      }
+    }
+  }
+
+  function randomizeCharacter(mode) {
+    if (mode !== 'adventure' && mode !== 'cute') return;
+    var data = window.Spacerek.characterData && window.Spacerek.characterData[mode];
+    if (!data) return;
+    var lang = (typeof window.getStoredLang === 'function' && window.getStoredLang()) || 'pl';
+    var names = data.names && data.names[lang];
+    var emojis = data.emojis || [];
+    var name = (names && names.length) ? names[Math.floor(Math.random() * names.length)] : (mode === 'adventure' ? 'Bohater' : 'Przyjaciel');
+    var emoji = emojis.length ? emojis[Math.floor(Math.random() * emojis.length)] : (mode === 'adventure' ? '🧙' : '🐰');
+    var cur = getStoredCharacter(mode) || {};
+    var character = { name: name, emoji: emoji, stats: cur.stats || { level: 1 } };
+    setStoredCharacter(mode, character);
+    renderCharacterCard(mode);
+    if (typeof applyMapStyle === 'function') applyMapStyle();
+  }
+
+  function saveCharacterName(mode, name) {
+    if (mode !== 'adventure' && mode !== 'cute') return;
+    var trimmed = (name || '').trim();
+    if (!trimmed) return;
+    var cur = getStoredCharacter(mode) || {};
+    var character = { name: trimmed, emoji: cur.emoji || (mode === 'adventure' ? '🧙' : '🐰'), stats: cur.stats || { level: 1 } };
+    setStoredCharacter(mode, character);
+    renderCharacterCard(mode);
   }
 
   function refreshDynamicLabels() {
@@ -65,6 +133,7 @@
     updateDebugPanel();
     updateRevealButton();
     renderExperiencePanel();
+    if (typeof renderCharacterCard === 'function') renderCharacterCard(state.mapStyle);
   }
 
   function initStartScreen() {
@@ -99,6 +168,8 @@
         updateMapStyleSelection();
         applyTheme();
         updateDistanceInstruction();
+        ensureCharacter(state.mapStyle);
+        renderCharacterCard(state.mapStyle);
       });
     });
     updateMapStyleSelection();
@@ -119,6 +190,46 @@
       if (state.selectedKm == null) return;
       startWalk();
     });
+
+    ensureCharacter('adventure');
+    ensureCharacter('cute');
+    renderCharacterCard(state.mapStyle);
+
+    var btnReroll = $('btn-character-reroll');
+    var btnRename = $('btn-character-rename');
+    var nameSpan = $('character-name');
+    var nameInput = $('character-name-input');
+    if (btnReroll) {
+      btnReroll.addEventListener('click', function () {
+        randomizeCharacter(state.mapStyle);
+      });
+    }
+    if (btnRename && nameSpan && nameInput) {
+      btnRename.addEventListener('click', function () {
+        if (nameInput.classList.contains('hidden')) {
+          nameInput.value = (getStoredCharacter(state.mapStyle) || {}).name || '';
+          nameInput.classList.remove('hidden');
+          nameSpan.classList.add('hidden');
+          nameInput.focus();
+        } else {
+          nameInput.classList.add('hidden');
+          nameSpan.classList.remove('hidden');
+          saveCharacterName(state.mapStyle, nameInput.value);
+        }
+      });
+      nameInput.addEventListener('blur', function () {
+        if (!nameInput.classList.contains('hidden')) {
+          nameInput.classList.add('hidden');
+          nameSpan.classList.remove('hidden');
+          saveCharacterName(state.mapStyle, nameInput.value);
+        }
+      });
+      nameInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          nameInput.blur();
+        }
+      });
+    }
   }
 
   function init() {

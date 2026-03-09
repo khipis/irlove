@@ -7,6 +7,7 @@
   var state = Sp.state;
   var haversine = Sp.haversine;
   var getStyleIcons = Sp.getStyleIcons;
+  var getStoredCharacter = Sp.getStoredCharacter;
   var applyMapStyle = Sp.applyMapStyle;
   var getTierFromDistanceMeters = Sp.getTierFromDistanceMeters;
   var getDecorationIcons = Sp.getDecorationIcons;
@@ -61,7 +62,9 @@
       styleSelect.value = state.mapStyle || 'adventure';
     }
 
-    var userIconChar = getStyleIcons(state.mapStyle || 'adventure').user;
+    var style = state.mapStyle || 'adventure';
+    var char = (style === 'adventure' || style === 'cute') && getStoredCharacter && getStoredCharacter(style);
+    var userIconChar = (char && char.emoji) ? char.emoji : getStyleIcons(style).user;
     var userTitle = t('tooltip_you_short').replace(/"/g, '&quot;');
     var userIcon = L.divIcon({
       className: 'user-marker',

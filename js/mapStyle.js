@@ -60,10 +60,12 @@
   function updateMarkerIcons() {
     var style = state.mapStyle || 'adventure';
     var icons = getStyleIcons(style);
+    var char = (style === 'adventure' || style === 'cute') && Sp.getStoredCharacter && Sp.getStoredCharacter(style);
+    var userIcon = (char && char.emoji) ? char.emoji : icons.user;
     var container = document.getElementById('map-container');
     if (!container) return;
     var userEl = container.querySelector('.user-marker-fun');
-    if (userEl) userEl.textContent = icons.user;
+    if (userEl) userEl.textContent = userIcon;
     container.querySelectorAll('.attraction-marker-pin').forEach(function (el) {
       el.textContent = icons.attraction || '?';
     });

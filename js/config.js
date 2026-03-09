@@ -11,9 +11,10 @@
   window.Spacerek.config = {
     OVERPASS_URL: 'https://overpass-api.de/api/interpreter',
     ARRIVAL_METERS: 50,
-    DECORATION_PROXIMITY_METERS: 35,
+    DECORATION_PROXIMITY_METERS: 65,
     STORAGE_KEY: 'spacerek_experience',
     STORAGE_KEY_THEME: 'spacerek_theme',
+    STORAGE_KEY_CHARACTERS: 'spacerek_characters',
     VALID_STYLES: ['adventure', 'stroll', 'cute'],
     WIKI_API: 'https://pl.wikipedia.org/w/api.php',
     WIKI_MAX_DIST_M: 120,
