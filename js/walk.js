@@ -28,8 +28,11 @@
   }
 
   function isInsecureContext() {
-    return (typeof location !== 'undefined' && location.protocol === 'http:' &&
-      location.hostname !== 'localhost' && location.hostname !== '127.0.0.1');
+    if (typeof location === 'undefined') return false;
+    if (location.protocol === 'file:') return true;
+    if (location.protocol === 'http:' &&
+      location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') return true;
+    return false;
   }
 
   function isIOS() {

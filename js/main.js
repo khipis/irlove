@@ -189,6 +189,22 @@
 
     initStartScreen();
 
+    var isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent || '');
+    var insecure = typeof location !== 'undefined' && (
+      location.protocol === 'file:' ||
+      (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1')
+    );
+    if (isIOS && insecure) {
+      var banner = document.createElement('div');
+      banner.id = 'ios-unsafe-banner';
+      banner.className = 'ios-unsafe-banner';
+      banner.setAttribute('role', 'alert');
+      banner.setAttribute('data-i18n', 'ios_banner');
+      banner.textContent = window.t ? window.t('ios_banner') : 'Na iPhonie aplikacja działa tylko przez HTTPS. Na komputerze: python3 -m http.server 8000. Na telefonie otwórz adres https z tunelu (ngrok) lub wdróż na serwer z SSL.';
+      var startContent = document.querySelector('#screen-start .start-content');
+      if (startContent) startContent.insertBefore(banner, startContent.firstChild);
+    }
+
     var btnExp = $('btn-experience');
     var btnExpMap = $('btn-experience-map');
     if (btnExp) btnExp.addEventListener('click', openExperiencePanel);

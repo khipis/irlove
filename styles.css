@@ -127,6 +127,23 @@ body {
   width: 100%;
 }
 
+.ios-unsafe-banner {
+  display: block;
+  margin: 0 0 1rem 0;
+  padding: 12px 14px;
+  background: rgba(180, 60, 60, 0.25);
+  border: 1px solid rgba(200, 80, 80, 0.6);
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  line-height: 1.4;
+  color: var(--text);
+  text-align: left;
+}
+
+.ios-unsafe-banner::before {
+  content: '⚠️ ';
+}
+
 .start-content h1 {
   font-family: var(--font-display);
   font-size: 2.1rem;
