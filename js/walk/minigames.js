@@ -315,7 +315,226 @@
     }
   }
 
-  var GAMES = [runReflexRPS, runTimingHit, runDodgeSignal, runRapidTap];
+  // —— Game 5: Stop the meter (click when bar in green zone) ——
+  function runStopMeter(done) {
+    var hits = 0;
+    var attempts = 0;
+    var zoneMin = 68;
+    var zoneMax = 92;
+    var fillDuration = 1600;
+
+    function attempt() {
+      attempts += 1;
+      var start = Date.now();
+      var stopped = false;
+      var stopValue = 0;
+
+      setContent(
+        '<p class="minigame-instruction">' + t('minigame_instruction_stop') + '</p>' +
+        '<p class="minigame-wait-prompt">' + attempts + '/3</p>' +
+        '<div class="minigame-timing-bar-wrap" style="height:28px;">' +
+        '<div class="minigame-timing-zone" style="left:' + zoneMin + '%; width:' + (zoneMax - zoneMin) + '%;"></div>' +
+        '<div id="minigame-stop-fill" class="minigame-stop-fill" style="width:0%;"></div>' +
+        '</div>' +
+        '<button type="button" id="minigame-stop-btn" class="minigame-tap-button" style="margin-top:12px;">' + t('minigame_stop_btn') + '</button>'
+      );
+
+      var fillEl = getEl('minigame-stop-fill');
+      var btnEl = getEl('minigame-stop-btn');
+
+      var anim = function () {
+        if (stopped) return;
+        var elapsed = Date.now() - start;
+        var pct = Math.min(1, elapsed / fillDuration);
+        stopValue = pct * 100;
+        if (fillEl) fillEl.style.width = stopValue + '%';
+        if (pct >= 1) {
+          roundResult(false);
+          return;
+        }
+        requestAnimationFrame(anim);
+      };
+      requestAnimationFrame(anim);
+
+      function roundResult(hit) {
+        if (stopped) return;
+        stopped = true;
+        if (hit) hits += 1;
+        if (hits >= 2 || attempts >= 3) {
+          setContent('<p class="minigame-result ' + (hits >= 2 ? 'win' : 'lose') + '">' + (hits >= 2 ? t('minigame_win') : t('minigame_lose')) + '</p>');
+          setTimeout(function () { done(hits >= 2); }, 1200);
+          return;
+        }
+        setTimeout(attempt, 700);
+      }
+
+      if (btnEl) {
+        btnEl.addEventListener('click', function () {
+          if (stopped) return;
+          stopped = true;
+          var hit = stopValue >= zoneMin && stopValue <= zoneMax;
+          roundResult(hit);
+        });
+      }
+    }
+    attempt();
+  }
+
+  // —— Game 6: Sequence memory (repeat 3 symbols) ——
+  var SEQ_KEYS = ['strike', 'dodge', 'spell'];
+
+  function runSequence(done) {
+    var labels = { strike: t('minigame_strike'), dodge: t('minigame_dodge'), spell: t('minigame_spell') };
+    var wins = 0;
+    var round = 0;
+
+    function playRound() {
+      round += 1;
+      var sequence = [SEQ_KEYS[Math.floor(Math.random() * 3)], SEQ_KEYS[Math.floor(Math.random() * 3)], SEQ_KEYS[Math.floor(Math.random() * 3)]];
+      var step = 0;
+
+      setContent(
+        '<p class="minigame-instruction">' + t('minigame_instruction_sequence') + '</p>' +
+        '<p class="minigame-round">' + round + '/2</p>' +
+        '<p id="minigame-seq-prompt" class="minigame-wait-prompt">' + t('minigame_sequence_watch') + '</p>' +
+        '<div id="minigame-seq-display" class="minigame-buttons"></div>' +
+        '<div id="minigame-seq-buttons" class="minigame-buttons" style="display:none;"></div>'
+      );
+
+      var displayEl = getEl('minigame-seq-display');
+      var buttonsEl = getEl('minigame-seq-buttons');
+      var promptEl = getEl('minigame-seq-prompt');
+
+      function showNext() {
+        if (step >= 3) {
+          if (promptEl) promptEl.textContent = t('minigame_sequence_your_turn');
+          if (displayEl) displayEl.innerHTML = '';
+          if (buttonsEl) {
+            buttonsEl.style.display = 'flex';
+            buttonsEl.innerHTML = SEQ_KEYS.map(function (k) {
+              return '<button type="button" class="minigame-btn-choice" data-choice="' + k + '">' + labels[k] + '</button>';
+            }).join('');
+          }
+          var playerSeq = [];
+          SEQ_KEYS.forEach(function (k) {
+            var btn = buttonsEl && buttonsEl.querySelector('[data-choice="' + k + '"]');
+            if (btn) {
+              btn.addEventListener('click', function () {
+                playerSeq.push(k);
+                if (playerSeq.length === 3) {
+                  var correct = playerSeq[0] === sequence[0] && playerSeq[1] === sequence[1] && playerSeq[2] === sequence[2];
+                  if (correct) wins += 1;
+                  if (wins >= 2 || round >= 2) {
+                    setContent('<p class="minigame-result ' + (wins >= 2 ? 'win' : 'lose') + '">' + (wins >= 2 ? t('minigame_win') : t('minigame_lose')) + '</p>');
+                    setTimeout(function () { done(wins >= 2); }, 1200);
+                  } else {
+                    setTimeout(playRound, 800);
+                  }
+                }
+              });
+            }
+          });
+          return;
+        }
+        if (displayEl) displayEl.innerHTML = '<span class="minigame-seq-symbol">' + labels[sequence[step]] + '</span>';
+        step += 1;
+        setTimeout(showNext, 700);
+      }
+      showNext();
+    }
+    playRound();
+  }
+
+  // —— Game 7: Match the icon (remember which one was shown) ——
+  function runMatchIcon(done) {
+    var correct = 0;
+    var attempts = 0;
+    var labels = { strike: t('minigame_strike'), dodge: t('minigame_dodge'), spell: t('minigame_spell') };
+
+    function attempt() {
+      attempts += 1;
+      var answer = SEQ_KEYS[Math.floor(Math.random() * 3)];
+      setContent(
+        '<p class="minigame-instruction">' + t('minigame_instruction_match') + '</p>' +
+        '<p class="minigame-round">' + attempts + '/3</p>' +
+        '<p id="minigame-match-show" class="minigame-seq-symbol">' + labels[answer] + '</p>'
+      );
+      setTimeout(function () {
+        setContent(
+          '<p class="minigame-instruction">' + t('minigame_instruction_match') + '</p>' +
+          '<p class="minigame-round">' + attempts + '/3</p>' +
+          '<p class="minigame-wait-prompt">' + t('minigame_match_which') + '</p>' +
+          '<div class="minigame-buttons">' +
+          SEQ_KEYS.map(function (k) {
+            return '<button type="button" class="minigame-btn-choice" data-choice="' + k + '">' + labels[k] + '</button>';
+          }).join('') +
+          '</div>'
+        );
+        var btns = document.querySelectorAll('.minigame-btn-choice[data-choice]');
+        btns.forEach(function (btn) {
+          btn.addEventListener('click', function () {
+            var ok = btn.getAttribute('data-choice') === answer;
+            if (ok) correct += 1;
+            if (correct >= 2 || attempts >= 3) {
+              setContent('<p class="minigame-result ' + (correct >= 2 ? 'win' : 'lose') + '">' + (correct >= 2 ? t('minigame_win') : t('minigame_lose')) + '</p>');
+              setTimeout(function () { done(correct >= 2); }, 1200);
+            } else {
+              setTimeout(attempt, 600);
+            }
+          });
+        });
+      }, 900);
+    }
+    attempt();
+  }
+
+  // —— Game 8: Whack (click the lit square in time) ——
+  function runWhack(done) {
+    var hits = 0;
+    var rounds = 0;
+    var maxRounds = 5;
+    var showMs = 900;
+
+    function round() {
+      rounds += 1;
+      var index = Math.floor(Math.random() * 4);
+      setContent(
+        '<p class="minigame-instruction">' + t('minigame_instruction_whack') + '</p>' +
+        '<p class="minigame-wait-prompt">' + rounds + '/' + maxRounds + '</p>' +
+        '<div id="minigame-whack-grid" class="minigame-whack-grid">' +
+        [0, 1, 2, 3].map(function (i) {
+          return '<button type="button" class="minigame-whack-cell' + (i === index ? ' minigame-whack-lit' : '') + '" data-idx="' + i + '"></button>';
+        }).join('') +
+        '</div>'
+      );
+      var grid = getEl('minigame-whack-grid');
+      var resolved = false;
+      function resolve(hit) {
+        if (resolved) return;
+        resolved = true;
+        if (hit) hits += 1;
+        if (hits >= 4 || rounds >= maxRounds) {
+          setContent('<p class="minigame-result ' + (hits >= 4 ? 'win' : 'lose') + '">' + (hits >= 4 ? t('minigame_win') : t('minigame_lose')) + '</p><p class="minigame-wait-prompt">' + hits + '/' + maxRounds + '</p>');
+          setTimeout(function () { done(hits >= 4); }, 1200);
+        } else {
+          setTimeout(round, 500);
+        }
+      }
+      var timeout = setTimeout(function () { resolve(false); }, showMs);
+      if (grid) {
+        grid.querySelectorAll('.minigame-whack-cell').forEach(function (cell) {
+          cell.addEventListener('click', function () {
+            var idx = parseInt(cell.getAttribute('data-idx'), 10);
+            clearTimeout(timeout);
+            resolve(idx === index);
+          });
+        });
+      }
+    }
+    round();
+  }
+
+  var GAMES = [runReflexRPS, runTimingHit, runDodgeSignal, runRapidTap, runStopMeter, runSequence, runMatchIcon, runWhack];
 
   function startMinigame(monsterChar, onWin, onLose) {
     showOverlay(monsterChar);

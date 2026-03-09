@@ -1836,6 +1836,55 @@ body[data-theme="cute"] .exp-tier-legendary {
   transform: scale(0.98);
 }
 
+.minigame-stop-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: width 0.03s linear;
+}
+
+.minigame-seq-symbol {
+  display: inline-block;
+  font-size: 1.4rem;
+  font-weight: 700;
+  padding: 12px 20px;
+  margin: 8px 0;
+  background: rgba(0,0,0,0.2);
+  border-radius: var(--radius);
+}
+
+.minigame-whack-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin: 16px 0;
+  max-width: 200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.minigame-whack-cell {
+  aspect-ratio: 1;
+  border: 2px solid var(--text-muted);
+  border-radius: var(--radius);
+  background: var(--bg);
+  cursor: pointer;
+  transition: background 0.1s, transform 0.1s;
+}
+
+.minigame-whack-cell:hover {
+  transform: scale(1.02);
+}
+
+.minigame-whack-cell.minigame-whack-lit {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 16px var(--accent);
+}
+
 .reveal-overlay {
   position: fixed;
   top: 0;
