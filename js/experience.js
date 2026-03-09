@@ -1,5 +1,5 @@
 /**
- * System doświadczenia (XP), rangi, panel osiągnięć.
+ * Experience system (XP), tiers, achievements panel.
  */
 (function () {
   'use strict';

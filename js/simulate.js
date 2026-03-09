@@ -1,5 +1,5 @@
 /**
- * Symulacja dojścia do celu (animacja ruchu) i przycisk "Symuluj dojście".
+ * Simulated arrival at target (walk animation) and "Simulate arrival" button.
  */
 (function () {
   'use strict';
@@ -41,6 +41,7 @@
       var lng = startLng + (endLng - startLng) * ease;
       state.userPosition = { lat: lat, lng: lng };
       state.userMarker.setLatLng([lat, lng]);
+      if (Sp.checkDecorationProximity) Sp.checkDecorationProximity(lat, lng);
       var dist = haversine(lat, lng, endLat, endLng);
       var hint = document.getElementById('hint-distance');
       if (hint) hint.textContent = t('simulate_distance', { m: Math.round(dist) });

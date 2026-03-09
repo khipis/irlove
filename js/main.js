@@ -1,5 +1,5 @@
 /**
- * Wejście aplikacji: inicjalizacja, przypięcie zdarzeń, odświeżanie etykiet.
+ * App entry point: init, event binding, label refresh.
  */
 (function () {
   'use strict';
@@ -33,6 +33,7 @@
   var updateRevealButton = Sp.updateRevealButton;
   var backToMap = Sp.backToMap;
   var resetWalk = Sp.resetWalk;
+  var showWalkStats = Sp.showWalkStats;
   var startWalk = Sp.startWalk;
   var simulateArrival = Sp.simulateArrival;
 
@@ -148,10 +149,23 @@
         if (collected < state.targetPlaces.length) {
           backToMap();
         } else {
-          resetWalk();
+          showWalkStats();
         }
       });
     }
+
+    function closeStatsAndReset() {
+      var overlay = document.getElementById('stats-overlay');
+      if (overlay) {
+        overlay.classList.add('hidden');
+        overlay.style.display = 'none';
+      }
+      resetWalk();
+    }
+    var btnStatsClose = $('btn-stats-close');
+    var btnStatsFinish = $('btn-stats-finish');
+    if (btnStatsClose) btnStatsClose.addEventListener('click', closeStatsAndReset);
+    if (btnStatsFinish) btnStatsFinish.addEventListener('click', closeStatsAndReset);
 
     var btnDebug = $('btn-debug-toggle');
     if (btnDebug) {

@@ -1,5 +1,5 @@
 /**
- * Lokalizacje – etykiety UI. Łatwo dodać nowy język: skopiuj obiekt pl lub en i przetłumacz wartości.
+ * Locales – UI labels. To add a language: copy the pl or en object and translate the values.
  */
 (function () {
   'use strict';
@@ -8,7 +8,7 @@
 
   var LOCALES = {
     pl: {
-      // Ekran startowy
+      // Start screen
       app_title: 'Spacerek – spacer w ciemno',
       start_tagline: 'Odkryj miejsce w okolicy – spacer w ciemno',
       start_instruction_distance: 'Wybierz zasięg spaceru:',
@@ -22,13 +22,13 @@
       mode_stroll: 'Spacer',
       mode_cute: 'Słodki',
 
-      // Map / status
+      // Map and status
       map_status_loading: 'Ładowanie lokalizacji…',
       map_style_label: 'Tryb:',
       map_style_select_title: 'Zmień tryb',
       map_loading_searching: 'Szukam miejsca w okolicy…',
 
-      // Spacer / walking
+      // Walk
       walk_hint_collected: 'Zebrane: {count}/{total}',
       walk_walking_hint: 'Spaceruj w kierunku celu. Gdy dojdziesz, miejsce się ujawni.',
       walk_hint_distance: 'Odległość do celu: – m',
@@ -44,11 +44,11 @@
       debug_summary_empty: 'Brak wyszukania (rozpocznij spacer).',
       debug_summary_found: 'Znaleziono: {n} miejsc. Atrakcji: {m}, zebrane: {c}/{m}.',
 
-      // Dojście / arrival
+      // Arrival
       arrival_title: 'Dotarłeś!',
       arrival_subtitle: 'Odkrywamy to miejsce…',
 
-      // Karta miejsca / reveal
+      // Place card / reveal
       reveal_title: 'Oto Twoje miejsce',
       reveal_ciekawostka: 'Ciekawostka',
       reveal_btn_next: 'Następna atrakcja',
@@ -56,7 +56,7 @@
       reveal_btn_end: 'Zakończ spacer',
       reveal_desc_placeholder: 'Brak opisu.',
 
-      // Panel doświadczenia
+      // Experience panel
       experience_title: '🏆 Twoje doświadczenie',
       experience_mode_prefix: 'Tryb: ',
       experience_btn_close_title: 'Zamknij',
@@ -65,7 +65,7 @@
       experience_btn_clear_label: '🗑️ Wyczyść dane (localStorage)',
       experience_empty: 'Jeszcze nie odwiedziłeś żadnego miejsca. Rozpocznij spacer!',
 
-      // Statusy (setStatus)
+      // Status messages (setStatus)
       status_getting_location: 'Pobieram Twoją lokalizację…',
       status_no_geolocation: 'Twoja przeglądarka nie obsługuje geolokalizacji.',
       status_location_denied: 'Potrzebujemy zgody na lokalizację.',
@@ -81,7 +81,7 @@
       status_position_error: 'Błąd odświeżania pozycji.',
       status_all_collected: 'Wszystkie atrakcje już zebrane.',
 
-      // Tooltipy i rangi
+      // Tooltips and tiers
       tooltip_you: 'Ty – tu jesteś',
       tooltip_you_short: 'Ty',
       tooltip_visited: ' (odwiedzone)',
@@ -89,8 +89,16 @@
       tier_epic: 'Epicki',
       tier_legendary: 'Legendarny',
 
-      // Symulacja
-      simulate_distance: 'Odległość do celu: {m} m (symulacja…)'
+      // Simulation
+      simulate_distance: 'Odległość do celu: {m} m (symulacja…)',
+
+      // Walk statistics
+      stats_title: '📊 Statystyki spaceru',
+      stats_places: 'Odwiedzone miejsca',
+      stats_monsters: 'Spotkane potwory',
+      stats_carrots: 'Zebrane marchewki',
+      stats_animals: 'Spotkane zwierzątka',
+      stats_btn_finish: 'Zakończ'
     },
 
     en: {
@@ -166,7 +174,14 @@
       tier_epic: 'Epic',
       tier_legendary: 'Legendary',
 
-      simulate_distance: 'Distance to goal: {m} m (simulation…)'
+      simulate_distance: 'Distance to goal: {m} m (simulation…)',
+
+      stats_title: '📊 Walk statistics',
+      stats_places: 'Places visited',
+      stats_monsters: 'Monsters met',
+      stats_carrots: 'Carrots collected',
+      stats_animals: 'Animals met',
+      stats_btn_finish: 'Finish'
     }
   };
 

@@ -1,5 +1,5 @@
 /**
- * Persystencja: motyw (tryb) oraz doświadczenie per tryb.
+ * Persistence: theme (mode) and experience per mode.
  */
 (function () {
   'use strict';

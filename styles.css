@@ -1,7 +1,7 @@
-/* Spacerek – motywy Noir i Vaporwave, cała aplikacja reaguje na wybór stylu */
+/* Spacerek – Noir and Vaporwave themes; app responds to style choice */
 @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,600;0,9..40,700&family=Outfit:wght@600;700&display=swap');
 
-/* ========== NOIR (domyślny) ========== */
+/* ========== NOIR (default) ========== */
 :root,
 body[data-theme="adventure"] {
   --bg: #0f0f14;
@@ -27,7 +27,7 @@ body[data-theme="adventure"] {
   --font-display: 'Outfit', var(--font-sans);
 }
 
-/* ========== WALK / STROLL (zwykły, ciemny, dobry kontrast) ========== */
+/* ========== WALK / STROLL (neutral dark, good contrast) ========== */
 body[data-theme="stroll"] {
   --bg: #1a1d24;
   --bg-card: #252830;
@@ -52,7 +52,7 @@ body[data-theme="stroll"] {
   --font-display: 'Outfit', var(--font-sans);
 }
 
-/* ========== CUTE (króliczek, marchewki) ========== */
+/* ========== CUTE (bunny, carrots) ========== */
 body[data-theme="cute"] {
   --bg: #0d0a14;
   --bg-card: #1a1225;
@@ -77,7 +77,7 @@ body[data-theme="cute"] {
   --font-display: 'Outfit', var(--font-sans);
 }
 
-/* ========== BAZA ========== */
+/* ========== BASE ========== */
 * {
   box-sizing: border-box;
   margin: 0;
@@ -103,7 +103,7 @@ body {
   position: relative;
 }
 
-/* ========== EKRAN STARTOWY ========== */
+/* ========== START SCREEN ========== */
 .screen {
   display: none;
   height: 100%;
@@ -212,7 +212,7 @@ body {
   color: var(--accent);
 }
 
-/* Przyciski stylu mapy */
+/* Map style buttons */
 .map-style-buttons {
   display: flex;
   flex-wrap: wrap;
@@ -248,7 +248,7 @@ body {
   box-shadow: var(--glow);
 }
 
-/* Przełącznik języka */
+/* Language switcher */
 .lang-switcher {
   display: flex;
   gap: 6px;
@@ -280,7 +280,7 @@ body {
   color: var(--accent);
 }
 
-/* Dystans */
+/* Distance */
 .btn-distance {
   padding: 12px 22px;
   font-size: 1rem;
@@ -305,7 +305,7 @@ body {
   color: var(--accent);
 }
 
-/* Główny CTA */
+/* Main CTA */
 .btn-primary {
   width: 100%;
   max-width: 280px;
@@ -335,7 +335,7 @@ body {
   transform: none;
 }
 
-/* ========== EKRAN MAPY ========== */
+/* ========== MAP SCREEN ========== */
 #screen-walk {
   padding: 0;
   display: none;
@@ -366,7 +366,7 @@ body[data-theme="cute"] .map-container.map-style-cute::after {
   z-index: 500;
 }
 
-/* Pasek stylu na mapie */
+/* Map style bar */
 .map-style-bar {
   position: absolute;
   top: 56px;
@@ -400,7 +400,7 @@ body[data-theme="cute"] .map-container.map-style-cute::after {
   outline: none;
 }
 
-/* Przycisk symulacji dojścia */
+/* Simulate arrival button */
 #btn-simulate-arrival.btn-simulate-arrival-fab {
   position: absolute;
   bottom: 16px;
@@ -618,7 +618,7 @@ body[data-theme="cute"] #btn-simulate-arrival.btn-simulate-arrival-fab:hover {
   box-shadow: var(--shadow);
 }
 
-/* Ikony per styl mapy (adventure / stroll / cute) */
+/* Icons per map style (adventure / stroll / cute) */
 .map-style-adventure .user-marker-fun {
   background: linear-gradient(145deg, #2a2520 0%, #1a1612 100%);
   color: #e8e0d8;
@@ -645,7 +645,7 @@ body[data-theme="cute"] #btn-simulate-arrival.btn-simulate-arrival-fab:hover {
   border-color: #666;
 }
 
-/* Stroll: zwykły styl, postać + gwiazdki, dobry kontrast */
+/* Stroll: neutral style, character + stars, good contrast */
 .map-style-stroll .user-marker-fun {
   background: #1a5fb4;
   color: #fff;
@@ -673,7 +673,7 @@ body[data-theme="cute"] #btn-simulate-arrival.btn-simulate-arrival-fab:hover {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
-/* Cute: króliczek, marchewki */
+/* Cute: bunny, carrots */
 .map-style-cute .user-marker-fun {
   background: linear-gradient(145deg, #ff71ce 0%, #01cdfe 100%);
   color: #fff;
@@ -699,7 +699,7 @@ body[data-theme="cute"] #btn-simulate-arrival.btn-simulate-arrival-fab:hover {
   box-shadow: 0 0 10px rgba(185, 103, 255, 0.7), 0 0 0 2px rgba(0, 0, 0, 0.4);
 }
 
-/* Markery dekoracyjne (potwory / marchewki+zwierzątka) – tło jak postac i miejsca */
+/* Decorative markers (monsters / carrots+animals) – background like character and places */
 .decoration-marker {
   background: none !important;
   border: none !important;
@@ -831,7 +831,7 @@ body[data-theme="cute"] .debug-row.debug-chosen {
   margin-top: 2px;
 }
 
-/* ========== DOŚWIADCZENIE (XP) ========== */
+/* ========== EXPERIENCE (XP) ========== */
 .btn-experience {
   margin-top: 1rem;
   padding: 8px 16px;
@@ -1071,6 +1071,36 @@ body[data-theme="cute"] .exp-tier-legendary {
   background: var(--bg-card-hover);
 }
 
+/* Walk statistics */
+.stats-panel .stats-list {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.stats-panel .stats-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: var(--radius-sm);
+}
+
+.stats-panel .stats-label {
+  color: var(--text-muted);
+  font-size: 0.95rem;
+}
+
+.stats-panel .stats-value {
+  font-weight: 700;
+  color: var(--accent);
+  font-size: 1.1rem;
+}
+
 /* ========== ARRIVAL & REVEAL ========== */
 .arrival-overlay {
   position: fixed;
@@ -1245,7 +1275,7 @@ body[data-theme="cute"] .exp-tier-legendary {
   margin: 0;
 }
 
-/* ========== RESPONSYWNOŚĆ ========== */
+/* ========== RESPONSIVE ========== */
 @media (min-width: 400px) {
   .start-content h1 {
     font-size: 2.35rem;

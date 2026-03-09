@@ -1,5 +1,5 @@
 /**
- * Stan aplikacji oraz pomocnicze funkcje DOM i geo.
+ * App state and DOM/geo helper functions.
  */
 (function () {
   'use strict';
@@ -20,7 +20,9 @@
     watchId: null,
     debugFoundPlaces: [],
     debugChosenIndex: -1,
-    mapStyle: 'adventure'
+    mapStyle: 'adventure',
+    stats: { monstersMet: 0, carrotsCollected: 0, animalsMet: 0 },
+    metDecorationIndices: {}
   };
 
   function $(id) {

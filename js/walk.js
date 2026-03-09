@@ -1,5 +1,5 @@
 /**
- * Spacer: geolokacja, śledzenie odległości, dojście, odkrywanie miejsca, Wikipedia.
+ * Walk: geolocation, distance tracking, arrival, place reveal, Wikipedia.
  */
 (function () {
   'use strict';
@@ -121,6 +121,7 @@
         if (state.userMarker) {
           state.userMarker.setLatLng([state.userPosition.lat, state.userPosition.lng]);
         }
+        if (Sp.checkDecorationProximity) Sp.checkDecorationProximity(state.userPosition.lat, state.userPosition.lng);
         checkDistances();
       },
       function () {
@@ -384,6 +385,31 @@
       });
   }
 
+  function showWalkStats() {
+    var listEl = document.getElementById('stats-list');
+    var overlay = document.getElementById('stats-overlay');
+    if (!listEl || !overlay) return;
+    var places = state.visitedMarkers ? state.visitedMarkers.length : 0;
+    var stats = state.stats || { monstersMet: 0, carrotsCollected: 0, animalsMet: 0 };
+    var style = state.mapStyle || 'adventure';
+    listEl.innerHTML = '';
+    function addRow(label, value) {
+      var li = document.createElement('li');
+      li.className = 'stats-row';
+      li.innerHTML = '<span class="stats-label">' + label + '</span><span class="stats-value">' + value + '</span>';
+      listEl.appendChild(li);
+    }
+    addRow(t('stats_places'), places);
+    if (style === 'adventure') addRow(t('stats_monsters'), stats.monstersMet);
+    if (style === 'cute') {
+      addRow(t('stats_carrots'), stats.carrotsCollected);
+      addRow(t('stats_animals'), stats.animalsMet);
+    }
+    overlay.classList.remove('hidden');
+    overlay.style.display = 'flex';
+    overlay.style.visibility = 'visible';
+  }
+
   Sp.setStatus = setStatus;
   Sp.updateDistanceHint = updateDistanceHint;
   Sp.updateDebugPanel = updateDebugPanel;
@@ -391,6 +417,7 @@
   Sp.backToMap = backToMap;
   Sp.revealPlace = revealPlace;
   Sp.resetWalk = resetWalk;
+  Sp.showWalkStats = showWalkStats;
   Sp.startWalk = startWalk;
   Sp.initMapAndSearch = initMapAndSearch;
 })();

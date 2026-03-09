@@ -1,5 +1,5 @@
 /**
- * Style mapy (Noir / Spacerek): filtry, ikony, motyw, markery.
+ * Map styles (Noir / Spacerek): filters, icons, theme, markers.
  */
 (function () {
   'use strict';
@@ -17,7 +17,11 @@
   };
 
   var ADVENTURE_MONSTERS = ['👹', '👺', '🐉', '👾', '💀', '🦇', '🐲', '🧌', '🐍', '🕷️'];
-  var CUTE_DECORATIONS = ['🥕', '🥕', '🥕', '🥕', '🥕', '🥕', '🥕', '🐰', '🐹', '🐿️'];
+  var CUTE_DECORATIONS = [
+    { char: '🥕', type: 'carrot' }, { char: '🥕', type: 'carrot' }, { char: '🥕', type: 'carrot' },
+    { char: '🥕', type: 'carrot' }, { char: '🥕', type: 'carrot' }, { char: '🥕', type: 'carrot' },
+    { char: '🥕', type: 'carrot' }, { char: '🐰', type: 'animal' }, { char: '🐹', type: 'animal' }, { char: '🐿️', type: 'animal' }
+  ];
 
   var MAP_STYLE_ICONS = {
     adventure: { user: '🧝‍♂️', attraction: '?', visited: '✔' },
@@ -36,16 +40,15 @@
     return a;
   }
 
-  /** Zwraca tablicę ikon do rozrzucenia na mapie (potwory / marchewki+zwierzątka). Puste dla Walk. */
+  /** Returns array of { char, type } to scatter on map. type: 'monster' | 'carrot' | 'animal'. */
   function getDecorationIcons(style) {
     if (style === 'adventure') {
       var monsters = shuffleArray(ADVENTURE_MONSTERS.slice());
       var n = 5 + Math.floor(Math.random() * 6);
-      return monsters.slice(0, n);
+      return monsters.slice(0, n).map(function (c) { return { char: c, type: 'monster' }; });
     }
     if (style === 'cute') {
-      var pool = shuffleArray(CUTE_DECORATIONS.slice());
-      return pool;
+      return shuffleArray(CUTE_DECORATIONS.slice());
     }
     return [];
   }

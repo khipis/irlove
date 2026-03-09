@@ -1,5 +1,5 @@
 /**
- * Pobieranie ciekawostek i zdjęć z Wikipedii.
+ * Fetching fun facts and images from Wikipedia.
  */
 (function () {
   'use strict';

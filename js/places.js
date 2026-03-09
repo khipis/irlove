@@ -1,5 +1,5 @@
 /**
- * Wyszukiwanie miejsc (Overpass API) i wybór atrakcji.
+ * Place search (Overpass API) and attraction selection.
  */
 (function () {
   'use strict';

@@ -1,5 +1,5 @@
 /**
- * Mapa Leaflet: inicjalizacja, warstwa kafelków, markery użytkownika i miejsc.
+ * Leaflet map: init, tile layer, user and place markers.
  */
 (function () {
   'use strict';
@@ -10,6 +10,7 @@
   var applyMapStyle = Sp.applyMapStyle;
   var getTierFromDistanceMeters = Sp.getTierFromDistanceMeters;
   var getDecorationIcons = Sp.getDecorationIcons;
+  var config = Sp.config;
 
   function t(key, replacements) {
     return window.t ? window.t(key, replacements) : key;
@@ -82,7 +83,9 @@
     var west = bounds.getWest();
     var east = bounds.getEast();
     state.decorationMarkers = [];
-    icons.forEach(function (char) {
+    icons.forEach(function (item, i) {
+      var char = item.char || item;
+      var type = item.type || 'monster';
       var lat = south + Math.random() * (north - south);
       var lng = west + Math.random() * (east - west);
       var icon = L.divIcon({
@@ -93,7 +96,26 @@
       });
       var marker = L.marker([lat, lng], { icon: icon }).addTo(state.map);
       marker._decorationChar = char;
+      marker._decorationIndex = i;
+      marker._decorationType = type;
       state.decorationMarkers.push(marker);
+    });
+  }
+
+  function checkDecorationProximity(lat, lng) {
+    if (!state.decorationMarkers || !state.decorationMarkers.length) return;
+    var radius = (config && config.DECORATION_PROXIMITY_METERS) || 35;
+    state.decorationMarkers.forEach(function (m, i) {
+      if (state.metDecorationIndices[i]) return;
+      var pos = m.getLatLng && m.getLatLng();
+      if (!pos) return;
+      var dist = haversine(lat, lng, pos.lat, pos.lng);
+      if (dist > radius) return;
+      state.metDecorationIndices[i] = true;
+      var t = m._decorationType || 'monster';
+      if (t === 'monster') state.stats.monstersMet += 1;
+      else if (t === 'carrot') state.stats.carrotsCollected += 1;
+      else if (t === 'animal') state.stats.animalsMet += 1;
     });
   }
 
@@ -110,6 +132,8 @@
     });
     state.visitedMarkers = [];
     clearDecorationMarkers();
+    state.stats = { monstersMet: 0, carrotsCollected: 0, animalsMet: 0 };
+    state.metDecorationIndices = {};
 
     var style = state.mapStyle || 'adventure';
     var attractionChar = getStyleIcons(style).attraction || '?';
@@ -170,4 +194,5 @@
   Sp.removeTargetMarkerAt = removeTargetMarkerAt;
   Sp.addVisitedMarker = addVisitedMarker;
   Sp.clearDecorationMarkers = clearDecorationMarkers;
+  Sp.checkDecorationProximity = checkDecorationProximity;
 })();

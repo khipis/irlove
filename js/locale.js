@@ -1,5 +1,5 @@
 /**
- * Lokalizacja UI: applyLocale, instrukcja zasięgu, odświeżanie etykiet.
+ * UI localization: applyLocale, distance instruction, label refresh.
  */
 (function () {
   'use strict';

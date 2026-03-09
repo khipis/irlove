@@ -1,6 +1,6 @@
 /**
- * Stałe konfiguracyjne aplikacji.
- * Polyfill forEach na NodeList dla starszego Safari.
+ * App configuration constants.
+ * NodeList.forEach polyfill for older Safari.
  */
 (function () {
   'use strict';
@@ -11,6 +11,7 @@
   window.Spacerek.config = {
     OVERPASS_URL: 'https://overpass-api.de/api/interpreter',
     ARRIVAL_METERS: 50,
+    DECORATION_PROXIMITY_METERS: 35,
     STORAGE_KEY: 'spacerek_experience',
     STORAGE_KEY_THEME: 'spacerek_theme',
     VALID_STYLES: ['adventure', 'stroll', 'cute'],
