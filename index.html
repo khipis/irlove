@@ -150,6 +150,12 @@
           <button type="button" id="btn-npc-ok" class="btn-primary" data-i18n="npc_btn_ok">OK</button>
         </div>
       </div>
+      <div id="minigame-overlay" class="minigame-overlay hidden" data-display="flex">
+        <div class="minigame-card">
+          <div id="minigame-monster-emoji" class="minigame-monster-emoji" aria-hidden="true">👹</div>
+          <div id="minigame-content" class="minigame-content"></div>
+        </div>
+      </div>
     </section>
 
     <!-- Walk statistics at end -->
@@ -214,6 +220,7 @@
   <!-- walk: simulate, walk flow -->
   <script src="js/walk/simulate.js"></script>
   <script src="js/walk/walk.js"></script>
+  <script src="js/walk/minigames.js"></script>
   <!-- entry -->
   <script src="js/main.js"></script>
 </body>

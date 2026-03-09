@@ -348,7 +348,22 @@
       if (typeof Sp.finishMonsterEncounter === 'function') Sp.finishMonsterEncounter('run');
     });
     if (btnMonsterFight) btnMonsterFight.addEventListener('click', function () {
-      if (typeof Sp.finishMonsterEncounter === 'function') Sp.finishMonsterEncounter('fight');
+      var overlay = $('monster-encounter-overlay');
+      if (overlay) {
+        overlay.classList.add('hidden');
+        overlay.style.display = 'none';
+      }
+      var marker = state.pendingMonsterMarker;
+      var monsterChar = (marker && marker._decorationChar) ? marker._decorationChar : '👹';
+      if (typeof Sp.startMinigame === 'function') {
+        Sp.startMinigame(monsterChar, function () {
+          Sp.finishMonsterEncounter('fight');
+        }, function () {
+          Sp.finishMonsterEncounter('lose');
+        });
+      } else {
+        if (typeof Sp.finishMonsterEncounter === 'function') Sp.finishMonsterEncounter('fight');
+      }
     });
 
     var btnNpcOk = $('btn-npc-ok');

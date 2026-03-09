@@ -266,6 +266,8 @@
       if (Sp.saveDecorationEntry) Sp.saveDecorationEntry('monster', name, xp);
       if (Sp.showToast) Sp.showToast(t('monster_fight_won', { xp: xp }));
       if (Sp.renderExperiencePanel) Sp.renderExperiencePanel();
+    } else if (choice === 'lose' && Sp.showToast) {
+      Sp.showToast(t('monster_fight_lost'));
     }
   }
 

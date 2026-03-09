@@ -354,10 +354,12 @@
     var ao = document.getElementById('arrival-overlay');
     var mo = document.getElementById('monster-encounter-overlay');
     var no = document.getElementById('npc-encounter-overlay');
+    var mgo = document.getElementById('minigame-overlay');
     if (ro) { ro.classList.add('hidden'); ro.style.display = 'none'; ro.style.visibility = 'hidden'; }
     if (ao) { ao.classList.add('hidden'); ao.style.display = 'none'; ao.style.visibility = 'hidden'; }
     if (mo) { mo.classList.add('hidden'); mo.style.display = 'none'; }
     if (no) { no.classList.add('hidden'); no.style.display = 'none'; }
+    if (mgo) { mgo.classList.add('hidden'); mgo.style.display = 'none'; }
     show($('loading-place'), false);
     show($('walking-info'), false);
     show($('map-style-bar'), false);

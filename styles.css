@@ -1633,6 +1633,176 @@ body[data-theme="cute"] .exp-tier-legendary {
   font-style: italic;
 }
 
+/* Minigame overlay (fight) */
+.minigame-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--overlay-bg);
+  z-index: 100002;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  pointer-events: auto;
+}
+
+.minigame-overlay.hidden {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+.minigame-overlay:not(.hidden) {
+  display: flex !important;
+  visibility: visible !important;
+  animation: arrivalFadeIn 0.25s ease;
+}
+
+.minigame-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 20px;
+  max-width: 340px;
+  width: 100%;
+  text-align: center;
+  box-shadow: var(--shadow-lg);
+}
+
+.minigame-monster-emoji {
+  font-size: 4rem;
+  line-height: 1;
+  margin-bottom: 16px;
+  animation: minigame-monster-pulse 0.6s ease-in-out infinite alternate;
+}
+
+@keyframes minigame-monster-pulse {
+  from { transform: scale(0.95); opacity: 0.9; }
+  to { transform: scale(1.08); opacity: 1; }
+}
+
+.minigame-content {
+  min-height: 80px;
+}
+
+.minigame-round {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+}
+
+.minigame-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.minigame-btn-choice {
+  padding: 12px 18px;
+  font-size: 1rem;
+  border-radius: var(--radius);
+  border: 2px solid var(--text-muted);
+  background: var(--bg);
+  color: var(--text);
+  cursor: pointer;
+  transition: transform 0.1s, border-color 0.15s;
+}
+
+.minigame-btn-choice:hover {
+  border-color: var(--accent);
+  transform: scale(1.02);
+}
+
+.minigame-btn-choice:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.minigame-timer-bar {
+  height: 8px;
+  background: var(--text-muted);
+  border-radius: 4px;
+  margin: 12px 0;
+  overflow: hidden;
+}
+
+.minigame-timer-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 4px;
+  width: 100%;
+  transition: width 0.05s linear;
+}
+
+.minigame-timing-bar-wrap {
+  height: 40px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  margin: 16px 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.minigame-timing-zone {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background: #2d5a27;
+  border-radius: 4px;
+  width: 22%;
+  left: 39%;
+}
+
+.minigame-timing-slider {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  background: var(--accent);
+  border-radius: 4px;
+  transition: left 0.02s linear;
+}
+
+.minigame-result {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: var(--radius);
+}
+
+.minigame-result.win {
+  background: rgba(45, 90, 39, 0.3);
+  color: #7bc96a;
+}
+
+.minigame-result.lose {
+  background: rgba(120, 40, 40, 0.3);
+  color: #ff9090;
+}
+
+.minigame-wait-prompt {
+  font-size: 1rem;
+  color: var(--text-muted);
+  margin: 16px 0;
+}
+
+.minigame-dodge-signal {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--accent);
+  margin: 20px 0;
+  animation: minigame-signal-flash 0.4s ease;
+}
+
+@keyframes minigame-signal-flash {
+  from { opacity: 0; transform: scale(0.5); }
+  to { opacity: 1; transform: scale(1); }
+}
+
 .reveal-overlay {
   position: fixed;
   top: 0;
