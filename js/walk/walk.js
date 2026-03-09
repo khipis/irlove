@@ -213,9 +213,9 @@
   function updateRevealButton() {
     var btn = $('btn-reveal-action');
     if (!btn) return;
-    var collected = Object.keys(state.collectedIndices).length;
-    var total = state.targetPlaces.length;
-    if (collected < total) {
+    var total = (state.targetPlaces && state.targetPlaces.length) || 0;
+    var collected = (state.collectedIndices && Object.keys(state.collectedIndices).length) || 0;
+    if (total === 0 || collected < total) {
       btn.textContent = t('reveal_btn_back');
     } else {
       btn.textContent = t('reveal_btn_end');
@@ -419,6 +419,14 @@
       });
   }
 
+  function safeEscapeHtml(s) {
+    if (s == null) return '';
+    if (typeof escapeHtml === 'function') return escapeHtml(String(s));
+    var div = document.createElement('div');
+    div.textContent = String(s);
+    return div.innerHTML;
+  }
+
   function showWalkStats() {
     var listEl = document.getElementById('stats-list');
     var overlay = document.getElementById('stats-overlay');
@@ -487,7 +495,7 @@
         if (!name) return;
         var item = document.createElement('li');
         item.className = 'stats-place-item';
-        item.innerHTML = '<span class="stats-place-icon">✨</span><span class="stats-place-name">' + escapeHtml(name) + '</span>';
+        item.innerHTML = '<span class="stats-place-icon">✨</span><span class="stats-place-name">' + safeEscapeHtml(name) + '</span>';
         placesList.appendChild(item);
       });
       listEl.appendChild(placesList);
@@ -496,6 +504,7 @@
     overlay.style.display = 'flex';
     overlay.style.visibility = 'visible';
     overlay.style.zIndex = '100000';
+    overlay.style.pointerEvents = 'auto';
   }
 
   Sp.setStatus = setStatus;

@@ -299,11 +299,25 @@
     var btnReveal = $('btn-reveal-action');
     if (btnReveal) {
       btnReveal.addEventListener('click', function () {
-        var collected = Object.keys(state.collectedIndices).length;
-        if (collected < state.targetPlaces.length) {
-          backToMap();
+        var total = (state.targetPlaces && state.targetPlaces.length) || 0;
+        var collected = (state.collectedIndices && Object.keys(state.collectedIndices).length) || 0;
+        if (total === 0 || collected < total) {
+          if (typeof backToMap === 'function') backToMap();
         } else {
-          showWalkStats();
+          if (typeof showWalkStats === 'function') {
+            try {
+              showWalkStats();
+            } catch (e) {
+              console.error('showWalkStats', e);
+              var ov = document.getElementById('stats-overlay');
+              if (ov) {
+                ov.classList.remove('hidden');
+                ov.style.display = 'flex';
+                ov.style.visibility = 'visible';
+                ov.style.zIndex = '100000';
+              }
+            }
+          }
         }
       });
     }
