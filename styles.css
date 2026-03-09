@@ -554,11 +554,11 @@ body[data-theme="cute"] #btn-simulate-arrival.btn-simulate-arrival-fab:hover {
   display: none !important;
 }
 
-/* Go to decoration (monster/carrot/animal) button */
+/* Go to decoration (monster/carrot/animal/chest) button – next to simulate */
 #btn-go-to-decoration.btn-go-to-decoration-fab {
   position: absolute;
-  bottom: 52px;
-  left: 16px;
+  bottom: 16px;
+  left: 165px;
   z-index: 99999;
   padding: 8px 12px;
   border: 2px solid var(--accent-hover);
