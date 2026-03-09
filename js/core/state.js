@@ -33,7 +33,8 @@
     pendingMonsterIndex: null,
     pendingMonsterMarker: null,
     pendingNpcIndex: null,
-    pendingNpcMarker: null
+    pendingNpcMarker: null,
+    pendingEncounterType: null
   };
 
   function $(id) {

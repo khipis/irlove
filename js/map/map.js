@@ -273,12 +273,25 @@
   var NPC_DIALOGUES_EN = ['Hello, traveller. Have a nice walk!', "Don't be afraid, it's me. Watch out for monsters.", "A carrot? I don't have any. Keep looking."];
 
   function showNpcEncounter(index, marker) {
+    state.pendingEncounterType = 'npc';
     state.pendingNpcIndex = index;
     state.pendingNpcMarker = marker;
     var name = marker._decorationName || '?';
     var lang = (typeof window.getStoredLang === 'function' && window.getStoredLang()) || 'pl';
     var dialogues = lang === 'en' ? NPC_DIALOGUES_EN : NPC_DIALOGUES_PL;
     var dialogue = dialogues[Math.floor(Math.random() * dialogues.length)];
+    showEncounterOverlay(name, dialogue);
+  }
+
+  function showAnimalEncounter(index, marker, dialogue) {
+    state.pendingEncounterType = 'animal';
+    state.pendingNpcIndex = index;
+    state.pendingNpcMarker = marker;
+    var name = marker._decorationName || '?';
+    showEncounterOverlay(name, dialogue || (t('npc_dialogue')));
+  }
+
+  function showEncounterOverlay(name, dialogue) {
     var elTitle = document.getElementById('npc-encounter-title');
     var elDialogue = document.getElementById('npc-encounter-dialogue');
     var overlay = document.getElementById('npc-encounter-overlay');
@@ -292,11 +305,13 @@
     }
   }
 
-  function finishNpcEncounter() {
+  function finishEncounter() {
     var index = state.pendingNpcIndex;
     var marker = state.pendingNpcMarker;
+    var encounterType = state.pendingEncounterType;
     state.pendingNpcIndex = null;
     state.pendingNpcMarker = null;
+    state.pendingEncounterType = null;
     var overlay = document.getElementById('npc-encounter-overlay');
     if (overlay) {
       overlay.classList.add('hidden');
@@ -305,8 +320,13 @@
     if (index == null || !marker) return;
     if (state.map && state.map.hasLayer(marker)) state.map.removeLayer(marker);
     var name = marker._decorationName || '?';
-    state.metNpcNames.push(name);
-    if (Sp.saveDecorationEntry) Sp.saveDecorationEntry('npc', name, 5);
+    if (encounterType === 'animal') {
+      state.metAnimalNames.push(name);
+      if (Sp.saveDecorationEntry) Sp.saveDecorationEntry('animal', name, 10);
+    } else {
+      state.metNpcNames.push(name);
+      if (Sp.saveDecorationEntry) Sp.saveDecorationEntry('npc', name, 5);
+    }
     if (Sp.renderExperiencePanel) Sp.renderExperiencePanel();
   }
 
@@ -396,17 +416,20 @@
         if (state.map && state.map.hasLayer(m)) state.map.removeLayer(m);
         return;
       } else if (type === 'animal') {
+        state.metDecorationIndices[i] = true;
         state.stats.animalsMet += 1;
-        state.metAnimalNames.push(name);
+        var langKey = (typeof window.getStoredLang === 'function' && window.getStoredLang()) === 'en' ? 'en' : 'pl';
+        var fallbackDialogue = langKey === 'pl' ? 'Cześć!' : 'Hi!';
         if (typeof window.generateAnimalQuest === 'function') {
-          var lang = (typeof window.getStoredLang === 'function' && window.getStoredLang()) || 'pl';
-          var langKey = (lang === 'en' || lang === 'pl') ? lang : 'pl';
           window.generateAnimalQuest(name || '', langKey).then(function (questText) {
-            if (questText && Sp.showToast) Sp.showToast('🐾 ' + questText);
+            showAnimalEncounter(i, m, questText || fallbackDialogue);
           }).catch(function () {
-            if (Sp.showToast) Sp.showToast('🐾 ' + (name || '') + (langKey === 'pl' ? ' mówi: Cześć!' : ' says: Hi!'));
+            showAnimalEncounter(i, m, fallbackDialogue);
           });
+        } else {
+          showAnimalEncounter(i, m, fallbackDialogue);
         }
+        return;
       }
       if (saveDecorationEntry) saveDecorationEntry(type, name);
       if (state.map && state.map.hasLayer(m)) state.map.removeLayer(m);
@@ -439,6 +462,7 @@
     state.pendingMonsterMarker = null;
     state.pendingNpcIndex = null;
     state.pendingNpcMarker = null;
+    state.pendingEncounterType = null;
 
     var style = state.mapStyle || 'adventure';
     var attractionChar = getStyleIcons(style).attraction || '?';
@@ -505,5 +529,5 @@
   Sp.clearDecorationSelection = clearDecorationSelection;
   Sp.updateDecorationSelectionVisual = updateDecorationSelectionVisual;
   Sp.finishMonsterEncounter = finishMonsterEncounter;
-  Sp.finishNpcEncounter = finishNpcEncounter;
+  Sp.finishEncounter = finishEncounter;
 })();

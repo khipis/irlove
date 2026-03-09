@@ -353,7 +353,7 @@
 
     var btnNpcOk = $('btn-npc-ok');
     if (btnNpcOk) btnNpcOk.addEventListener('click', function () {
-      if (typeof Sp.finishNpcEncounter === 'function') Sp.finishNpcEncounter();
+      if (typeof Sp.finishEncounter === 'function') Sp.finishEncounter();
     });
 
     var btnStatsClose = $('btn-stats-close');
