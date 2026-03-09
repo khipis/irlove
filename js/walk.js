@@ -190,7 +190,7 @@
         show($('loading-place'), false);
         show($('walking-info'), true);
         show($('map-style-bar'), true);
-        show($('btn-simulate-arrival'), true);
+        show($('map-fab-buttons'), true);
         if (state.mapStyle === 'adventure' || state.mapStyle === 'cute') {
           show($('btn-go-to-decoration'), true);
         } else {
@@ -234,15 +234,14 @@
     updateDistanceHint();
     show($('walking-info'), true);
     show($('map-style-bar'), true);
-    show($('btn-simulate-arrival'), true);
+    show($('map-fab-buttons'), true);
     if (state.mapStyle === 'adventure' || state.mapStyle === 'cute') show($('btn-go-to-decoration'), true);
     setStatus(t('status_go_to_next'), '');
     startWatching();
   }
 
   function revealPlace() {
-    show($('btn-simulate-arrival'), false);
-    show($('btn-go-to-decoration'), false);
+    show($('map-fab-buttons'), false);
     show($('map-style-bar'), false);
     state.map.panTo([state.targetPlace.lat, state.targetPlace.lng]);
 
@@ -344,8 +343,7 @@
     show($('loading-place'), false);
     show($('walking-info'), false);
     show($('map-style-bar'), false);
-    show($('btn-simulate-arrival'), false);
-    show($('btn-go-to-decoration'), false);
+    show($('map-fab-buttons'), false);
     show($('btn-experience-map'), false);
     state.debugFoundPlaces = [];
     state.debugChosenIndex = -1;
@@ -364,7 +362,6 @@
     }
     $('btn-start').disabled = false;
     state.selectedKm = 1.9;
-    show($('btn-go-to-decoration'), false);
   }
 
   function startWalk() {

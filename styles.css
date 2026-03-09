@@ -509,13 +509,28 @@ body[data-theme="cute"] .map-container.map-style-cute::after {
   outline: none;
 }
 
-/* Simulate arrival button */
-#btn-simulate-arrival.btn-simulate-arrival-fab {
+/* Map FAB buttons container – "Idź" + "Idź do potwora" side by side */
+.map-fab-buttons {
   position: absolute;
   bottom: 16px;
   left: 16px;
   z-index: 99999;
-  padding: 8px 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+.map-fab-buttons.hidden {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
+/* "Idź" button (go to place) */
+#btn-simulate-arrival.btn-simulate-arrival-fab {
+  padding: 8px 14px;
   border: 2px solid var(--success-bright);
   border-radius: var(--radius-sm);
   background: var(--success);
@@ -554,12 +569,8 @@ body[data-theme="cute"] #btn-simulate-arrival.btn-simulate-arrival-fab:hover {
   display: none !important;
 }
 
-/* Go to decoration (monster/carrot/animal/chest) button – next to simulate */
+/* "Idź do potwora" button (go to decoration – monster/carrot/chest) */
 #btn-go-to-decoration.btn-go-to-decoration-fab {
-  position: absolute;
-  bottom: 16px;
-  left: 165px;
-  z-index: 99999;
   padding: 8px 12px;
   border: 2px solid var(--accent-hover);
   border-radius: var(--radius-sm);
@@ -573,7 +584,6 @@ body[data-theme="cute"] #btn-simulate-arrival.btn-simulate-arrival-fab:hover {
   align-items: center;
   gap: 4px;
   transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
-  pointer-events: auto;
 }
 
 #btn-go-to-decoration.btn-go-to-decoration-fab:hover {
