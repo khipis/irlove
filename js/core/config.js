@@ -18,7 +18,7 @@
     VALID_STYLES: ['adventure', 'stroll', 'cute'],
     WIKI_API: 'https://pl.wikipedia.org/w/api.php',
     WIKI_MAX_DIST_M: 120,
-    SIMULATE_WALK_MS: 900,
+    SIMULATE_WALK_MS: 300,
     CARROT_SPOILED_CHANCE: 0.12,
     CARROT_SPOILED_XP: -3,
     ARTIFACT_ULTRALEGENDARY_CHANCE: 0.05,
