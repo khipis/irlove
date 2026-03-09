@@ -9,7 +9,6 @@
   var haversine = Sp.haversine;
   var removeTargetMarkerAt = Sp.removeTargetMarkerAt;
   var addVisitedMarker = Sp.addVisitedMarker;
-  var revealPlace = Sp.revealPlace;
   var setStatus = Sp.setStatus;
 
   function t(key, replacements) {
@@ -71,7 +70,7 @@
       state.collectedIndices[idx] = true;
       removeTargetMarkerAt(idx);
       addVisitedMarker(state.targetPlace);
-      revealPlace();
+      if (typeof Sp.revealPlace === 'function') Sp.revealPlace();
     }
     animateWalkToTarget(onReached);
   }

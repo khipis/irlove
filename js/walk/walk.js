@@ -241,9 +241,14 @@
   }
 
   function revealPlace() {
+    if (!state.targetPlace) return;
     show($('map-fab-buttons'), false);
     show($('map-style-bar'), false);
-    state.map.panTo([state.targetPlace.lat, state.targetPlace.lng]);
+    if (state.map && state.map.panTo) {
+      try {
+        state.map.panTo([state.targetPlace.lat, state.targetPlace.lng]);
+      } catch (e) { console.error('revealPlace panTo', e); }
+    }
 
     var arrivalEl = document.getElementById('arrival-overlay');
     var revealEl = document.getElementById('reveal-overlay');
@@ -264,7 +269,7 @@
     var photoEl = document.getElementById('reveal-photo');
     var ciekawostkiEl = document.getElementById('reveal-ciekawostki');
     var funfactEl = document.getElementById('reveal-funfact');
-    if (nameEl) nameEl.textContent = state.targetPlace.name;
+    if (nameEl) nameEl.textContent = state.targetPlace.name || '';
     if (descEl) descEl.textContent = state.targetPlace.desc || t('reveal_desc_placeholder');
     if (photoEl) {
       photoEl.innerHTML = '';
@@ -274,21 +279,29 @@
 
     updateRevealButton();
 
-    var distanceM = state.userPosition ? haversine(state.userPosition.lat, state.userPosition.lng, state.targetPlace.lat, state.targetPlace.lng) : 0;
-    var tier = getTierFromDistanceMeters(distanceM);
-    var xpConfig = XP_TIERS[tier] || XP_TIERS.casual;
-    saveExperienceEntry(state.targetPlace, tier, xpConfig);
+    try {
+      var distanceM = state.userPosition ? haversine(state.userPosition.lat, state.userPosition.lng, state.targetPlace.lat, state.targetPlace.lng) : 0;
+      var tier = (typeof getTierFromDistanceMeters === 'function') ? getTierFromDistanceMeters(distanceM) : 'casual';
+      var xpConfig = (XP_TIERS && XP_TIERS[tier]) ? XP_TIERS[tier] : (XP_TIERS && XP_TIERS.casual) || { xp: 10 };
+      if (typeof saveExperienceEntry === 'function') saveExperienceEntry(state.targetPlace, tier, xpConfig);
+    } catch (e) { console.error('revealPlace save XP', e); }
 
-    fetchWikipediaCiekawostki(state.targetPlace.lat, state.targetPlace.lng, state.targetPlace.name, function (extract, imgUrl) {
+    function showCiekawostki(extract, imgUrl) {
       if (imgUrl && photoEl) {
         photoEl.classList.remove('no-photo');
-        photoEl.innerHTML = '<img src="' + imgUrl.replace(/^http:/, 'https:') + '" alt="" loading="lazy" />';
+        photoEl.innerHTML = '<img src="' + String(imgUrl).replace(/^http:/, 'https:') + '" alt="" loading="lazy" />';
       }
       if (extract && funfactEl && ciekawostkiEl) {
         funfactEl.textContent = extract;
         ciekawostkiEl.classList.remove('hidden');
       }
-    });
+    }
+
+    if (typeof fetchWikipediaCiekawostki === 'function') {
+      try {
+        fetchWikipediaCiekawostki(state.targetPlace.lat, state.targetPlace.lng, state.targetPlace.name, showCiekawostki);
+      } catch (e) { console.error('revealPlace wiki', e); }
+    }
 
     setTimeout(function () {
       var a = document.getElementById('arrival-overlay');
@@ -302,7 +315,8 @@
         r.classList.remove('hidden');
         r.style.display = 'flex';
         r.style.visibility = 'visible';
-        r.style.zIndex = '99998';
+        r.style.zIndex = '100000';
+        r.style.pointerEvents = 'auto';
       }
     }, 1400);
   }
@@ -444,7 +458,10 @@
       ao.style.visibility = 'hidden';
     }
     var placesCount = state.visitedMarkers ? state.visitedMarkers.length : 0;
-    var stats = state.stats || { monstersMet: 0, carrotsCollected: 0, animalsMet: 0 };
+    var stats = state.stats || {};
+    var monstersMet = stats.monstersMet != null ? stats.monstersMet : (state.metMonsterNames || []).length;
+    var carrotsCollected = stats.carrotsCollected != null ? stats.carrotsCollected : (state.metCarrotNames || []).length;
+    var animalsMet = stats.animalsMet != null ? stats.animalsMet : (state.metAnimalNames || []).length;
     var style = state.mapStyle || 'adventure';
     listEl.innerHTML = '';
     function addStatRow(icon, label, value) {
@@ -471,16 +488,16 @@
     }
     addStatRow('📍', t('stats_places'), placesCount);
     if (style === 'adventure') {
-      addStatRow('👹', t('stats_monsters'), stats.monstersMet);
+      addStatRow('👹', t('stats_monsters'), monstersMet);
       addNamesList(state.metMonsterNames || [], 'stats-names-list');
       addStatRow('🏺', t('stats_artifacts'), (state.artifactsFound && state.artifactsFound.length) || 0);
       addNamesList(state.artifactsFound || [], 'stats-names-list');
       addStatRow('🩹', t('stats_wounds'), state.wounds || 0);
     }
     if (style === 'cute') {
-      addStatRow('🥕', t('stats_carrots'), stats.carrotsCollected);
+      addStatRow('🥕', t('stats_carrots'), carrotsCollected);
       addNamesList(state.metCarrotNames || [], 'stats-names-list');
-      addStatRow('🐾', t('stats_animals'), stats.animalsMet);
+      addStatRow('🐾', t('stats_animals'), animalsMet);
       addNamesList(state.metAnimalNames || [], 'stats-names-list');
     }
     if (state.visitedMarkers && state.visitedMarkers.length > 0) {
