@@ -17,6 +17,41 @@
     return window.t ? window.t(key, replacements) : key;
   }
 
+  var DIRECTION_KEYS = ['npc_dir_north', 'npc_dir_northeast', 'npc_dir_east', 'npc_dir_southeast', 'npc_dir_south', 'npc_dir_southwest', 'npc_dir_west', 'npc_dir_northwest'];
+
+  function bearingDegrees(lat1, lng1, lat2, lng2) {
+    var dLon = (lng2 - lng1) * Math.PI / 180;
+    var y = Math.sin(dLon) * Math.cos(lat2 * Math.PI / 180);
+    var x = Math.cos(lat1 * Math.PI / 180) * Math.sin(lat2 * Math.PI / 180) - Math.sin(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.cos(dLon);
+    var br = Math.atan2(y, x) * 180 / Math.PI;
+    return (br + 360) % 360;
+  }
+
+  function bearingToDirectionIndex(lat1, lng1, lat2, lng2) {
+    var bearing = bearingDegrees(lat1, lng1, lat2, lng2);
+    var index = Math.floor((bearing + 22.5) / 45) % 8;
+    return index;
+  }
+
+  function getNearestMonsterFrom(npcLat, npcLng) {
+    if (!state.decorationMarkers || !state.decorationMarkers.length || !state.map) return null;
+    var nearest = null;
+    var minDist = Infinity;
+    for (var i = 0; i < state.decorationMarkers.length; i++) {
+      var m = state.decorationMarkers[i];
+      if ((m._decorationType || '') !== 'monster') continue;
+      if (!state.map.hasLayer(m)) continue;
+      var pos = m.getLatLng && m.getLatLng();
+      if (!pos) continue;
+      var dist = haversine(npcLat, npcLng, pos.lat, pos.lng);
+      if (dist < minDist) {
+        minDist = dist;
+        nearest = { marker: m, lat: pos.lat, lng: pos.lng, distance: dist, directionIndex: bearingToDirectionIndex(npcLat, npcLng, pos.lat, pos.lng) };
+      }
+    }
+    return nearest;
+  }
+
   function loadLeaflet() {
     return new Promise(function (resolve, reject) {
       if (window.L) {
@@ -279,8 +314,18 @@
     var name = marker._decorationName || '?';
     var lang = (typeof window.getStoredLang === 'function' && window.getStoredLang()) || 'pl';
     var dialoguesSource = (Sp.npcDialogues && Sp.npcDialogues[lang]) ? Sp.npcDialogues[lang] : (lang === 'en' ? ['Hello, traveller. Have a nice walk!'] : ['Witaj, wędrowcze. Miłego spaceru!']);
-    var dialogues = dialoguesSource;
-    var dialogue = dialogues[Math.floor(Math.random() * dialogues.length)];
+    var dialogue = dialoguesSource[Math.floor(Math.random() * dialoguesSource.length)];
+    var npcPos = marker.getLatLng && marker.getLatLng();
+    if (npcPos) {
+      var nearest = getNearestMonsterFrom(npcPos.lat, npcPos.lng);
+      if (nearest) {
+        var dirKey = DIRECTION_KEYS[nearest.directionIndex];
+        var dirName = t(dirKey);
+        var hintKey = 'npc_monster_hint_' + (1 + Math.floor(Math.random() * 5));
+        var hint = t(hintKey, { direction: dirName });
+        dialogue = dialogue + ' ' + hint;
+      }
+    }
     showEncounterOverlay(name, dialogue, false);
   }
 

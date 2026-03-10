@@ -94,6 +94,21 @@
       monster_fight_won: 'Pokonałeś potwora! +{xp} XP',
       monster_fight_lost: 'Potwór Cię pokonał!',
 
+      // NPC direction hint (monster nearby)
+      npc_dir_north: 'północ',
+      npc_dir_northeast: 'północny wschód',
+      npc_dir_east: 'wschód',
+      npc_dir_southeast: 'południowy wschód',
+      npc_dir_south: 'południe',
+      npc_dir_southwest: 'południowy zachód',
+      npc_dir_west: 'zachód',
+      npc_dir_northwest: 'północny zachód',
+      npc_monster_hint_1: 'W kierunku {direction} coś się odzywa.',
+      npc_monster_hint_2: 'Słyszę coś na {direction}.',
+      npc_monster_hint_3: 'Idź w stronę {direction} – tam coś jest.',
+      npc_monster_hint_4: 'Ostatnio widziano stwora na {direction}.',
+      npc_monster_hint_5: 'Z {direction} dochodziły dziwne odgłosy.',
+
       // Minigames (fight)
       minigame_round: 'Runda {n}',
       minigame_win: 'Wygrana!',
@@ -287,6 +302,20 @@
       monster_btn_fight: 'Fight',
       monster_fight_won: 'You defeated the monster! +{xp} XP',
       monster_fight_lost: 'The monster defeated you!',
+
+      npc_dir_north: 'north',
+      npc_dir_northeast: 'northeast',
+      npc_dir_east: 'east',
+      npc_dir_southeast: 'southeast',
+      npc_dir_south: 'south',
+      npc_dir_southwest: 'southwest',
+      npc_dir_west: 'west',
+      npc_dir_northwest: 'northwest',
+      npc_monster_hint_1: 'Something stirs to the {direction}.',
+      npc_monster_hint_2: 'I hear it to the {direction}.',
+      npc_monster_hint_3: 'That way, toward the {direction} – something is there.',
+      npc_monster_hint_4: 'The creature was last seen to the {direction}.',
+      npc_monster_hint_5: 'Strange sounds came from the {direction}.',
 
       minigame_round: 'Round {n}',
       minigame_win: 'You win!',
