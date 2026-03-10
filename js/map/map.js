@@ -527,28 +527,54 @@
         if (input) input.disabled = true;
         if (sendBtn) sendBtn.disabled = true;
         showGeneratingPlaceholder();
-        window.generateAnimalReplyFromContext(animalName || 'Animal', langKey, state.encounterMessages).then(function (llmReply) {
-          removeGeneratingPlaceholder();
-          var reply = llmReply && llmReply.trim();
-          var fromLLM = !!reply;
-          if (!reply && replies && replies.animalGeneric && replies.animalGeneric[langKey]) reply = getRandomReply(replies.animalGeneric[langKey]);
-          if (!reply) reply = langKey === 'pl' ? 'Hmm, miło pogadać!' : 'Nice to chat!';
-          if (!fromLLM && window.Spacerek && window.Spacerek.llmModuleLoaded && Sp.showToast) {
-            Sp.showToast(window.t ? window.t('npc_model_failed_toast') : 'AI model failed – using template');
+        (async function () {
+          try {
+            // ----- Translation path: use UI language (selected at start), not input detection -----
+            var needTranslate = (langKey === 'pl');
+            if (typeof console !== 'undefined' && console.debug) {
+              console.debug('[Spacerek] Dialog (zwierzę) | Język UI: ' + langKey + ' | Wejście: "' + text + '"');
+            }
+            // ----- Pre-processing: if UI is Polish, translate PL→EN before sending to LLM -----
+            var textForLlm = text;
+            if (needTranslate && window.Spacerek && typeof window.Spacerek.translateToEnglish === 'function') {
+              textForLlm = await window.Spacerek.translateToEnglish(text);
+              if (typeof console !== 'undefined' && console.debug) {
+                console.debug('[Spacerek] Tłumaczenie PL→EN (dla LLM): "' + textForLlm + '"');
+              }
+            }
+            var messagesForLlm = state.encounterMessages.slice(0, -1).concat([{ who: 'player', text: textForLlm }]);
+            // ----- LLM invocation (unchanged) -----
+            var llmReply = await (window.generateAnimalReplyFromContext(animalName || 'Animal', 'en', messagesForLlm) || Promise.resolve(null));
+            var reply = llmReply && llmReply.trim();
+            var fromLLM = !!reply;
+            if (typeof console !== 'undefined' && console.debug && reply) {
+              console.debug('[Spacerek] Odpowiedź LLM (EN): "' + reply + '"');
+            }
+            // ----- Post-processing: if UI is Polish, translate LLM response EN→PL -----
+            if (reply && needTranslate && window.Spacerek && typeof window.Spacerek.translateToPolish === 'function') {
+              reply = await window.Spacerek.translateToPolish(reply);
+              if (typeof console !== 'undefined' && console.debug) {
+                console.debug('[Spacerek] Tłumaczenie EN→PL (wyświetl): "' + reply + '"');
+              }
+            }
+            if (!reply && replies && replies.animalGeneric && replies.animalGeneric[langKey]) reply = getRandomReply(replies.animalGeneric[langKey]);
+            if (!reply) reply = langKey === 'pl' ? 'Hmm, miło pogadać!' : 'Nice to chat!';
+            if (!fromLLM && window.Spacerek && window.Spacerek.llmModuleLoaded && Sp.showToast) {
+              Sp.showToast(window.t ? window.t('npc_model_failed_toast') : 'AI model failed – using template');
+            }
+            appendEncounterMessage('them', reply, fromLLM);
+          } catch (e) {
+            var genericList = replies.animalGeneric && replies.animalGeneric[langKey];
+            if (window.Spacerek && window.Spacerek.llmModuleLoaded && Sp.showToast) {
+              Sp.showToast(window.t ? window.t('npc_model_failed_toast') : 'AI model failed – using template');
+            }
+            appendEncounterMessage('them', getRandomReply(genericList) || (langKey === 'pl' ? 'Hmm, miło pogadać!' : 'Nice to chat!'), false);
+          } finally {
+            removeGeneratingPlaceholder();
+            if (input) input.disabled = false;
+            if (sendBtn) sendBtn.disabled = false;
           }
-          appendEncounterMessage('them', reply, fromLLM);
-          if (input) input.disabled = false;
-          if (sendBtn) sendBtn.disabled = false;
-        }).catch(function () {
-          removeGeneratingPlaceholder();
-          var genericList = replies.animalGeneric && replies.animalGeneric[langKey];
-          if (window.Spacerek && window.Spacerek.llmModuleLoaded && Sp.showToast) {
-            Sp.showToast(window.t ? window.t('npc_model_failed_toast') : 'AI model failed – using template');
-          }
-          appendEncounterMessage('them', getRandomReply(genericList) || (langKey === 'pl' ? 'Hmm, miło pogadać!' : 'Nice to chat!'), false);
-          if (input) input.disabled = false;
-          if (sendBtn) sendBtn.disabled = false;
-        });
+        })();
         return;
       }
       var genericList = replies.animalGeneric && replies.animalGeneric[langKey];
@@ -577,28 +603,54 @@
         if (input) input.disabled = true;
         if (sendBtn) sendBtn.disabled = true;
         showGeneratingPlaceholder();
-        window.generateNpcReplyFromContext(npcName || 'NPC', langKey, state.encounterMessages).then(function (llmReply) {
-          removeGeneratingPlaceholder();
-          var reply = llmReply && llmReply.trim();
-          var fromLLM = !!reply;
-          if (!reply && replies && replies.npcGeneric && replies.npcGeneric[langKey]) reply = getRandomReply(replies.npcGeneric[langKey]);
-          if (!reply) reply = langKey === 'pl' ? 'Rozumiem. Miłego spaceru!' : 'I see. Have a nice walk!';
-          if (!fromLLM && window.Spacerek && window.Spacerek.llmModuleLoaded && Sp.showToast) {
-            Sp.showToast(window.t ? window.t('npc_model_failed_toast') : 'AI model failed – using template');
+        (async function () {
+          try {
+            // ----- Translation path: use UI language (selected at start) -----
+            var needTranslate = (langKey === 'pl');
+            if (typeof console !== 'undefined' && console.debug) {
+              console.debug('[Spacerek] Dialog (NPC) | Język UI: ' + langKey + ' | Wejście: "' + text + '"');
+            }
+            // ----- Pre-processing: if UI is Polish, translate PL→EN before sending to LLM -----
+            var textForLlm = text;
+            if (needTranslate && window.Spacerek && typeof window.Spacerek.translateToEnglish === 'function') {
+              textForLlm = await window.Spacerek.translateToEnglish(text);
+              if (typeof console !== 'undefined' && console.debug) {
+                console.debug('[Spacerek] Tłumaczenie PL→EN (dla LLM): "' + textForLlm + '"');
+              }
+            }
+            var messagesForLlm = state.encounterMessages.slice(0, -1).concat([{ who: 'player', text: textForLlm }]);
+            // ----- LLM invocation (unchanged) -----
+            var llmReply = await (window.generateNpcReplyFromContext(npcName || 'NPC', 'en', messagesForLlm) || Promise.resolve(null));
+            var reply = llmReply && llmReply.trim();
+            var fromLLM = !!reply;
+            if (typeof console !== 'undefined' && console.debug && reply) {
+              console.debug('[Spacerek] Odpowiedź LLM (EN): "' + reply + '"');
+            }
+            // ----- Post-processing: if UI is Polish, translate LLM response EN→PL -----
+            if (reply && needTranslate && window.Spacerek && typeof window.Spacerek.translateToPolish === 'function') {
+              reply = await window.Spacerek.translateToPolish(reply);
+              if (typeof console !== 'undefined' && console.debug) {
+                console.debug('[Spacerek] Tłumaczenie EN→PL (wyświetl): "' + reply + '"');
+              }
+            }
+            if (!reply && replies && replies.npcGeneric && replies.npcGeneric[langKey]) reply = getRandomReply(replies.npcGeneric[langKey]);
+            if (!reply) reply = langKey === 'pl' ? 'Rozumiem. Miłego spaceru!' : 'I see. Have a nice walk!';
+            if (!fromLLM && window.Spacerek && window.Spacerek.llmModuleLoaded && Sp.showToast) {
+              Sp.showToast(window.t ? window.t('npc_model_failed_toast') : 'AI model failed – using template');
+            }
+            appendEncounterMessage('them', reply, fromLLM);
+          } catch (e) {
+            var genericList = replies.npcGeneric && replies.npcGeneric[langKey];
+            if (window.Spacerek && window.Spacerek.llmModuleLoaded && Sp.showToast) {
+              Sp.showToast(window.t ? window.t('npc_model_failed_toast') : 'AI model failed – using template');
+            }
+            appendEncounterMessage('them', getRandomReply(genericList) || (langKey === 'pl' ? 'Rozumiem. Miłego spaceru!' : 'I see. Have a nice walk!'), false);
+          } finally {
+            removeGeneratingPlaceholder();
+            if (input) input.disabled = false;
+            if (sendBtn) sendBtn.disabled = false;
           }
-          appendEncounterMessage('them', reply, fromLLM);
-          if (input) input.disabled = false;
-          if (sendBtn) sendBtn.disabled = false;
-        }).catch(function () {
-          removeGeneratingPlaceholder();
-          var genericList = replies.npcGeneric && replies.npcGeneric[langKey];
-          if (window.Spacerek && window.Spacerek.llmModuleLoaded && Sp.showToast) {
-            Sp.showToast(window.t ? window.t('npc_model_failed_toast') : 'AI model failed – using template');
-          }
-          appendEncounterMessage('them', getRandomReply(genericList) || (langKey === 'pl' ? 'Rozumiem. Miłego spaceru!' : 'I see. Have a nice walk!'), false);
-          if (input) input.disabled = false;
-          if (sendBtn) sendBtn.disabled = false;
-        });
+        })();
         return;
       }
       if (replies && replies.npcGeneric && replies.npcGeneric[langKey]) {

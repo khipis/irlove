@@ -232,7 +232,8 @@
   <!-- services: Overpass, Wikipedia -->
   <script src="js/services/places.js"></script>
   <script src="js/services/wiki.js"></script>
-  <!-- NPC dialogue: fallback (templates) always; WebLLM (WebGPU) only on http(s) -->
+  <!-- NPC dialogue: offline translator (PL↔EN), then fallback + WebLLM -->
+  <script src="js/llm/translator.js"></script>
   <script src="js/llm/animal-quest-fallback.js"></script>
   <script>
     (function () {
