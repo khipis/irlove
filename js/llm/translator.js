@@ -1,6 +1,7 @@
 /**
  * Translator for NPC dialogue: when UI is PL → input PL→EN, LLM replies in EN, response EN→PL.
- * When UI is EN → no translation. Uses Opus-MT (Transformers.js); on load failure falls back to pass-through.
+ * When UI is EN → no translation.
+ * EN→PL: Opus-MT (offline) or MyMemory API (online fallback when Hugging Face returns 401).
  */
 (function () {
   'use strict';
@@ -9,6 +10,7 @@
   var MODEL_PL_EN = 'Xenova/opus-mt-pl-en';
   var MODEL_EN_PL = 'Xenova/opus-mt-en-pl';
   var MODEL_EN_PL_FALLBACK = 'Helsinki-NLP/opus-mt-en-pl';
+  var MYMEMORY_URL = 'https://api.mymemory.translated.net/get';
   var DEBUG_PREFIX = '[Spacerek]';
 
   var plEnPipe = null;
@@ -101,21 +103,45 @@
     }
   }
 
+  function translateToPolishViaApi(text) {
+    if (typeof fetch === 'undefined' || typeof document === 'undefined' || document.location.protocol === 'file:') {
+      return Promise.resolve(null);
+    }
+    var url = MYMEMORY_URL + '?q=' + encodeURIComponent(text.slice(0, 500)) + '&langpair=en|pl';
+    return fetch(url, { method: 'GET' })
+      .then(function (res) { return res.ok ? res.json() : null; })
+      .then(function (data) {
+        var translated = data && data.responseData && data.responseData.translatedText;
+        return translated && translated !== text ? translated : null;
+      })
+      .catch(function () { return null; });
+  }
+
   async function translateToPolish(text) {
     if (!text || typeof text !== 'string') return '';
     var t = text.trim();
     if (!t.length) return '';
     try {
       var pipe = await loadEnPl();
-      if (!pipe) {
-        log('EN→PL (pass-through): "' + t + '"');
-        return t;
+      if (pipe) {
+        var out = await pipe(t, { max_length: 150 });
+        var result = (out && Array.isArray(out) && out[0] && out[0].translation_text) ? out[0].translation_text : (typeof out === 'string' ? out : t);
+        log('EN→PL (Opus-MT): "' + t + '" → "' + result + '"');
+        return result;
       }
-      var out = await pipe(t, { max_length: 150 });
-      var result = (out && Array.isArray(out) && out[0] && out[0].translation_text) ? out[0].translation_text : (typeof out === 'string' ? out : t);
-      log('EN→PL: "' + t + '" → "' + result + '"');
-      return result;
+      var apiResult = await translateToPolishViaApi(t);
+      if (apiResult) {
+        log('EN→PL (MyMemory API): "' + t + '" → "' + apiResult + '"');
+        return apiResult;
+      }
+      log('EN→PL (pass-through): "' + t + '"');
+      return t;
     } catch (e) {
+      var apiResult = await translateToPolishViaApi(t).catch(function () { return null; });
+      if (apiResult) {
+        log('EN→PL (MyMemory API): "' + t + '" → "' + apiResult + '"');
+        return apiResult;
+      }
       log('EN→PL error (pass-through)', e);
       return t;
     }
