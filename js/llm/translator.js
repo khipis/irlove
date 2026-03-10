@@ -1,20 +1,17 @@
 /**
- * Translator for NPC dialogue: when UI is PL → input PL→EN (Opus-MT), LLM in EN, response EN→PL.
- * EN→PL: Xenova/opus-mt-en-pl (offline) if load OK; else MyMemory API (online). When UI is EN → no translation.
+ * Translator: when UI is PL → input PL→EN (Xenova/Opus-MT), LLM in EN, response EN→PL (MyMemory API only).
+ * When UI is EN → no translation. EN→PL only via MyMemory (no Hugging Face – 401).
  */
 (function () {
   'use strict';
 
   var TRANSFORMERS_CDN = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0';
   var MODEL_PL_EN = 'Xenova/opus-mt-pl-en';
-  var MODEL_EN_PL = 'Xenova/opus-mt-en-pl';
   var MYMEMORY_URL = 'https://api.mymemory.translated.net/get';
   var DEBUG_PREFIX = '[Spacerek]';
 
   var plEnPipe = null;
-  var enPlPipe = null;
   var plEnLoadPromise = null;
-  var enPlLoadPromise = null;
 
   function log() {
     if (typeof console !== 'undefined' && console.log) {
@@ -43,27 +40,6 @@
         return null;
       });
     return plEnLoadPromise;
-  }
-
-  function loadEnPl() {
-    if (enPlLoadPromise) return enPlLoadPromise;
-    enPlLoadPromise = import(/* webpackIgnore: true */ TRANSFORMERS_CDN)
-      .then(function (mod) {
-        var pipeline = mod.pipeline || (mod.default && mod.default.pipeline);
-        if (!pipeline) throw new Error('pipeline not found');
-        return pipeline('translation', MODEL_EN_PL, { progress_callback: null });
-      })
-      .then(function (pipe) {
-        enPlPipe = pipe;
-        log('Translator EN→PL załadowany (Xenova/Opus-MT)');
-        return pipe;
-      })
-      .catch(function (err) {
-        log('Translator EN→PL (Xenova) niedostępny, używam MyMemory API', err.message || err);
-        enPlLoadPromise = null;
-        return null;
-      });
-    return enPlLoadPromise;
   }
 
   async function translateToEnglish(text) {
@@ -104,17 +80,6 @@
     if (!text || typeof text !== 'string') return '';
     var t = text.trim();
     if (!t.length) return '';
-    try {
-      var pipe = await loadEnPl();
-      if (pipe) {
-        var out = await pipe(t, { max_length: 150 });
-        var result = (out && Array.isArray(out) && out[0] && out[0].translation_text) ? out[0].translation_text : (typeof out === 'string' ? out : t);
-        log('EN→PL (Xenova): "' + t + '" → "' + result + '"');
-        return result;
-      }
-    } catch (e) {
-      /* fall through to MyMemory */
-    }
     var apiResult = await translateToPolishViaApi(t);
     if (apiResult) {
       log('EN→PL (MyMemory API): "' + t + '" → "' + apiResult + '"');
@@ -125,7 +90,7 @@
   }
 
   function updatePassThrough() {
-    var passThrough = !plEnPipe || !enPlPipe;
+    var passThrough = !plEnPipe;
     if (typeof window !== 'undefined' && window.Spacerek) {
       window.Spacerek.translatorIsPassThrough = passThrough;
     }
