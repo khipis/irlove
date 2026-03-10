@@ -204,6 +204,7 @@
   <script src="js/data/animal-names.js"></script>
   <script src="js/data/artifact-names.js"></script>
   <script src="js/data/npc-names.js"></script>
+  <script src="js/data/npc-dialogues.js"></script>
   <!-- storage -->
   <script src="js/storage/storage.js"></script>
   <!-- ui: experience (XP panel), locale -->
@@ -215,8 +216,17 @@
   <!-- services: Overpass, Wikipedia -->
   <script src="js/services/places.js"></script>
   <script src="js/services/wiki.js"></script>
-  <!-- optional: local LLM for animal quest lines (~85MB, loads on first use) -->
-  <script type="module" src="js/llm/animal-quest.js"></script>
+  <!-- animal quest: fallback always (works file:// + GitHub Pages); LLM module only on http(s) -->
+  <script src="js/llm/animal-quest-fallback.js"></script>
+  <script>
+    (function () {
+      if (document.location.protocol === 'file:') return;
+      var s = document.createElement('script');
+      s.type = 'module';
+      s.src = 'js/llm/animal-quest.js';
+      document.body.appendChild(s);
+    })();
+  </script>
   <!-- walk: simulate, walk flow -->
   <script src="js/walk/simulate.js"></script>
   <script src="js/walk/walk.js"></script>

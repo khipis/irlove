@@ -271,16 +271,14 @@
     }
   }
 
-  var NPC_DIALOGUES_PL = ['Witaj, wędrowcze. Miłego spaceru!', 'Nie bój się, to ja. Uważaj na potwory.', 'Marchewka? Nie, nie mam. Szukaj dalej.'];
-  var NPC_DIALOGUES_EN = ['Hello, traveller. Have a nice walk!', "Don't be afraid, it's me. Watch out for monsters.", "A carrot? I don't have any. Keep looking."];
-
   function showNpcEncounter(index, marker) {
     state.pendingEncounterType = 'npc';
     state.pendingNpcIndex = index;
     state.pendingNpcMarker = marker;
     var name = marker._decorationName || '?';
     var lang = (typeof window.getStoredLang === 'function' && window.getStoredLang()) || 'pl';
-    var dialogues = lang === 'en' ? NPC_DIALOGUES_EN : NPC_DIALOGUES_PL;
+    var dialoguesSource = (Sp.npcDialogues && Sp.npcDialogues[lang]) ? Sp.npcDialogues[lang] : (lang === 'en' ? ['Hello, traveller. Have a nice walk!'] : ['Witaj, wędrowcze. Miłego spaceru!']);
+    var dialogues = dialoguesSource;
     var dialogue = dialogues[Math.floor(Math.random() * dialogues.length)];
     showEncounterOverlay(name, dialogue);
   }
