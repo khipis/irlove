@@ -139,6 +139,42 @@
     return shuffleArray(list).slice(0, Math.min(count, list.length));
   }
 
+  function randomPointOnPathOrInBounds(bounds, places, userPos) {
+    var south = bounds.getSouth();
+    var north = bounds.getNorth();
+    var west = bounds.getWest();
+    var east = bounds.getEast();
+    var usePath = (places && places.length && userPos && Math.random() < 0.65);
+    if (usePath) {
+      var from = userPos;
+      var to = places[Math.floor(Math.random() * places.length)];
+      if (from && to && (from.lat !== to.lat || from.lng !== to.lng)) {
+        var t = 0.15 + Math.random() * 0.7;
+        var lat = from.lat + t * (to.lat - from.lat);
+        var lng = from.lng + t * (to.lng - from.lng);
+        lat = Math.max(south, Math.min(north, lat));
+        lng = Math.max(west, Math.min(east, lng));
+        return { lat: lat, lng: lng };
+      }
+      if (places.length >= 2 && Math.random() < 0.5) {
+        var a = places[Math.floor(Math.random() * places.length)];
+        var b = places[Math.floor(Math.random() * places.length)];
+        if (a !== b) {
+          var t2 = 0.2 + Math.random() * 0.6;
+          lat = a.lat + t2 * (b.lat - a.lat);
+          lng = a.lng + t2 * (b.lng - a.lng);
+          lat = Math.max(south, Math.min(north, lat));
+          lng = Math.max(west, Math.min(east, lng));
+          return { lat: lat, lng: lng };
+        }
+      }
+    }
+    return {
+      lat: south + Math.random() * (north - south),
+      lng: west + Math.random() * (east - west)
+    };
+  }
+
   function addDecorationMarkers(style, bounds) {
     var icons = getDecorationIcons(style);
     if (!icons.length || !state.map || !bounds) return;
@@ -147,6 +183,8 @@
     var north = bounds.getNorth();
     var west = bounds.getWest();
     var east = bounds.getEast();
+    var places = state.targetPlaces || [];
+    var userPos = state.userPosition || null;
     var lang = (typeof window.getStoredLang === 'function' && window.getStoredLang()) || 'pl';
     state.decorationMarkers = [];
     var monsterCount = icons.filter(function (item) { return (item.type || 'monster') === 'monster'; }).length;
@@ -173,8 +211,9 @@
       } else {
         name = animalNames[animalIdx++] || '…';
       }
-      var lat = south + Math.random() * (north - south);
-      var lng = west + Math.random() * (east - west);
+      var pt = randomPointOnPathOrInBounds(bounds, places, userPos);
+      var lat = pt.lat;
+      var lng = pt.lng;
       var icon = L.divIcon({
         className: 'decoration-marker',
         html: '<span class="decoration-marker-pin">' + char + '</span>',

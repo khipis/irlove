@@ -51,15 +51,29 @@
     return a;
   }
 
-  /** Returns array of { char, type } to scatter on map. type: 'monster' | 'carrot' | 'animal' | 'chest' | 'npc'. */
+  /** Scale factor: at 5 attractions use current counts; scale up/down with numAttractions. */
+  function getDecorationScale() {
+    var num = (state && state.numAttractions != null) ? state.numAttractions : 5;
+    return Math.max(0.2, Math.min(2.5, num / 5));
+  }
+
+  /** Returns array of { char, type } to scatter on map. type: 'monster' | 'carrot' | 'animal' | 'chest' | 'npc'. Counts scale with numAttractions (base = 5). */
   function getDecorationIcons(style) {
+    var scale = getDecorationScale();
     if (style === 'adventure') {
       var monsters = shuffleArray(ADVENTURE_MONSTERS.slice());
-      var n = 5 + Math.floor(Math.random() * 6);
-      var list = monsters.slice(0, n).map(function (c) { return { char: c, type: 'monster' }; });
-      var numChests = 3 + Math.floor(Math.random() * 2);
-      var chests = shuffleArray(ADVENTURE_CHESTS.slice()).slice(0, numChests);
-      var numNpcs = 5 + Math.floor(Math.random() * 4);
+      var baseMonsters = 5 + Math.floor(Math.random() * 6);
+      var n = Math.max(1, Math.round(baseMonsters * scale));
+      var list = [];
+      for (var i = 0; i < n; i++) list.push({ char: monsters[i % monsters.length], type: 'monster' });
+      var baseChests = 3 + Math.floor(Math.random() * 2);
+      var numChests = Math.max(1, Math.round(baseChests * scale));
+      var chests = shuffleArray(ADVENTURE_CHESTS.slice()).slice(0, Math.min(numChests, ADVENTURE_CHESTS.length));
+      for (var c = chests.length; c < numChests; c++) {
+        chests.push(ADVENTURE_CHESTS[Math.floor(Math.random() * ADVENTURE_CHESTS.length)]);
+      }
+      var baseNpcs = 5 + Math.floor(Math.random() * 4);
+      var numNpcs = Math.max(1, Math.round(baseNpcs * scale));
       var npcs = [];
       for (var i = 0; i < numNpcs; i++) {
         var pick = ADVENTURE_NPCS[Math.floor(Math.random() * ADVENTURE_NPCS.length)];
@@ -68,7 +82,13 @@
       return list.concat(chests).concat(npcs);
     }
     if (style === 'cute') {
-      return shuffleArray(CUTE_DECORATIONS.slice());
+      var baseCount = CUTE_DECORATIONS.length;
+      var want = Math.max(3, Math.min(25, Math.round(baseCount * scale)));
+      var out = [];
+      for (var i = 0; i < want; i++) {
+        out.push(CUTE_DECORATIONS[i % baseCount]);
+      }
+      return shuffleArray(out);
     }
     return [];
   }
