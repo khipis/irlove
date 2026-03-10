@@ -342,6 +342,8 @@
     var elTitle = document.getElementById('npc-encounter-title');
     var elAvatar = document.getElementById('npc-encounter-avatar');
     var elConv = document.getElementById('npc-conversation');
+    var elPlayerStats = document.getElementById('npc-player-stats');
+    var elMonstersHint = document.getElementById('npc-monsters-hint');
     var elCarrotsHint = document.getElementById('npc-carrots-hint');
     var elInput = document.getElementById('npc-chat-input');
     var elLlmBadge = document.getElementById('npc-llm-badge');
@@ -387,13 +389,33 @@
         elAiHint.classList.add('hidden');
       }
     }
-    if (elCarrotsHint) {
-      if (isAnimal && state.stats && state.stats.carrotsCollected != null) {
-        var n = state.stats.carrotsCollected;
-        elCarrotsHint.textContent = (window.t ? window.t('npc_carrots_hint', { count: n }) : 'Masz ' + n + ' marchewek').replace('{count}', n);
-        elCarrotsHint.classList.remove('hidden');
+    if (elPlayerStats) {
+      var carrotsCount = (state.stats && state.stats.carrotsCollected != null) ? state.stats.carrotsCollected : 0;
+      var monstersKilled = state.monstersKilled || 0;
+      var monsterNames = state.metMonsterNames || [];
+      if (isAnimal) {
+        if (elMonstersHint) { elMonstersHint.classList.add('hidden'); }
+        if (elCarrotsHint) {
+          elCarrotsHint.textContent = '\u{1F955} ' + (window.t ? window.t('npc_carrots_hint', { count: carrotsCount }) : 'Masz ' + carrotsCount + ' marchewek').replace('{count}', carrotsCount);
+          elCarrotsHint.classList.remove('hidden');
+        }
+        elPlayerStats.classList.remove('hidden');
       } else {
-        elCarrotsHint.classList.add('hidden');
+        if (elMonstersHint) {
+          if (monstersKilled > 0) {
+            var namesStr = monsterNames.length ? ' (' + monsterNames.slice(0, 5).join(', ') + (monsterNames.length > 5 ? '…' : '') + ')' : '';
+            elMonstersHint.textContent = '\u{1F479} ' + (window.t ? window.t('npc_monsters_hint') : 'Pokonane potwory:') + ' ' + monstersKilled + namesStr;
+            elMonstersHint.classList.remove('hidden');
+          } else {
+            elMonstersHint.textContent = '\u{1F479} ' + (window.t ? window.t('npc_monsters_hint') : 'Pokonane potwory:') + ' 0';
+            elMonstersHint.classList.remove('hidden');
+          }
+        }
+        if (elCarrotsHint) {
+          elCarrotsHint.textContent = '\u{1F955} ' + (window.t ? window.t('npc_carrots_hint', { count: carrotsCount }) : 'Marchewki: ' + carrotsCount).replace('{count}', carrotsCount);
+          elCarrotsHint.classList.remove('hidden');
+        }
+        elPlayerStats.classList.remove('hidden');
       }
     }
     if (elInput) {
@@ -670,7 +692,12 @@
             }
             var messagesForLlm = state.encounterMessages.slice(0, -1).concat([{ who: 'player', text: textForLlm }]);
             var llmLang = 'en';
-            var llmReply = await (window.generateNpcReplyFromContext(npcName || 'NPC', llmLang, messagesForLlm) || Promise.resolve(null));
+            var playerContext = {
+              monstersKilled: state.monstersKilled || 0,
+              monsterNames: state.metMonsterNames || [],
+              carrots: (state.stats && state.stats.carrotsCollected != null) ? state.stats.carrotsCollected : 0
+            };
+            var llmReply = await (window.generateNpcReplyFromContext(npcName || 'NPC', llmLang, messagesForLlm, playerContext) || Promise.resolve(null));
             var reply = llmReply && llmReply.trim();
             var fromLLM = !!reply;
             if (typeof console !== 'undefined' && console.log && reply) {

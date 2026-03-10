@@ -65,12 +65,24 @@ function cleanAndTrimReply(content, rejectIfEquals) {
   return firstLine;
 }
 
-function getSystemPrompt(name, lang, isAnimal) {
+function getSystemPrompt(name, lang, isAnimal, playerContext) {
   var role = isAnimal ? 'A friendly animal named ' + name + '.' : 'A character named ' + name + '.';
   var langRule = lang === 'pl'
     ? ' Reply in one short sentence in Polish only.'
     : ' Reply in one short sentence in English only.';
-  return role + ' Answer only as ' + name + ', briefly. Output only the reply text: no "I reply", no "I say", no "' + name + ' says/replies", no quotation marks around the reply.' + langRule;
+  var base = role + ' Answer only as ' + name + ', briefly. Output only the reply text: no "I reply", no "I say", no "' + name + ' says/replies", no quotation marks around the reply.' + langRule;
+  if (playerContext && (playerContext.monstersKilled > 0 || playerContext.carrots > 0)) {
+    var parts = [];
+    if (playerContext.monstersKilled > 0) {
+      var names = (playerContext.monsterNames || []).slice(0, 5).join(', ');
+      parts.push('The traveler has defeated ' + playerContext.monstersKilled + ' monster(s)' + (names ? ': ' + names : '') + '.');
+    }
+    if (playerContext.carrots != null && playerContext.carrots > 0) {
+      parts.push('The traveler has ' + playerContext.carrots + ' carrot(s).');
+    }
+    if (parts.length) base += ' Context: ' + parts.join(' ') + ' You may acknowledge this in your reply.';
+  }
+  return base;
 }
 
 function loadWebLLM(progressCb) {
@@ -161,14 +173,14 @@ function generateAnimalReplyFromContext(animalName, lang, messages) {
   });
 }
 
-function generateNpcReplyFromContext(npcName, lang, messages) {
+function generateNpcReplyFromContext(npcName, lang, messages, playerContext) {
   if (!messages || !messages.length) return Promise.resolve(null);
   var langKey = lang === 'pl' ? 'pl' : 'en';
   var name = npcName || 'NPC';
   var last = messages[messages.length - 1];
   var playerSaid = (last && last.who === 'player' ? last.text : '').trim().slice(0, 120).replace(/"/g, "'");
   if (!playerSaid) return Promise.resolve(null);
-  var system = getSystemPrompt(name, langKey, false);
+  var system = getSystemPrompt(name, langKey, false, playerContext);
   var chatMessages = [
     { role: 'system', content: system },
     { role: 'user', content: 'Traveler said: "' + playerSaid + '". What does ' + name + ' reply?' }
