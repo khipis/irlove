@@ -10,10 +10,10 @@
   var DEBUG_PREFIX = '[Spacerek]';
 
   function log() {
-    if (typeof console !== 'undefined' && console.debug) {
+    if (typeof console !== 'undefined' && console.log) {
       var args = [].slice.call(arguments);
       args[0] = DEBUG_PREFIX + ' ' + (args[0] || '');
-      console.debug.apply(console, args);
+      console.log.apply(console, args);
     }
   }
 
