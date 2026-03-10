@@ -16,9 +16,9 @@
   }
 
   var XP_TIERS = {
-    casual: { xp: 10, label: 'Casual' },
-    epic: { xp: 50, label: 'Epic' },
-    legendary: { xp: 100, label: 'Legendary' }
+    casual: { xp: 8, label: 'Casual' },
+    epic: { xp: 22, label: 'Epic' },
+    legendary: { xp: 45, label: 'Legendary' }
   };
 
   function getTierFromKm(km) {
@@ -39,10 +39,10 @@
   }
 
   function levelFromXp(xp) {
-    if (xp < 100) return 1;
-    if (xp < 300) return 2;
-    if (xp < 600) return 3;
-    if (xp < 1000) return 4;
+    if (xp < 80) return 1;
+    if (xp < 220) return 2;
+    if (xp < 450) return 3;
+    if (xp < 800) return 4;
     return 5;
   }
 

@@ -233,10 +233,11 @@
           playerLevel = Math.max(1, Math.min(5, Sp.levelFromXp(totalXp)));
         }
         var levelScale = Math.max(0, playerLevel - 1);
-        marker._monsterLevel = Math.min(6, 1 + Math.floor(Math.random() * 3) + levelScale);
-        marker._monsterStr = Math.min(15, 2 + Math.floor(Math.random() * 7) + levelScale * 2);
-        marker._monsterDex = Math.min(15, 2 + Math.floor(Math.random() * 7) + levelScale * 2);
-        marker._monsterXp = 5 + marker._monsterLevel * 5 + levelScale * 3;
+        var scaleCap = Math.min(2, levelScale);
+        marker._monsterLevel = Math.min(5, 1 + Math.floor(Math.random() * 3) + scaleCap);
+        marker._monsterStr = Math.min(14, 2 + Math.floor(Math.random() * 6) + scaleCap * 2);
+        marker._monsterDex = Math.min(14, 2 + Math.floor(Math.random() * 6) + scaleCap * 2);
+        marker._monsterXp = 8 + marker._monsterLevel * 4 + levelScale * 2;
       }
       marker.bindTooltip(name, { permanent: false });
       marker.on('click', function () {
@@ -667,7 +668,7 @@
         var isLegendary = names.artifactsUltralegendary && names.artifactsUltralegendary[langKey] && names.artifactsUltralegendary[langKey].length && Math.random() < 0.5;
         var list = isLegendary ? (names.artifactsUltralegendary && names.artifactsUltralegendary[langKey]) : (names.artifacts && names.artifacts[langKey]);
         var artifactName = (list && list.length) ? list[Math.floor(Math.random() * list.length)] : (window.t ? window.t('chest_artifact_unknown') : 'Artefakt');
-        var artifactXp = isLegendary ? 45 + Math.floor(Math.random() * 26) : 30 + Math.floor(Math.random() * 21);
+        var artifactXp = isLegendary ? 35 + Math.floor(Math.random() * 8) : 22 + Math.floor(Math.random() * 10);
         state.artifactsFound.push(artifactName);
         if (typeof Sp.getStoredCharacter === 'function' && typeof Sp.setStoredCharacter === 'function') {
           var char = Sp.getStoredCharacter('adventure');
@@ -697,10 +698,7 @@
       stats[k] = Math.min(cap, (stats[k] || 5) + 1);
     }
     addOne();
-    if (isUltralegendary) {
-      addOne();
-      addOne();
-    }
+    if (isUltralegendary) addOne();
     character.stats = stats;
     return character;
   }
@@ -730,7 +728,7 @@
       var isUltralegendary = names.artifactsUltralegendary && names.artifactsUltralegendary[langKey] && names.artifactsUltralegendary[langKey].length && Math.random() < ulChance;
       var list = isUltralegendary ? (names.artifactsUltralegendary && names.artifactsUltralegendary[langKey]) : (names.artifacts && names.artifacts[langKey]);
       var artifactName = (list && list.length) ? list[Math.floor(Math.random() * list.length)] : t('chest_artifact_unknown');
-      var xp = isUltralegendary ? ulXp : 15;
+      var xp = isUltralegendary ? ulXp : 18;
       state.artifactsFound.push(artifactName);
       if (typeof Sp.getStoredCharacter === 'function' && typeof Sp.setStoredCharacter === 'function') {
         var char = Sp.getStoredCharacter('adventure');
@@ -739,7 +737,7 @@
       if (saveDecorationEntry) saveDecorationEntry('artifact', artifactName, xp);
       showChestResultToast('artifact', artifactName, isUltralegendary);
     } else if (roll === 2) {
-      var xp = 15;
+      var xp = 18;
       if (saveDecorationEntry) saveDecorationEntry('chest_xp', t('chest_xp_label'), xp);
       showChestResultToast('xp', xp);
     } else {

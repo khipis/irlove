@@ -50,15 +50,16 @@
     return Math.max(1, Math.min(5, level));
   }
 
-  /** Effective difficulty: base level + monster level offset, then reduced by player stats (dex/str help). */
+  /** Effective difficulty: base level + monster level offset, then reduced by player stats (max 2). */
   function getEffectiveMinigameLevel(baseLevel, monsterMarker, playerStats) {
     var monsterLevel = (monsterMarker && monsterMarker._monsterLevel != null) ? monsterMarker._monsterLevel : 1;
     var level = Math.min(5, Math.max(1, baseLevel + Math.floor(monsterLevel / 2) - 1));
     if (!playerStats || typeof playerStats !== 'object') return level;
     var bonus = 0;
-    if ((playerStats.dexterity || 0) >= 8) bonus += 1;
-    if ((playerStats.strength || 0) >= 8) bonus += 1;
-    if ((playerStats.intelligence || 0) >= 9) bonus += 1;
+    if ((playerStats.dexterity || 0) >= 7) bonus += 1;
+    if ((playerStats.strength || 0) >= 7) bonus += 1;
+    if ((playerStats.intelligence || 0) >= 8) bonus += 1;
+    bonus = Math.min(2, bonus);
     return Math.max(1, level - bonus);
   }
 
@@ -68,17 +69,21 @@
   var RPS_COUNTER = { strike: 'dodge', dodge: 'spell', spell: 'strike' };
 
   function dexTimeMult(opts) {
-    return (opts.playerStats && (opts.playerStats.dexterity || 0) >= 7) ? 1.12 : 1;
+    var dex = (opts.playerStats && opts.playerStats.dexterity) ? opts.playerStats.dexterity : 0;
+    if (dex >= 9) return 1.15;
+    if (dex >= 7) return 1.10;
+    if (dex >= 6) return 1.05;
+    return 1;
   }
 
   function runReflexRPS(done, opts) {
     opts = opts || {};
     var level = opts.level || 1;
     var mult = dexTimeMult(opts);
-    var telegraphMs = Math.floor((Math.max(400, 800 - (level - 1) * 80)) * mult);
-    var choiceMs = Math.floor((Math.max(500, 1000 - (level - 1) * 100)) * mult);
+    var telegraphMs = Math.floor((Math.max(380, 780 - (level - 1) * 70)) * mult);
+    var choiceMs = Math.floor((Math.max(480, 950 - (level - 1) * 90)) * mult);
     var roundsWon = 0;
-    var roundsToWin = (opts.playerStats && (opts.playerStats.strength || 0) >= 9) ? 1 : 2;
+    var roundsToWin = (opts.playerStats && (opts.playerStats.strength || 0) >= 8) ? 1 : 2;
     var keys = ['strike', 'dodge', 'spell'];
     var labels = { strike: t('minigame_strike'), dodge: t('minigame_dodge'), spell: t('minigame_spell') };
 
@@ -168,16 +173,16 @@
     opts = opts || {};
     var level = opts.level || 1;
     var mult = dexTimeMult(opts);
-    var zoneWidth = Math.min(28, Math.max(12, 24 - (level - 1) * 3) + ((opts.playerStats && (opts.playerStats.dexterity || 0) >= 7) ? 3 : 0));
+    var zoneWidth = Math.min(28, Math.max(12, 24 - (level - 1) * 2.5) + ((opts.playerStats && (opts.playerStats.dexterity || 0) >= 6) ? 2 : 0));
     var zoneLeft = 50 - zoneWidth / 2;
-    var baseDuration = Math.floor((Math.max(1200, 2200 - (level - 1) * 200)) * mult);
+    var baseDuration = Math.floor((Math.max(1100, 2100 - (level - 1) * 180)) * mult);
     var hits = 0;
     var attempts = 0;
     var maxAttempts = 3;
 
     function attempt() {
       attempts += 1;
-      var duration = baseDuration + Math.random() * Math.max(200, 600 - (level - 1) * 80);
+      var duration = baseDuration + Math.random() * Math.max(250, 550 - (level - 1) * 60);
       var start = Date.now();
 
       setContent(
@@ -243,7 +248,7 @@
     opts = opts || {};
     var level = opts.level || 1;
     var mult = dexTimeMult(opts);
-    var windowMs = Math.floor((Math.max(260, 500 - (level - 1) * 60)) * mult);
+    var windowMs = Math.floor((Math.max(280, 520 - (level - 1) * 50)) * mult);
     var successes = 0;
     var attempts = 0;
     var maxAttempts = 3;
@@ -311,7 +316,8 @@
   function runReaction(done, opts) {
     opts = opts || {};
     var level = opts.level || 1;
-    var maxReactMs = Math.max(250, 450 - (level - 1) * 50);
+    var mult = dexTimeMult(opts);
+    var maxReactMs = Math.floor((Math.max(280, 480 - (level - 1) * 45)) * mult);
     var successes = 0;
     var attempts = 0;
     var maxAttempts = 3;
@@ -338,7 +344,7 @@
         tFail = setTimeout(function () {
           if (reacted) return;
           onReact(false);
-        }, Math.max(500, 1000 - (level - 1) * 100));
+        }, Math.floor((Math.max(520, 980 - (level - 1) * 90)) * mult));
       }, delay);
       var tFail = null;
 
