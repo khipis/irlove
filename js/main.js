@@ -370,6 +370,19 @@
     if (btnNpcOk) btnNpcOk.addEventListener('click', function () {
       if (typeof Sp.finishEncounter === 'function') Sp.finishEncounter();
     });
+    var btnNpcSend = $('btn-npc-send');
+    if (btnNpcSend) btnNpcSend.addEventListener('click', function () {
+      if (typeof Sp.handleEncounterSend === 'function') Sp.handleEncounterSend();
+    });
+    var npcChatInput = document.getElementById('npc-chat-input');
+    if (npcChatInput) {
+      npcChatInput.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          if (typeof Sp.handleEncounterSend === 'function') Sp.handleEncounterSend();
+        }
+      });
+    }
 
     var btnStatsClose = $('btn-stats-close');
     var btnStatsFinish = $('btn-stats-finish');

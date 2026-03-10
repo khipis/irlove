@@ -280,7 +280,7 @@
     var dialoguesSource = (Sp.npcDialogues && Sp.npcDialogues[lang]) ? Sp.npcDialogues[lang] : (lang === 'en' ? ['Hello, traveller. Have a nice walk!'] : ['Witaj, wędrowcze. Miłego spaceru!']);
     var dialogues = dialoguesSource;
     var dialogue = dialogues[Math.floor(Math.random() * dialogues.length)];
-    showEncounterOverlay(name, dialogue);
+    showEncounterOverlay(name, dialogue, false);
   }
 
   function showAnimalEncounter(index, marker, dialogue) {
@@ -288,15 +288,42 @@
     state.pendingNpcIndex = index;
     state.pendingNpcMarker = marker;
     var name = marker._decorationName || '?';
-    showEncounterOverlay(name, dialogue || (t('npc_dialogue')));
+    showEncounterOverlay(name, dialogue || (t('npc_dialogue')), true);
   }
 
-  function showEncounterOverlay(name, dialogue) {
-    var elTitle = document.getElementById('npc-encounter-title');
-    var elDialogue = document.getElementById('npc-encounter-dialogue');
+  function showEncounterOverlay(name, dialogue, isAnimal) {
     var overlay = document.getElementById('npc-encounter-overlay');
+    var elTitle = document.getElementById('npc-encounter-title');
+    var elConv = document.getElementById('npc-conversation');
+    var elCarrotsHint = document.getElementById('npc-carrots-hint');
+    var elInput = document.getElementById('npc-chat-input');
+    state.encounterMessages = [{ who: 'them', text: dialogue }];
+    state.carrotGivenInEncounter = false;
     if (elTitle) elTitle.textContent = name;
-    if (elDialogue) elDialogue.textContent = dialogue;
+    if (elConv) {
+      elConv.innerHTML = '';
+      state.encounterMessages.forEach(function (msg) {
+        var div = document.createElement('div');
+        div.className = 'npc-msg npc-msg-' + msg.who;
+        div.textContent = msg.text;
+        elConv.appendChild(div);
+      });
+      elConv.scrollTop = elConv.scrollHeight;
+    }
+    if (elCarrotsHint) {
+      if (isAnimal && state.stats && state.stats.carrotsCollected != null) {
+        var n = state.stats.carrotsCollected;
+        elCarrotsHint.textContent = (window.t ? window.t('npc_carrots_hint', { count: n }) : 'Masz ' + n + ' marchewek').replace('{count}', n);
+        elCarrotsHint.classList.remove('hidden');
+      } else {
+        elCarrotsHint.classList.add('hidden');
+      }
+    }
+    if (elInput) {
+      elInput.value = '';
+      elInput.placeholder = window.t ? window.t('npc_chat_placeholder') : 'Napisz coś…';
+      elInput.focus();
+    }
     if (overlay) {
       overlay.classList.remove('hidden');
       overlay.style.display = 'flex';
@@ -305,13 +332,93 @@
     }
   }
 
+  function isGivingCarrot(text, lang) {
+    if (!text || typeof text !== 'string') return false;
+    var raw = text.trim().toLowerCase();
+    if (!raw.length) return false;
+    var replies = window.Spacerek && window.Spacerek.conversationReplies;
+    if (!replies || !replies.giveCarrotKeywords) return false;
+    var keywords = replies.giveCarrotKeywords[lang === 'en' ? 'en' : 'pl'] || replies.giveCarrotKeywords.pl;
+    for (var i = 0; i < keywords.length; i++) {
+      if (raw.indexOf(keywords[i]) !== -1) return true;
+    }
+    return false;
+  }
+
+  function getRandomReply(list) {
+    if (!list || !list.length) return '';
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  function appendEncounterMessage(who, text) {
+    state.encounterMessages = state.encounterMessages || [];
+    state.encounterMessages.push({ who: who, text: text });
+    var elConv = document.getElementById('npc-conversation');
+    if (elConv) {
+      var div = document.createElement('div');
+      div.className = 'npc-msg npc-msg-' + who;
+      div.textContent = text;
+      elConv.appendChild(div);
+      elConv.scrollTop = elConv.scrollHeight;
+    }
+  }
+
+  function handleEncounterSend() {
+    var elInput = document.getElementById('npc-chat-input');
+    if (!elInput) return;
+    var text = (elInput.value || '').trim();
+    if (!text.length) return;
+    elInput.value = '';
+    var encounterType = state.pendingEncounterType;
+    var lang = (typeof window.getStoredLang === 'function' && window.getStoredLang()) || 'pl';
+    var langKey = lang === 'en' ? 'en' : 'pl';
+    var replies = window.Spacerek && window.Spacerek.conversationReplies;
+    var carrotXp = (config && config.CARROT_GIFT_XP) != null ? config.CARROT_GIFT_XP : 25;
+
+    appendEncounterMessage('player', text);
+
+    if (encounterType === 'animal' && replies) {
+      var givingCarrot = isGivingCarrot(text, lang);
+      var hasCarrots = state.stats && state.stats.carrotsCollected != null && state.stats.carrotsCollected > 0;
+      if (givingCarrot && hasCarrots && !state.carrotGivenInEncounter) {
+        state.stats.carrotsCollected -= 1;
+        state.carrotGivenInEncounter = true;
+        var happyList = replies.animalHappy && replies.animalHappy[langKey];
+        var reply = getRandomReply(happyList) || (langKey === 'pl' ? 'Dziękuję! Jestem wniebowzięta!' : 'Thank you! I\'m over the moon!');
+        appendEncounterMessage('them', reply);
+        if (Sp.showToast) Sp.showToast('🥕 ' + (window.t ? window.t('npc_gave_carrot_toast', { xp: carrotXp }) : 'Dałeś marchewkę! +' + carrotXp + ' XP').replace('{xp}', carrotXp));
+        if (Sp.renderExperiencePanel) Sp.renderExperiencePanel();
+        var hint = document.getElementById('npc-carrots-hint');
+        if (hint && state.stats.carrotsCollected != null) hint.textContent = (window.t ? window.t('npc_carrots_hint', { count: state.stats.carrotsCollected }) : 'Masz ' + state.stats.carrotsCollected + ' marchewek').replace('{count}', state.stats.carrotsCollected);
+        return;
+      }
+      if (givingCarrot && !hasCarrots) {
+        var noCarrotsMsg = (replies.animalNoCarrots && replies.animalNoCarrots[langKey]) || (langKey === 'pl' ? 'Nie masz teraz marchewki.' : 'You don\'t have a carrot.');
+        appendEncounterMessage('them', noCarrotsMsg);
+        return;
+      }
+      var genericList = replies.animalGeneric && replies.animalGeneric[langKey];
+      appendEncounterMessage('them', getRandomReply(genericList) || (langKey === 'pl' ? 'Hmm, miło pogadać!' : 'Nice to chat!'));
+      return;
+    }
+
+    if (encounterType === 'npc' && replies && replies.npcGeneric && replies.npcGeneric[langKey]) {
+      appendEncounterMessage('them', getRandomReply(replies.npcGeneric[langKey]));
+    } else {
+      appendEncounterMessage('them', langKey === 'pl' ? 'Rozumiem. Miłego spaceru!' : 'I see. Have a nice walk!');
+    }
+  }
+
   function finishEncounter() {
     var index = state.pendingNpcIndex;
     var marker = state.pendingNpcMarker;
     var encounterType = state.pendingEncounterType;
+    var carrotGiven = state.carrotGivenInEncounter;
     state.pendingNpcIndex = null;
     state.pendingNpcMarker = null;
     state.pendingEncounterType = null;
+    state.encounterMessages = [];
+    state.carrotGivenInEncounter = false;
     var overlay = document.getElementById('npc-encounter-overlay');
     if (overlay) {
       overlay.classList.add('hidden');
@@ -322,7 +429,8 @@
     var name = marker._decorationName || '?';
     if (encounterType === 'animal') {
       state.metAnimalNames.push(name);
-      if (Sp.saveDecorationEntry) Sp.saveDecorationEntry('animal', name, 10);
+      var xp = carrotGiven ? ((config && config.CARROT_GIFT_XP) != null ? config.CARROT_GIFT_XP : 25) : 10;
+      if (Sp.saveDecorationEntry) Sp.saveDecorationEntry('animal', name, xp);
     } else {
       state.metNpcNames.push(name);
       if (Sp.saveDecorationEntry) Sp.saveDecorationEntry('npc', name, 5);
@@ -530,4 +638,5 @@
   Sp.updateDecorationSelectionVisual = updateDecorationSelectionVisual;
   Sp.finishMonsterEncounter = finishMonsterEncounter;
   Sp.finishEncounter = finishEncounter;
+  Sp.handleEncounterSend = handleEncounterSend;
 })();

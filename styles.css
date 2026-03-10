@@ -1633,6 +1633,81 @@ body[data-theme="cute"] .exp-tier-legendary {
   font-style: italic;
 }
 
+/* NPC/animal conversation (multi-turn chat) */
+.npc-conversation {
+  max-height: 200px;
+  overflow-y: auto;
+  text-align: left;
+  margin-bottom: 12px;
+  padding: 8px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  border: 1px solid var(--border, rgba(255,255,255,0.1));
+}
+
+.npc-msg {
+  margin-bottom: 8px;
+  padding: 8px 10px;
+  border-radius: var(--radius);
+  font-size: 0.95rem;
+  line-height: 1.4;
+}
+
+.npc-msg:last-child {
+  margin-bottom: 0;
+}
+
+.npc-msg-them {
+  background: var(--accent);
+  color: var(--bg);
+  margin-right: 24px;
+}
+
+.npc-msg-player {
+  background: var(--text-muted);
+  color: var(--bg);
+  margin-left: 24px;
+  text-align: right;
+}
+
+.npc-carrots-hint {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  margin: 0 0 10px 0;
+}
+
+.npc-carrots-hint.hidden {
+  display: none;
+}
+
+.npc-chat-row {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.npc-chat-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid var(--border, rgba(255,255,255,0.2));
+  border-radius: var(--radius);
+  background: var(--bg);
+  color: var(--text);
+  font-size: 1rem;
+}
+
+.npc-chat-input::placeholder {
+  color: var(--text-muted);
+}
+
+.btn-npc-send {
+  flex-shrink: 0;
+}
+
+.btn-npc-end {
+  width: 100%;
+}
+
 /* Minigame overlay (fight) */
 .minigame-overlay {
   position: fixed;

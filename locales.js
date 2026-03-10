@@ -125,11 +125,15 @@
       minigame_instruction_whack: 'Gdy zapali się jedno pole – kliknij je w porę. 5 rund, potrzebujesz 4 trafień.',
       minigame_whack_hit: 'Kliknij!',
 
-      // NPC encounter (Adventure)
+      // NPC encounter (Adventure + Cute chat)
       npc_encounter_title: 'Spotkanie',
       npc_says: '{name} mówi',
       npc_dialogue: 'Witaj, wędrowcze. Miłego spaceru!',
-      npc_btn_ok: 'OK',
+      npc_btn_send: 'Wyślij',
+      npc_btn_end: 'Zakończ rozmowę',
+      npc_carrots_hint: 'Masz {count} marchewek',
+      npc_chat_placeholder: 'Napisz coś…',
+      npc_gave_carrot_toast: 'Dałeś marchewkę! +{xp} XP',
 
       // Experience panel
       experience_title: '🏆 Twoje doświadczenie',
@@ -299,7 +303,11 @@
       npc_encounter_title: 'Encounter',
       npc_says: '{name} says',
       npc_dialogue: 'Hello, traveller. Have a nice walk!',
-      npc_btn_ok: 'OK',
+      npc_btn_send: 'Send',
+      npc_btn_end: 'End conversation',
+      npc_carrots_hint: 'You have {count} carrots',
+      npc_chat_placeholder: 'Type something…',
+      npc_gave_carrot_toast: 'You gave a carrot! +{xp} XP',
 
       experience_title: '🏆 Your experience',
       experience_mode_prefix: 'Mode: ',

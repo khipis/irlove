@@ -146,8 +146,13 @@
       <div id="npc-encounter-overlay" class="encounter-overlay hidden" data-display="flex">
         <div class="encounter-card npc-encounter-card">
           <h3 id="npc-encounter-title" class="encounter-name" data-i18n="npc_encounter_title">Spotkanie</h3>
-          <p id="npc-encounter-dialogue" class="npc-dialogue"></p>
-          <button type="button" id="btn-npc-ok" class="btn-primary" data-i18n="npc_btn_ok">OK</button>
+          <div id="npc-conversation" class="npc-conversation" role="log" aria-live="polite"></div>
+          <p id="npc-carrots-hint" class="npc-carrots-hint hidden"></p>
+          <div class="npc-chat-row">
+            <input type="text" id="npc-chat-input" class="npc-chat-input" maxlength="200" placeholder="" data-i18n-placeholder="npc_chat_placeholder" />
+            <button type="button" id="btn-npc-send" class="btn-primary btn-npc-send" data-i18n="npc_btn_send">Wyślij</button>
+          </div>
+          <button type="button" id="btn-npc-ok" class="btn-secondary btn-npc-end" data-i18n="npc_btn_end">Zakończ rozmowę</button>
         </div>
       </div>
       <div id="minigame-overlay" class="minigame-overlay hidden" data-display="flex">
@@ -205,6 +210,7 @@
   <script src="js/data/artifact-names.js"></script>
   <script src="js/data/npc-names.js"></script>
   <script src="js/data/npc-dialogues.js"></script>
+  <script src="js/data/conversation-replies.js"></script>
   <!-- storage -->
   <script src="js/storage/storage.js"></script>
   <!-- ui: experience (XP panel), locale -->
