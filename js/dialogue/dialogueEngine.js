@@ -38,6 +38,4 @@
   window.generateAnimalQuest = Sp.generateAnimalQuest;
   window.generateAnimalReplyFromContext = generateAnimalReplyFromContext;
   window.generateNpcReplyFromContext = generateNpcReplyFromContext;
-  window.Spacerek.llmModuleLoaded = false;
-  window.Spacerek.llmAvailable = false;
 })();

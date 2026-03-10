@@ -1757,45 +1757,7 @@ body[data-theme="cute"] .exp-tier-legendary {
   margin-bottom: 0;
 }
 
-.npc-llm-badge {
-  font-size: 1.25rem;
-  line-height: 1;
-  opacity: 0.9;
-  cursor: help;
-}
-
-.npc-llm-badge.hidden {
-  display: none !important;
-}
-
 /* NPC/animal conversation (multi-turn chat) – vertical stack */
-.npc-llm-progress {
-  width: 100%;
-  margin: 0 0 8px 0;
-  flex-shrink: 0;
-}
-.npc-llm-progress.hidden {
-  display: none;
-}
-.npc-llm-progress-text {
-  font-size: 0.85rem;
-  color: var(--text-muted);
-  margin: 0 0 4px 0;
-}
-.npc-llm-progress-bar {
-  height: 6px;
-  background: var(--bg-muted, rgba(0,0,0,0.1));
-  border-radius: 3px;
-  overflow: hidden;
-}
-.npc-llm-progress-fill {
-  height: 100%;
-  width: 0%;
-  background: var(--accent, #6c5ce7);
-  border-radius: 3px;
-  transition: width 0.2s ease;
-}
-
 .npc-conversation {
   flex: 1 1 0;
   min-height: 100px;
@@ -1847,7 +1809,7 @@ body[data-theme="cute"] .exp-tier-legendary {
   margin-bottom: 0;
 }
 
-/* Visible AI / Template badges – always below the message bubble */
+/* Template badge – below the message bubble */
 .npc-msg-badge {
   display: inline-block;
   font-size: 0.75rem;
@@ -1857,12 +1819,6 @@ body[data-theme="cute"] .exp-tier-legendary {
   letter-spacing: 0.05em;
   margin-top: 2px;
   flex-shrink: 0;
-}
-
-.npc-msg-ai-badge {
-  background: var(--accent);
-  color: var(--bg);
-  border: 1px solid var(--accent);
 }
 
 .npc-msg-template-badge {
@@ -1882,18 +1838,6 @@ body[data-theme="cute"] .exp-tier-legendary {
   color: var(--bg);
   margin-left: 24px;
   text-align: right;
-}
-
-.npc-ai-hint {
-  font-size: 0.8rem;
-  color: var(--text-muted);
-  margin: 0 0 8px 0;
-  flex-shrink: 0;
-  line-height: 1.35;
-}
-
-.npc-ai-hint.hidden {
-  display: none;
 }
 
 .npc-player-stats {
