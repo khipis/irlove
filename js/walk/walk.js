@@ -284,6 +284,18 @@
       var tier = (typeof getTierFromDistanceMeters === 'function') ? getTierFromDistanceMeters(distanceM) : 'casual';
       var xpConfig = (XP_TIERS && XP_TIERS[tier]) ? XP_TIERS[tier] : (XP_TIERS && XP_TIERS.casual) || { xp: 10 };
       if (typeof saveExperienceEntry === 'function') saveExperienceEntry(state.targetPlace, tier, xpConfig);
+      if (state.mapStyle === 'adventure' && state.targetPlace && state.targetPlace.name) {
+        var placeArtifactName = (typeof t === 'function' ? t('place_artifact_prefix') : 'Relikwia: ') + (state.targetPlace.name || '').trim();
+        var placeRank = 'ultralegendary';
+        var placeXp = (Sp.ARTIFACT_RANK_XP && Sp.ARTIFACT_RANK_XP[placeRank]) ? Sp.ARTIFACT_RANK_XP[placeRank] : 50;
+        if (state.artifactsFound) state.artifactsFound.push(placeArtifactName);
+        if (typeof Sp.getStoredCharacter === 'function' && typeof Sp.setStoredCharacter === 'function' && typeof Sp.applyArtifactStatBonus === 'function') {
+          var char = Sp.getStoredCharacter('adventure');
+          if (char) Sp.setStoredCharacter('adventure', Sp.applyArtifactStatBonus(Object.assign({}, char), placeRank));
+        }
+        if (typeof Sp.saveDecorationEntry === 'function') Sp.saveDecorationEntry('place_artifact', placeArtifactName, placeXp);
+        if (Sp.showToast) Sp.showToast('🌟 ' + (typeof t === 'function' ? t('place_artifact_toast') : 'Relikwia z miejsca') + ': ' + (state.targetPlace.name || '').trim() + ' +' + placeXp + ' XP');
+      }
     } catch (e) { console.error('revealPlace save XP', e); }
 
     function showCiekawostki(extract, imgUrl) {

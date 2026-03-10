@@ -74,7 +74,7 @@
       else if (entry.type === 'spoiled_carrot') carrotsSpoiled += 1;
       else if (entry.type === 'animal') animals.push(entry);
       else if (entry.type === 'npc') npcs.push(entry);
-      else if (entry.type === 'artifact' || entry.type === 'npc_reward_artifact') artifacts.push(entry);
+      else if (entry.type === 'artifact' || entry.type === 'npc_reward_artifact' || entry.type === 'place_artifact') artifacts.push(entry);
       else if (entry.type === 'wound') wounds.push(entry);
       else if (!entry.type && entry.name) places.push(entry);
     });

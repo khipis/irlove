@@ -234,9 +234,13 @@
         }
         var levelScale = Math.max(0, playerLevel - 1);
         var scaleCap = Math.min(2, levelScale);
-        marker._monsterLevel = Math.min(5, 1 + Math.floor(Math.random() * 3) + scaleCap);
-        marker._monsterStr = Math.min(14, 2 + Math.floor(Math.random() * 6) + scaleCap * 2);
-        marker._monsterDex = Math.min(14, 2 + Math.floor(Math.random() * 6) + scaleCap * 2);
+        var powerRoll = Math.floor(Math.random() * 100);
+        var baseLevel = powerRoll < 25 ? 1 + Math.floor(Math.random() * 2) : powerRoll < 70 ? 2 + Math.floor(Math.random() * 2) : 3 + Math.floor(Math.random() * 2);
+        var baseStr = powerRoll < 25 ? 2 + Math.floor(Math.random() * 4) : powerRoll < 70 ? 4 + Math.floor(Math.random() * 4) : 6 + Math.floor(Math.random() * 4);
+        var baseDex = powerRoll < 25 ? 2 + Math.floor(Math.random() * 4) : powerRoll < 70 ? 4 + Math.floor(Math.random() * 4) : 6 + Math.floor(Math.random() * 4);
+        marker._monsterLevel = Math.min(5, baseLevel + scaleCap);
+        marker._monsterStr = Math.min(14, baseStr + scaleCap * 2);
+        marker._monsterDex = Math.min(14, baseDex + scaleCap * 2);
         marker._monsterXp = 8 + marker._monsterLevel * 4 + levelScale * 2;
       }
       marker.bindTooltip(name, { permanent: false });
@@ -438,10 +442,7 @@
             elMonstersHint.classList.remove('hidden');
           }
         }
-        if (elCarrotsHint) {
-          elCarrotsHint.textContent = '\u{1F955} ' + (window.t ? window.t('npc_carrots_hint', { count: carrotsCount }) : 'Marchewki: ' + carrotsCount).replace('{count}', carrotsCount);
-          elCarrotsHint.classList.remove('hidden');
-        }
+        if (elCarrotsHint) elCarrotsHint.classList.add('hidden');
         elPlayerStats.classList.remove('hidden');
       }
     }
@@ -666,13 +667,14 @@
         var langKey = (lang === 'en' || lang === 'pl') ? lang : 'pl';
         var names = (window.Spacerek && window.Spacerek.decorationNames) || {};
         var isLegendary = names.artifactsUltralegendary && names.artifactsUltralegendary[langKey] && names.artifactsUltralegendary[langKey].length && Math.random() < 0.5;
+        var npcRank = isLegendary ? 'legendary' : 'epic';
         var list = isLegendary ? (names.artifactsUltralegendary && names.artifactsUltralegendary[langKey]) : (names.artifacts && names.artifacts[langKey]);
         var artifactName = (list && list.length) ? list[Math.floor(Math.random() * list.length)] : (window.t ? window.t('chest_artifact_unknown') : 'Artefakt');
-        var artifactXp = isLegendary ? 35 + Math.floor(Math.random() * 8) : 22 + Math.floor(Math.random() * 10);
+        var artifactXp = ARTIFACT_RANK_XP[npcRank] != null ? ARTIFACT_RANK_XP[npcRank] : 28;
         state.artifactsFound.push(artifactName);
         if (typeof Sp.getStoredCharacter === 'function' && typeof Sp.setStoredCharacter === 'function') {
           var char = Sp.getStoredCharacter('adventure');
-          if (char) Sp.setStoredCharacter('adventure', applyArtifactStatBonus(Object.assign({}, char), isLegendary));
+          if (char) Sp.setStoredCharacter('adventure', applyArtifactStatBonus(Object.assign({}, char), npcRank));
         }
         if (Sp.saveDecorationEntry) Sp.saveDecorationEntry('npc_reward_artifact', artifactName, artifactXp);
         if (Sp.showToast) Sp.showToast((isLegendary ? '🌟 ' : '🏺 ') + (window.t ? window.t('npc_artifact_reward') : 'NPC dał ci artefakt') + ': ' + artifactName + ' +' + artifactXp + ' XP');
@@ -687,18 +689,36 @@
     if (Sp.renderExperiencePanel) Sp.renderExperiencePanel();
   }
 
-  /** Apply artifact stat bonus to adventure character. Returns updated character. */
-  function applyArtifactStatBonus(character, isUltralegendary) {
+  /** Artifact rank: common, rare, epic, legendary, ultralegendary. XP and stat bonus scale by rank. */
+  var ARTIFACT_RANK_XP = { common: 12, rare: 18, epic: 28, legendary: 38, ultralegendary: 50 };
+
+  /** Apply artifact stat bonus to adventure character by rank. Returns updated character. */
+  function applyArtifactStatBonus(character, rank) {
     if (!character || state.mapStyle !== 'adventure') return character;
     var stats = character.stats || { strength: 5, dexterity: 5, intelligence: 5 };
     var keys = ['strength', 'dexterity', 'intelligence'];
     var cap = 18;
-    function addOne() {
+    function addToRandom(amount) {
       var k = keys[Math.floor(Math.random() * keys.length)];
-      stats[k] = Math.min(cap, (stats[k] || 5) + 1);
+      stats[k] = Math.min(cap, (stats[k] || 5) + amount);
     }
-    addOne();
-    if (isUltralegendary) addOne();
+    function addOne() {
+      addToRandom(1);
+    }
+    if (rank === 'ultralegendary') {
+      addToRandom(2);
+      addToRandom(2);
+    } else if (rank === 'legendary') {
+      addToRandom(2);
+      addOne();
+    } else if (rank === 'epic') {
+      addToRandom(2);
+    } else if (rank === 'rare') {
+      addOne();
+      addOne();
+    } else {
+      addOne();
+    }
     character.stats = stats;
     return character;
   }
@@ -723,16 +743,16 @@
     var saveDecorationEntry = Sp.saveDecorationEntry;
     if (roll === 1) {
       var names = (window.Spacerek && window.Spacerek.decorationNames) || {};
-      var ulChance = (config && config.ARTIFACT_ULTRALEGENDARY_CHANCE) != null ? config.ARTIFACT_ULTRALEGENDARY_CHANCE : 0.05;
-      var ulXp = (config && config.ARTIFACT_ULTRALEGENDARY_XP) != null ? config.ARTIFACT_ULTRALEGENDARY_XP : 50;
+      var ulChance = (config && config.ARTIFACT_ULTRALEGENDARY_CHANCE) != null ? config.ARTIFACT_ULTRALEGENDARY_CHANCE : 0.08;
       var isUltralegendary = names.artifactsUltralegendary && names.artifactsUltralegendary[langKey] && names.artifactsUltralegendary[langKey].length && Math.random() < ulChance;
+      var rank = isUltralegendary ? 'ultralegendary' : (Math.random() < 0.5 ? 'common' : 'rare');
       var list = isUltralegendary ? (names.artifactsUltralegendary && names.artifactsUltralegendary[langKey]) : (names.artifacts && names.artifacts[langKey]);
       var artifactName = (list && list.length) ? list[Math.floor(Math.random() * list.length)] : t('chest_artifact_unknown');
-      var xp = isUltralegendary ? ulXp : 18;
+      var xp = ARTIFACT_RANK_XP[rank] != null ? ARTIFACT_RANK_XP[rank] : 18;
       state.artifactsFound.push(artifactName);
       if (typeof Sp.getStoredCharacter === 'function' && typeof Sp.setStoredCharacter === 'function') {
         var char = Sp.getStoredCharacter('adventure');
-        if (char) Sp.setStoredCharacter('adventure', applyArtifactStatBonus(Object.assign({}, char), isUltralegendary));
+        if (char) Sp.setStoredCharacter('adventure', applyArtifactStatBonus(Object.assign({}, char), rank));
       }
       if (saveDecorationEntry) saveDecorationEntry('artifact', artifactName, xp);
       showChestResultToast('artifact', artifactName, isUltralegendary);
@@ -909,4 +929,6 @@
   Sp.finishMonsterEncounter = finishMonsterEncounter;
   Sp.finishEncounter = finishEncounter;
   Sp.handleEncounterSend = handleEncounterSend;
+  Sp.applyArtifactStatBonus = applyArtifactStatBonus;
+  Sp.ARTIFACT_RANK_XP = ARTIFACT_RANK_XP;
 })();

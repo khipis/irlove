@@ -64,7 +64,7 @@
     return Array.isArray(data[m]) ? data[m] : [];
   }
 
-  var DECORATION_XP = { carrot: 5, monster: 10, animal: 10, artifact: 18, chest_xp: 18, wound: 0, npc: 5 };
+  var DECORATION_XP = { carrot: 5, monster: 10, animal: 10, artifact: 18, place_artifact: 50, chest_xp: 18, wound: 0, npc: 5 };
 
   function saveExperienceEntry(place, tier, xpConfig) {
     var data = getExperienceRaw();

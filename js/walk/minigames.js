@@ -50,16 +50,21 @@
     return Math.max(1, Math.min(5, level));
   }
 
-  /** Effective difficulty: base level + monster level offset, then reduced by player stats (max 2). */
+  /** Effective difficulty: base level + monster level and stats, reduced by player stats (compare player vs monster). */
   function getEffectiveMinigameLevel(baseLevel, monsterMarker, playerStats) {
     var monsterLevel = (monsterMarker && monsterMarker._monsterLevel != null) ? monsterMarker._monsterLevel : 1;
-    var level = Math.min(5, Math.max(1, baseLevel + Math.floor(monsterLevel / 2) - 1));
+    var monsterStr = (monsterMarker && monsterMarker._monsterStr != null) ? monsterMarker._monsterStr : 5;
+    var monsterDex = (monsterMarker && monsterMarker._monsterDex != null) ? monsterMarker._monsterDex : 5;
+    var monsterPower = Math.floor((monsterStr + monsterDex) / 8);
+    var level = Math.min(5, Math.max(1, baseLevel + Math.floor(monsterLevel / 2) - 1 + monsterPower));
     if (!playerStats || typeof playerStats !== 'object') return level;
     var bonus = 0;
     if ((playerStats.dexterity || 0) >= 7) bonus += 1;
     if ((playerStats.strength || 0) >= 7) bonus += 1;
     if ((playerStats.intelligence || 0) >= 8) bonus += 1;
     bonus = Math.min(2, bonus);
+    var playerPower = Math.floor(((playerStats.strength || 0) + (playerStats.dexterity || 0) + (playerStats.intelligence || 0)) / 10);
+    if (playerPower > monsterPower) bonus = Math.min(3, bonus + 1);
     return Math.max(1, level - bonus);
   }
 

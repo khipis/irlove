@@ -80,6 +80,8 @@
       chest_wound_label: 'Rana',
       chest_artifact_unknown: 'Nieznany artefakt',
       chest_artifact_ultralegendary: 'Ultralegendarny!',
+      place_artifact_prefix: 'Relikwia: ',
+      place_artifact_toast: 'Relikwia z miejsca',
       npc_artifact_reward: 'NPC dał ci epicki/legendarny artefakt',
       chest_result_btn_close: 'OK',
 
@@ -293,6 +295,8 @@
       chest_wound_label: 'Wound',
       chest_artifact_unknown: 'Unknown artifact',
       chest_artifact_ultralegendary: 'Ultralegendary!',
+      place_artifact_prefix: 'Relic: ',
+      place_artifact_toast: 'Place relic',
       npc_artifact_reward: 'NPC gave you epic/legendary artifact',
       chest_result_btn_close: 'OK',
 
