@@ -346,7 +346,33 @@
     if (elInput) {
       elInput.value = '';
       elInput.placeholder = window.t ? window.t('npc_chat_placeholder') : 'Napisz coś…';
+      elInput.title = window.t ? window.t('npc_chat_word_limit') : 'Max 10 words';
       elInput.focus();
+    }
+    var elProgressWrap = document.getElementById('npc-llm-progress-wrap');
+    var elProgressFill = document.getElementById('npc-llm-progress-fill');
+    var elProgressText = document.getElementById('npc-llm-progress-text');
+    var progressBar = elProgressWrap ? elProgressWrap.querySelector('[role="progressbar"]') : null;
+    if (document.location.protocol !== 'file:' && typeof window.Spacerek !== 'undefined' && typeof window.Spacerek.preloadWebLLM === 'function' && !window.Spacerek.llmAvailable) {
+      if (elProgressWrap) elProgressWrap.classList.remove('hidden');
+      if (elProgressText) elProgressText.textContent = (window.t ? window.t('npc_wait_full_experience') : 'Wait for full experience…');
+      if (elProgressFill) elProgressFill.style.width = '0%';
+      if (progressBar) progressBar.setAttribute('aria-valuenow', '0');
+      window.Spacerek.preloadWebLLM(function (prog) {
+        var pct = (prog && (prog.progress != null ? prog.progress : prog.percent)) != null ? Number(prog.progress != null ? prog.progress : prog.percent) : 0;
+        if (elProgressFill) elProgressFill.style.width = Math.min(100, Math.max(0, pct)) + '%';
+        if (progressBar) progressBar.setAttribute('aria-valuenow', Math.min(100, Math.max(0, pct)));
+        if (elProgressText) {
+          var label = window.t ? window.t('npc_full_experience') : 'Full experience';
+          elProgressText.textContent = label + (pct > 0 && pct < 100 ? ' ' + Math.round(pct) + '%' : (pct >= 100 ? '' : '…'));
+        }
+      }).then(function () {
+        if (elProgressWrap) elProgressWrap.classList.add('hidden');
+      }).catch(function () {
+        if (elProgressWrap) elProgressWrap.classList.add('hidden');
+      });
+    } else {
+      if (elProgressWrap) elProgressWrap.classList.add('hidden');
     }
     if (overlay) {
       overlay.classList.remove('hidden');
@@ -451,11 +477,20 @@
     }
   }
 
+  var MAX_PLAYER_WORDS = 10;
+
+  function trimToWordLimit(str, limit) {
+    if (!str || limit < 1) return '';
+    var parts = str.trim().split(/\s+/);
+    return parts.slice(0, limit).join(' ');
+  }
+
   function handleEncounterSend() {
     var elInput = document.getElementById('npc-chat-input');
     if (!elInput) return;
-    var text = (elInput.value || '').trim();
-    if (!text.length) return;
+    var raw = (elInput.value || '').trim();
+    if (!raw.length) return;
+    var text = trimToWordLimit(raw, MAX_PLAYER_WORDS);
     elInput.value = '';
     var encounterType = state.pendingEncounterType;
     var lang = (typeof window.getStoredLang === 'function' && window.getStoredLang()) || 'pl';

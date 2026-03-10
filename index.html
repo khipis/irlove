@@ -149,6 +149,12 @@
             <h3 id="npc-encounter-title" class="encounter-name" data-i18n="npc_encounter_title">Spotkanie</h3>
             <span id="npc-llm-badge" class="npc-llm-badge hidden" aria-hidden="true" title="Generowane lokalnym modelem AI">🧠</span>
           </div>
+          <div id="npc-llm-progress-wrap" class="npc-llm-progress hidden" aria-live="polite">
+            <p class="npc-llm-progress-text" id="npc-llm-progress-text"></p>
+            <div class="npc-llm-progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+              <div class="npc-llm-progress-fill" id="npc-llm-progress-fill"></div>
+            </div>
+          </div>
           <div id="npc-conversation" class="npc-conversation" role="log" aria-live="polite"></div>
           <p id="npc-ai-hint" class="npc-ai-hint hidden" data-i18n="npc_ai_https_hint"></p>
           <p id="npc-carrots-hint" class="npc-carrots-hint hidden"></p>

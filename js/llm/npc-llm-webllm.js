@@ -177,10 +177,11 @@ function generateNpcReplyFromContext(npcName, lang, messages) {
 if (typeof window !== 'undefined') {
   window.Spacerek = window.Spacerek || {};
   window.Spacerek.llmModuleLoaded = true;
+  window.Spacerek.preloadWebLLM = function (progressCb) {
+    if (document.location.protocol === 'file:') return Promise.resolve(null);
+    return loadWebLLM(progressCb);
+  };
   window.generateAnimalQuest = generateAnimalQuest;
   window.generateAnimalReplyFromContext = generateAnimalReplyFromContext;
   window.generateNpcReplyFromContext = generateNpcReplyFromContext;
-  setTimeout(function () {
-    if (document.location.protocol !== 'file:') loadWebLLM().catch(function () {});
-  }, 1500);
 }
