@@ -485,7 +485,6 @@
       if (btnEl) {
         btnEl.addEventListener('click', function () {
           if (stopped) return;
-          stopped = true;
           var hit = stopValue >= zoneMin && stopValue <= zoneMax;
           roundResult(hit);
         });

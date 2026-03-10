@@ -1,7 +1,6 @@
 /**
- * Local LLM (Transformers.js, ~85MB distilgpt2) to generate short animal "quest" lines.
- * When meeting an animal in Cute mode, generates e.g. "The squirrel says: I'm so hungry, I could eat a carrot!"
- * Polish: uses static templates (no small PL model under 100MB). English: uses distilgpt2 in browser.
+ * Local LLM (Transformers.js) for animal/NPC replies. Uses GPT-2 small for better context than DistilGPT-2.
+ * Polish: static templates. English: Xenova/gpt2 in browser (~125M params, better at following conversation).
  */
 
 const POLISH_TEMPLATES = [
@@ -248,11 +247,14 @@ function getEnglishFallback(animalName) {
   return (animalName ? animalName + ' says: ' : '') + template;
 }
 
+/** Model ID: Xenova/gpt2 = full GPT-2 small (better context); Xenova/distilgpt2 = smaller, faster, weaker. */
+const TEXT_GEN_MODEL = 'Xenova/gpt2';
+
 async function loadGenerator() {
   if (generatorPromise) return generatorPromise;
   try {
     const { pipeline } = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0');
-    generatorPromise = pipeline('text-generation', 'Xenova/distilgpt2', { progress_callback: null });
+    generatorPromise = pipeline('text-generation', TEXT_GEN_MODEL, { progress_callback: null });
     if (typeof window !== 'undefined') {
       window.Spacerek = window.Spacerek || {};
       window.Spacerek.llmAvailable = true;
