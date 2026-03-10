@@ -1568,6 +1568,10 @@ body[data-theme="cute"] .exp-tier-legendary {
   display: flex !important;
   visibility: visible !important;
   animation: arrivalFadeIn 0.3s ease;
+  padding: 12px;
+  box-sizing: border-box;
+  overflow-y: auto;
+  align-items: flex-start;
 }
 
 .encounter-card {
@@ -1578,6 +1582,21 @@ body[data-theme="cute"] .exp-tier-legendary {
   width: 100%;
   text-align: center;
   box-shadow: var(--shadow-lg);
+}
+
+/* NPC/animal chat card: fit viewport on portrait mobile */
+.npc-encounter-card {
+  max-height: calc(100vh - 24px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  padding: 16px;
+}
+
+@media (max-height: 500px) {
+  .npc-encounter-card {
+    padding: 10px;
+  }
 }
 
 .encounter-name {
@@ -1639,6 +1658,7 @@ body[data-theme="cute"] .exp-tier-legendary {
   justify-content: center;
   gap: 8px;
   margin-bottom: 12px;
+  flex-shrink: 0;
 }
 
 .encounter-title-row .encounter-name {
@@ -1658,14 +1678,17 @@ body[data-theme="cute"] .exp-tier-legendary {
 
 /* NPC/animal conversation (multi-turn chat) */
 .npc-conversation {
+  flex: 1 1 0;
+  min-height: 60px;
   max-height: 200px;
   overflow-y: auto;
   text-align: left;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
   padding: 8px;
   background: var(--bg);
   border-radius: var(--radius);
   border: 1px solid var(--border, rgba(255,255,255,0.1));
+  -webkit-overflow-scrolling: touch;
 }
 
 .npc-msg {
@@ -1697,6 +1720,7 @@ body[data-theme="cute"] .exp-tier-legendary {
   font-size: 0.9rem;
   color: var(--text-muted);
   margin: 0 0 10px 0;
+  flex-shrink: 0;
 }
 
 .npc-carrots-hint.hidden {
@@ -1707,6 +1731,7 @@ body[data-theme="cute"] .exp-tier-legendary {
   display: flex;
   gap: 8px;
   margin-bottom: 10px;
+  flex-shrink: 0;
 }
 
 .npc-chat-input {
@@ -1729,6 +1754,7 @@ body[data-theme="cute"] .exp-tier-legendary {
 
 .btn-npc-end {
   width: 100%;
+  flex-shrink: 0;
 }
 
 /* Minigame overlay (fight) */
