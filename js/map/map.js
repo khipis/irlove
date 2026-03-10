@@ -536,29 +536,28 @@
         showGeneratingPlaceholder();
         (async function () {
           try {
-            // ----- Translation path: use UI language (selected at start), not input detection -----
-            var needTranslate = (langKey === 'pl');
+            // ----- Translation path: use UI language; if pass-through translator, LLM gets langKey (no external translate) -----
+            var passThrough = !!(window.Spacerek && window.Spacerek.translatorIsPassThrough);
+            var needTranslate = !passThrough && (langKey === 'pl');
             if (typeof console !== 'undefined' && console.debug) {
               console.debug('[Spacerek] Dialog (zwierzę) | Język UI: ' + langKey + ' | Wejście: "' + text + '"');
             }
-            // ----- Pre-processing: if UI is Polish, translate PL→EN before sending to LLM -----
             var textForLlm = text;
-            if (needTranslate && window.Spacerek && typeof window.Spacerek.translateToEnglish === 'function') {
+            if (needTranslate && typeof window.Spacerek.translateToEnglish === 'function') {
               textForLlm = await window.Spacerek.translateToEnglish(text);
               if (typeof console !== 'undefined' && console.debug) {
                 console.debug('[Spacerek] Tłumaczenie PL→EN (dla LLM): "' + textForLlm + '"');
               }
             }
             var messagesForLlm = state.encounterMessages.slice(0, -1).concat([{ who: 'player', text: textForLlm }]);
-            // ----- LLM invocation (unchanged) -----
-            var llmReply = await (window.generateAnimalReplyFromContext(animalName || 'Animal', 'en', messagesForLlm) || Promise.resolve(null));
+            var llmLang = passThrough ? langKey : 'en';
+            var llmReply = await (window.generateAnimalReplyFromContext(animalName || 'Animal', llmLang, messagesForLlm) || Promise.resolve(null));
             var reply = llmReply && llmReply.trim();
             var fromLLM = !!reply;
             if (typeof console !== 'undefined' && console.debug && reply) {
-              console.debug('[Spacerek] Odpowiedź LLM (EN): "' + reply + '"');
+              console.debug('[Spacerek] Odpowiedź LLM (' + llmLang + '): "' + reply + '"');
             }
-            // ----- Post-processing: if UI is Polish, translate LLM response EN→PL -----
-            if (reply && needTranslate && window.Spacerek && typeof window.Spacerek.translateToPolish === 'function') {
+            if (reply && needTranslate && typeof window.Spacerek.translateToPolish === 'function') {
               reply = await window.Spacerek.translateToPolish(reply);
               if (typeof console !== 'undefined' && console.debug) {
                 console.debug('[Spacerek] Tłumaczenie EN→PL (wyświetl): "' + reply + '"');
@@ -612,29 +611,28 @@
         showGeneratingPlaceholder();
         (async function () {
           try {
-            // ----- Translation path: use UI language (selected at start) -----
-            var needTranslate = (langKey === 'pl');
+            // ----- Translation path: if pass-through translator, LLM gets langKey (no external translate) -----
+            var passThrough = !!(window.Spacerek && window.Spacerek.translatorIsPassThrough);
+            var needTranslate = !passThrough && (langKey === 'pl');
             if (typeof console !== 'undefined' && console.debug) {
               console.debug('[Spacerek] Dialog (NPC) | Język UI: ' + langKey + ' | Wejście: "' + text + '"');
             }
-            // ----- Pre-processing: if UI is Polish, translate PL→EN before sending to LLM -----
             var textForLlm = text;
-            if (needTranslate && window.Spacerek && typeof window.Spacerek.translateToEnglish === 'function') {
+            if (needTranslate && typeof window.Spacerek.translateToEnglish === 'function') {
               textForLlm = await window.Spacerek.translateToEnglish(text);
               if (typeof console !== 'undefined' && console.debug) {
                 console.debug('[Spacerek] Tłumaczenie PL→EN (dla LLM): "' + textForLlm + '"');
               }
             }
             var messagesForLlm = state.encounterMessages.slice(0, -1).concat([{ who: 'player', text: textForLlm }]);
-            // ----- LLM invocation (unchanged) -----
-            var llmReply = await (window.generateNpcReplyFromContext(npcName || 'NPC', 'en', messagesForLlm) || Promise.resolve(null));
+            var llmLang = passThrough ? langKey : 'en';
+            var llmReply = await (window.generateNpcReplyFromContext(npcName || 'NPC', llmLang, messagesForLlm) || Promise.resolve(null));
             var reply = llmReply && llmReply.trim();
             var fromLLM = !!reply;
             if (typeof console !== 'undefined' && console.debug && reply) {
-              console.debug('[Spacerek] Odpowiedź LLM (EN): "' + reply + '"');
+              console.debug('[Spacerek] Odpowiedź LLM (' + llmLang + '): "' + reply + '"');
             }
-            // ----- Post-processing: if UI is Polish, translate LLM response EN→PL -----
-            if (reply && needTranslate && window.Spacerek && typeof window.Spacerek.translateToPolish === 'function') {
+            if (reply && needTranslate && typeof window.Spacerek.translateToPolish === 'function') {
               reply = await window.Spacerek.translateToPolish(reply);
               if (typeof console !== 'undefined' && console.debug) {
                 console.debug('[Spacerek] Tłumaczenie EN→PL (wyświetl): "' + reply + '"');
