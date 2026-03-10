@@ -255,14 +255,30 @@ if (typeof window !== 'undefined') {
   window.Spacerek.llmModuleLoaded = true;
 }
 
-/** Treat as garbage: too many non-ASCII, or very short with odd chars (model glitch). */
+/** Common English words (3+ chars) – reply should contain at least one to be considered valid. */
+const COMMON_EN_WORDS = new Set([
+  'the', 'and', 'have', 'that', 'with', 'this', 'from', 'they', 'would', 'there', 'could', 'other',
+  'about', 'into', 'more', 'some', 'very', 'when', 'just', 'your', 'said', 'each', 'she', 'which',
+  'their', 'been', 'were', 'where', 'much', 'before', 'right', 'find', 'give', 'these', 'thing',
+  'only', 'after', 'many', 'them', 'then', 'what', 'over', 'such', 'make', 'like', 'long', 'take',
+  'will', 'come', 'here', 'think', 'also', 'around', 'another', 'again', 'little', 'know', 'place',
+  'while', 'same', 'always', 'often', 'once', 'never', 'sometimes', 'carrot', 'want', 'need',
+  'hello', 'thanks', 'yes', 'not', 'can', 'you', 'are', 'was', 'has', 'had', 'did', 'say', 'get',
+  'see', 'way', 'how', 'all', 'out', 'her', 'his', 'one', 'our', 'who', 'day', 'may', 'new', 'now',
+  'old', 'any', 'ask', 'put', 'too', 'use', 'don\'t', 'can\'t', 'won\'t', 'that\'s', 'it\'s', 'i\'m'
+]);
+
+/** Treat as garbage: non-ASCII, glitch chars, or no common English word (e.g. "urs dac na kuliebna"). */
 function looksLikeGarbage(text) {
   if (!text || typeof text !== 'string') return true;
   const t = text.trim();
-  if (t.length < 3) return true;
+  if (t.length < 4) return true;
   const asciiLetters = (t.match(/[a-zA-Z\s.,!?'-]/g) || []).length;
-  if (t.length > 0 && asciiLetters / t.length < 0.6) return true;
+  if (t.length > 0 && asciiLetters / t.length < 0.65) return true;
   if (/^[\x00-\x1F\u0080-\uFFFF]+$/.test(t) || /^[Ǿe\u00ad\u200b]+/i.test(t)) return true;
+  const words = t.toLowerCase().replace(/[.,!?'-]+/g, ' ').split(/\s+/).filter(Boolean);
+  const hasCommonWord = words.some(function (w) { return COMMON_EN_WORDS.has(w); });
+  if (!hasCommonWord) return true;
   return false;
 }
 
@@ -271,7 +287,7 @@ async function loadGenerator() {
   if (generatorPromise === false) return false;
   try {
     const { pipeline } = await import('https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0');
-    const pipelinePromise = pipeline('text-generation', TEXT_GEN_MODEL, { progress_callback: null });
+    const pipelinePromise = pipeline('text-generation', TEXT_GEN_MODEL, { progress_callback: null, dtype: 'q8' });
     generatorPromise = pipelinePromise;
     const gen = await pipelinePromise;
     if (typeof window !== 'undefined') {
