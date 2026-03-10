@@ -1,7 +1,6 @@
 /**
- * Translator for NPC dialogue: when UI is PL → input PL→EN, LLM replies in EN, response EN→PL.
- * When UI is EN → no translation.
- * EN→PL: Opus-MT (offline) or MyMemory API (online fallback when Hugging Face returns 401).
+ * Translator for NPC dialogue: when UI is PL → input PL→EN (Opus-MT), LLM in EN, response EN→PL.
+ * EN→PL: Xenova/opus-mt-en-pl (offline) if load OK; else MyMemory API (online). When UI is EN → no translation.
  */
 (function () {
   'use strict';
@@ -9,7 +8,6 @@
   var TRANSFORMERS_CDN = 'https://cdn.jsdelivr.net/npm/@huggingface/transformers@3.0.0';
   var MODEL_PL_EN = 'Xenova/opus-mt-pl-en';
   var MODEL_EN_PL = 'Xenova/opus-mt-en-pl';
-  var MODEL_EN_PL_FALLBACK = 'Helsinki-NLP/opus-mt-en-pl';
   var MYMEMORY_URL = 'https://api.mymemory.translated.net/get';
   var DEBUG_PREFIX = '[Spacerek]';
 
@@ -17,7 +15,6 @@
   var enPlPipe = null;
   var plEnLoadPromise = null;
   var enPlLoadPromise = null;
-  var passThrough = true;
 
   function log() {
     if (typeof console !== 'undefined' && console.log) {
@@ -58,25 +55,11 @@
       })
       .then(function (pipe) {
         enPlPipe = pipe;
+        log('Translator EN→PL załadowany (Xenova/Opus-MT)');
         return pipe;
       })
       .catch(function (err) {
-        log('Translator EN→PL (' + MODEL_EN_PL + ') failed, trying ' + MODEL_EN_PL_FALLBACK, err);
-        return import(/* webpackIgnore: true */ TRANSFORMERS_CDN).then(function (mod) {
-          var pipeline = mod.pipeline || (mod.default && mod.default.pipeline);
-          if (!pipeline) throw new Error('pipeline not found');
-          return pipeline('translation', MODEL_EN_PL_FALLBACK, { progress_callback: null });
-        });
-      })
-      .then(function (pipe) {
-        if (pipe) {
-          enPlPipe = pipe;
-          log('Translator EN→PL załadowany');
-        }
-        return pipe || null;
-      })
-      .catch(function (err) {
-        log('Translator EN→PL load failed (używam pass-through)', err);
+        log('Translator EN→PL (Xenova) niedostępny, używam MyMemory API', err.message || err);
         enPlLoadPromise = null;
         return null;
       });
@@ -126,29 +109,23 @@
       if (pipe) {
         var out = await pipe(t, { max_length: 150 });
         var result = (out && Array.isArray(out) && out[0] && out[0].translation_text) ? out[0].translation_text : (typeof out === 'string' ? out : t);
-        log('EN→PL (Opus-MT): "' + t + '" → "' + result + '"');
+        log('EN→PL (Xenova): "' + t + '" → "' + result + '"');
         return result;
       }
-      var apiResult = await translateToPolishViaApi(t);
-      if (apiResult) {
-        log('EN→PL (MyMemory API): "' + t + '" → "' + apiResult + '"');
-        return apiResult;
-      }
-      log('EN→PL (pass-through): "' + t + '"');
-      return t;
     } catch (e) {
-      var apiResult = await translateToPolishViaApi(t).catch(function () { return null; });
-      if (apiResult) {
-        log('EN→PL (MyMemory API): "' + t + '" → "' + apiResult + '"');
-        return apiResult;
-      }
-      log('EN→PL error (pass-through)', e);
-      return t;
+      /* fall through to MyMemory */
     }
+    var apiResult = await translateToPolishViaApi(t);
+    if (apiResult) {
+      log('EN→PL (MyMemory API): "' + t + '" → "' + apiResult + '"');
+      return apiResult;
+    }
+    log('EN→PL (pass-through): "' + t + '"');
+    return t;
   }
 
   function updatePassThrough() {
-    passThrough = !plEnPipe || !enPlPipe;
+    var passThrough = !plEnPipe || !enPlPipe;
     if (typeof window !== 'undefined' && window.Spacerek) {
       window.Spacerek.translatorIsPassThrough = passThrough;
     }
