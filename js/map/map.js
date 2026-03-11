@@ -81,7 +81,7 @@
     var tip = formatUserTooltip(profile.displayName || t('map_you'), profile.age, profile.height, profile.tags, profile.bio, profile.interests, profile.status);
     state.userMarker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [12, 0] });
     state.radiusCircle = L.circle([center.lat, center.lng], {
-      radius: 1000,
+      radius: 2000,
       color: 'rgba(224, 122, 95, 0.85)',
       fillColor: 'transparent',
       fillOpacity: 0,
