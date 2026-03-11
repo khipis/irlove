@@ -105,32 +105,35 @@
       function (pos) {
         state.userPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         state.profile = p;
-        gunConnect();
-        var auth = getOrCreateAuth();
-        gunAuth(auth.alias, auth.pass, function (user) {
-          if (!user) {
-            setStatus('Auth failed');
-            return;
-          }
+        function showMapAndMaybeRelay() {
           loadLeaflet().then(function () {
             initMap();
             setUserAvatar(p.avatar);
-            startLocationSync();
-            subscribeToNearby();
-            subscribeInbox(function (fromPub, text) {
-              if (state.chatWith === fromPub) {
-                appendChatMessage(fromPub, text, false);
-              } else {
-                App.showToast(t('notifications_new_user') + ': ' + text.substring(0, 30));
-              }
-            });
             showScreen('screen-map');
             setStatus(t('map_status_online'));
             requestNotificationPermission();
+            var gun = gunConnect();
+            if (gun) {
+              var auth = getOrCreateAuth();
+              gunAuth(auth.alias, auth.pass, function (user) {
+                if (user) {
+                  startLocationSync();
+                  subscribeToNearby();
+                  subscribeInbox(function (fromPub, text) {
+                    if (state.chatWith === fromPub) {
+                      appendChatMessage(fromPub, text, false);
+                    } else {
+                      App.showToast(t('notifications_new_user') + ': ' + (text || '').substring(0, 30));
+                    }
+                  });
+                }
+              });
+            }
           }).catch(function () {
             setStatus(t('status_location_error'));
           });
-        });
+        }
+        showMapAndMaybeRelay();
       },
       function () {
         setStatus(t('status_location_denied'));
