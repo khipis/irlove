@@ -121,7 +121,7 @@
     radiusKm = radiusKm || config.RADIUS_KM || 2;
     var maxDistDeg = (radiusKm * 1000) / 111320;
     var names = ['Ola', 'Kasia', 'Michał', 'Zuza', 'Tomek', 'Nina', 'Bartek', 'Ania'];
-    var avatars = ['😊', '🌸', '🔥', '🌈', '🦊', '🐱', '⭐', '🌙'];
+    var avatars = config.AVATAR_EMOJIS || ['👤', '😊', '🙂', '👩🏻', '👨🏽'];
     var tagOpts = [['chat'], ['date'], ['beer'], ['chat', 'date'], ['beer', 'chat']];
     for (var i = 0; i < count; i++) {
       var angle = Math.random() * 2 * Math.PI;
