@@ -16,3 +16,6 @@ Thumbs.db
 # Relay server
 server/node_modules/
 server/data/
+
+# Static site build (used by GitHub Actions only)
+_site/
