@@ -1,10 +1,20 @@
-# Deploy to GitHub Pages on push to main
-# App: https://khipis.github.io/irlove/
+# =============================================================================
+# Deploy STATIC site only (index.html + CSS/JS) to GitHub Pages. No Node server.
+# Site URL after deploy: https://khipis.github.io/irlove/
+# =============================================================================
 #
-# If you see "Get Pages site failed" / HttpError Not Found:
-# → Go to repo Settings → Pages → Build and deployment
-# → Set "Source" to "GitHub Actions" (not "Deploy from a branch")
-# → Save; then re-run the workflow or push again.
+# ❗ IF DEPLOY FAILS with "Get Pages site failed" or "HttpError: Not Found":
+#
+#   1. Open: https://github.com/khipis/irlove/settings/pages
+#   2. Under "Build and deployment" → "Source" choose: "GitHub Actions"
+#   3. Save. Then re-run the workflow (Actions tab → Deploy to GitHub Pages → Re-run)
+#
+#   Pages must be enabled with source "GitHub Actions" once in repo settings.
+#   This workflow cannot enable it for you.
+#
+# Node.js 24: FORCE_JAVASCRIPT_ACTIONS_TO_NODE24 avoids Node 20 deprecation warning.
+# =============================================================================
+
 name: Deploy to GitHub Pages
 
 on:
