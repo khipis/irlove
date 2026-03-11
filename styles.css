@@ -98,16 +98,45 @@ body[data-theme="4"] {
   flex-shrink: 0;
 }
 
-/* Logo – handwritten, medium-bold (Caveat 600) */
+/* Theme sidebar – z boku */
+.theme-sidebar {
+  position: fixed;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  z-index: 20;
+}
+
+.theme-sidebar .btn-theme {
+  width: 40px;
+  height: 40px;
+  font-size: 1.15rem;
+}
+
+/* Logo – przepiękne, z serduszkiem zamiast V */
 .logo {
   font-family: var(--font-logo);
-  font-weight: 600;
-  font-size: clamp(2rem, 8vw, 3rem);
+  font-weight: 700;
+  font-size: clamp(2.5rem, 12vw, 4rem);
   line-height: 1.1;
   letter-spacing: -0.02em;
-  margin-bottom: 0.25rem;
+  margin-bottom: 0.35rem;
   color: var(--text);
-  text-shadow: 0 0 32px var(--accent-glow);
+  text-shadow: 0 0 40px var(--accent-glow), 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.logo-heart {
+  color: var(--accent);
+  display: inline-block;
+  animation: logoHeart 2s ease-in-out infinite;
+}
+
+@keyframes logoHeart {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.08); opacity: 0.95; }
 }
 
 .tagline {
@@ -123,14 +152,6 @@ body[data-theme="4"] {
   margin-bottom: 0.5rem;
   color: var(--text-muted);
   font-weight: 500;
-}
-
-/* Theme switcher – 4 themes */
-.theme-buttons {
-  display: flex;
-  gap: 8px;
-  justify-content: center;
-  margin-bottom: 0.6rem;
 }
 
 .btn-theme {
@@ -534,6 +555,34 @@ body[data-theme="4"] {
   pointer-events: none;
 }
 
+.map-status-row {
+  margin-top: 8px;
+  pointer-events: auto;
+}
+
+.map-status-input {
+  width: 100%;
+  max-width: 280px;
+  padding: 8px 12px;
+  font-size: 0.85rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-pill);
+  background: var(--bg-card);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.map-status-input::placeholder {
+  color: var(--text-muted);
+  opacity: 0.8;
+}
+
+.map-status-input:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px var(--accent-soft);
+}
+
 #map-overlay * {
   pointer-events: auto;
 }
@@ -651,7 +700,40 @@ body[data-theme="4"] {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
+  gap: 4px;
+}
+
+/* Dymek nad ikonką – status + intencja (jak Instagram) */
+.user-marker-bubble {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(18, 18, 24, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.35);
+  max-width: 140px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.user-marker-bubble .user-marker-status-text {
+  font-size: 0.7rem;
+  color: #f0ede8;
+  font-weight: 500;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 1;
+}
+
+.user-marker-bubble .user-marker-tag-icon {
+  font-size: 12px;
+  line-height: 1;
+  opacity: 0.95;
+  flex-shrink: 0;
 }
 
 .user-marker-tag-icon {
@@ -742,6 +824,12 @@ body[data-theme="4"] {
   color: rgba(240, 237, 232, 0.85);
   font-weight: 500;
   font-size: 0.8rem;
+}
+
+.leaflet-tooltip.marker-tooltip .marker-tooltip-status {
+  color: rgba(240, 237, 232, 0.95);
+  font-size: 0.8rem;
+  font-style: italic;
 }
 
 .leaflet-tooltip.marker-tooltip .marker-tooltip-tags {
@@ -958,8 +1046,8 @@ body[data-theme="4"] {
     justify-content: flex-start;
   }
   .logo {
-    font-size: 1.75rem;
-    margin-bottom: 0.15rem;
+    font-size: 2rem;
+    margin-bottom: 0.2rem;
   }
   .tagline {
     font-size: 0.8rem;
@@ -969,13 +1057,13 @@ body[data-theme="4"] {
     font-size: 0.75rem;
     margin-bottom: 0.35rem;
   }
-  .theme-buttons {
-    margin-bottom: 0.4rem;
+  .theme-sidebar {
+    right: 8px;
   }
-  .btn-theme {
+  .theme-sidebar .btn-theme {
     width: 34px;
     height: 34px;
-    font-size: 1.1rem;
+    font-size: 1.05rem;
   }
   .profile-form {
     margin-bottom: 0.5rem;

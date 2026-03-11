@@ -29,6 +29,7 @@
       height: '',
       avatar: '👤',
       bio: '',
+      status: '',
       tags: [],
       interests: []
     };

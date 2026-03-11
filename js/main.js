@@ -274,7 +274,9 @@
               var R = (radiusKm * 1000) / 111320;
               state.map.fitBounds([[c.lat - R, c.lng - R], [c.lat + R, c.lng + R]], { padding: [24, 24], maxZoom: 17 });
             }
-            setUserAvatar(p.avatar, p.tags);
+            var statusInput = document.getElementById('map-status-input');
+            if (statusInput) statusInput.value = p.status || '';
+            setUserAvatar(p.avatar, p.tags, p.status);
             if (typeof App.addSimulatedUsers === 'function') App.addSimulatedUsers(state.userPosition, 2 + Math.floor(Math.random() * 2), radiusKm);
             setStatus(t('map_status_online'));
             requestNotificationPermission();
@@ -520,6 +522,18 @@
 
     var btnNotifications = $('btn-enable-notifications');
     if (btnNotifications) btnNotifications.addEventListener('click', enableNotifications);
+
+    var mapStatusInput = document.getElementById('map-status-input');
+    if (mapStatusInput) {
+      mapStatusInput.addEventListener('input', function () {
+        var val = (this.value || '').trim().substring(0, 50);
+        var p = getProfile() || {};
+        p.status = val;
+        setProfile(p);
+        state.profile = p;
+        if (typeof setUserAvatar === 'function') setUserAvatar(p.avatar, p.tags, val);
+      });
+    }
   }
 
   if (document.readyState === 'loading') {

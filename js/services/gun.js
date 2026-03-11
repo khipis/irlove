@@ -79,6 +79,9 @@
       age: profile.age || '',
       height: profile.height || '',
       avatar: profile.avatar || '👤',
+      status: profile.status || '',
+      bio: profile.bio || '',
+      interests: profile.interests || [],
       tags: profile.tags || []
     });
   }
@@ -121,7 +124,8 @@
         lng: lng,
         displayName: profile.displayName,
         avatar: profile.avatar,
-        tags: profile.tags || []
+        tags: profile.tags || [],
+        profile: profile
       };
       if (App.updateOtherUser) App.updateOtherUser(pub, payload);
       state.nearbyUsers[pub] = { at: at, profile: profile, lat: lat, lng: lng };

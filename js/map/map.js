@@ -63,19 +63,21 @@
     var profile = state.profile || {};
     var avatar = (profile.avatar && profile.avatar.trim()) ? profile.avatar.trim() : '👤';
     if (avatar.length > 2) avatar = '👤';
-    var tagIcon = tagToSmallIcon(profile.tags);
+    var tagIcons = tagsToIconsString(profile.tags || []);
+    var statusText = (profile.status && String(profile.status).trim()) ? escapeHtml(String(profile.status).trim().substring(0, 40)) : '';
+    var bubbleHtml = '<div class="user-marker-bubble"><span class="user-marker-status-text">' + statusText + '</span><span class="user-marker-tag-icon">' + tagIcons + '</span></div>';
     var userIcon = L.divIcon({
       className: 'user-marker irlove-user',
-      html: '<div class="user-marker-wrap"><span class="user-marker-tag-icon">' + tagIcon + '</span><span class="user-marker-avatar" title="' + escapeHtml(profile.displayName || t('map_you')) + '">' + avatar + '</span></div>',
-      iconSize: [48, 56],
-      iconAnchor: [24, 52]
+      html: '<div class="user-marker-wrap">' + bubbleHtml + '<span class="user-marker-avatar" title="' + escapeHtml(profile.displayName || t('map_you')) + '">' + avatar + '</span></div>',
+      iconSize: [48, 72],
+      iconAnchor: [24, 68]
     });
     state.userMarker = L.marker([center.lat, center.lng], { icon: userIcon }).addTo(state.map);
-    var tip = formatUserTooltip(profile.displayName || t('map_you'), profile.age, profile.height, profile.tags, profile.bio, profile.interests);
+    var tip = formatUserTooltip(profile.displayName || t('map_you'), profile.age, profile.height, profile.tags, profile.bio, profile.interests, profile.status);
     state.userMarker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [12, 0] });
   }
 
-  function formatUserTooltip(name, age, height, tags, bio, interests) {
+  function formatUserTooltip(name, age, height, tags, bio, interests, status) {
     var lines = [];
     var line1 = '<strong class="marker-tooltip-name">' + escapeHtml(name) + '</strong>';
     var meta = [];
@@ -83,6 +85,7 @@
     if (height) meta.push(height + ' cm');
     if (meta.length) line1 += ' <span class="marker-tooltip-meta">' + meta.join(' · ') + '</span>';
     lines.push('<div class="marker-tooltip-line">' + line1 + '</div>');
+    if (status && String(status).trim()) lines.push('<div class="marker-tooltip-line marker-tooltip-status">' + escapeHtml(String(status).trim()) + '</div>');
     if (tags && tags.length) {
       var tagLabels = tags.map(function (tag) { return t('profile_tag_' + tag); });
       lines.push('<div class="marker-tooltip-line marker-tooltip-tags">' + tagLabels.map(function (l) { return escapeHtml(l); }).join(' · ') + '</div>');
@@ -134,7 +137,7 @@
         interests.push(intList[idx]);
         intList.splice(idx, 1);
       }
-      var tip = formatUserTooltip(name, String(age), String(height), tags, bio, interests);
+      var tip = formatUserTooltip(name, String(age), String(height), tags, bio, interests, '');
       marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [12, 0] });
       if (!state.simulatedMarkers) state.simulatedMarkers = [];
       state.simulatedMarkers.push(marker);
@@ -147,6 +150,15 @@
     if (tags.indexOf('date') >= 0) return '❤️';
     if (tags.indexOf('chat') >= 0) return '💬';
     return '';
+  }
+
+  function tagsToIconsString(tags) {
+    if (!tags || !tags.length) return '';
+    var out = [];
+    if (tags.indexOf('chat') >= 0) out.push('💬');
+    if (tags.indexOf('date') >= 0) out.push('❤️');
+    if (tags.indexOf('beer') >= 0) out.push('🍺');
+    return out.join('');
   }
 
   function updateUserPosition(lat, lng) {
@@ -185,7 +197,7 @@
     });
     var marker = L.marker([lat, lng], { icon: icon }).addTo(state.map);
     var prof = data.profile || data;
-    var tip = formatUserTooltip(name, prof.age, prof.height, tags, prof.bio, prof.interests);
+    var tip = formatUserTooltip(name, prof.age, prof.height, tags, prof.bio, prof.interests, prof.status);
     marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [12, 0] });
     marker._pub = pub;
     marker.on('click', function () {
@@ -202,11 +214,18 @@
     delete state.otherUserMarkers[pub];
   }
 
-  function setUserAvatar(avatar, tags) {
-    var el = document.querySelector('.user-marker-avatar');
-    if (el) el.textContent = (avatar && avatar.trim()) ? avatar.trim().substring(0, 2) : '👤';
-    var tagEl = document.querySelector('.user-marker-tag-icon');
-    if (tagEl) tagEl.textContent = tagToSmallIcon(tags || (state.profile && state.profile.tags));
+  function setUserAvatar(avatar, tags, status) {
+    var wrap = document.querySelector('.user-marker-wrap');
+    if (!wrap) return;
+    var avatarEl = wrap.querySelector('.user-marker-avatar');
+    if (avatarEl) avatarEl.textContent = (avatar && avatar.trim()) ? avatar.trim().substring(0, 2) : '👤';
+    var bubble = wrap.querySelector('.user-marker-bubble');
+    if (bubble) {
+      var statusEl = bubble.querySelector('.user-marker-status-text');
+      var tagEl = bubble.querySelector('.user-marker-tag-icon');
+      if (statusEl) statusEl.textContent = (status && String(status).trim()) ? String(status).trim().substring(0, 40) : '';
+      if (tagEl) tagEl.textContent = tagsToIconsString(tags || (state.profile && state.profile.tags) || []);
+    }
   }
 
   App.loadLeaflet = loadLeaflet;
