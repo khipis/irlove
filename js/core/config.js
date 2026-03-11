@@ -10,10 +10,7 @@
   window.IRLove.config = {
     RADIUS_KM: 2,
     RADIUS_M: 2000,
-    RADIUS_KM_MIN: 1,
-    RADIUS_KM_MAX: 8,
     RADIUS_KM_DEFAULT: 2,
-    STORAGE_KEY_RADIUS_KM: 'irlove_radius_km',
     STATUS_MAX_LENGTH: 120,
     BIO_MAX_LENGTH: 200,
     INTERESTS_MAX: 5,

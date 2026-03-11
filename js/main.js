@@ -64,15 +64,6 @@
       var tag = btn.getAttribute('data-tag');
       btn.classList.toggle('selected', tags.indexOf(tag) >= 0);
     });
-    var radiusKm = getStoredRadiusKm();
-    var slider = $('radius-slider');
-    var radiusValue = document.getElementById('radius-value');
-    if (slider) {
-      slider.value = radiusKm;
-      slider.min = config.RADIUS_KM_MIN;
-      slider.max = config.RADIUS_KM_MAX;
-    }
-    if (radiusValue) radiusValue.textContent = radiusKm;
     if (typeof renderAvatarToolbox === 'function') renderAvatarToolbox();
   }
 
@@ -144,24 +135,6 @@
     try {
       localStorage.setItem(config.STORAGE_KEY_THEME, theme);
     } catch (e) {}
-  }
-
-  function getStoredRadiusKm() {
-    try {
-      var v = parseInt(localStorage.getItem(config.STORAGE_KEY_RADIUS_KM), 10);
-      if (!isNaN(v) && v >= config.RADIUS_KM_MIN && v <= config.RADIUS_KM_MAX) return v;
-    } catch (e) {}
-    return config.RADIUS_KM_DEFAULT;
-  }
-
-  function setStoredRadiusKm(km) {
-    var n = parseInt(km, 10);
-    if (isNaN(n) || n < config.RADIUS_KM_MIN) n = config.RADIUS_KM_MIN;
-    if (n > config.RADIUS_KM_MAX) n = config.RADIUS_KM_MAX;
-    try {
-      localStorage.setItem(config.STORAGE_KEY_RADIUS_KM, String(n));
-    } catch (e) {}
-    return n;
   }
 
   function applyTheme(theme) {
@@ -272,7 +245,7 @@
         state.userPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         state.profile = p;
         function showMapAndMaybeRelay() {
-          var radiusKm = getStoredRadiusKm();
+          var radiusKm = config.RADIUS_KM || 2;
           config.RADIUS_M = radiusKm * 1000;
           showScreen('screen-map');
           loadLeaflet().then(function () {
@@ -480,15 +453,6 @@
         this.classList.toggle('selected');
       });
     });
-
-    var radiusSlider = $('radius-slider');
-    var radiusValueEl = document.getElementById('radius-value');
-    if (radiusSlider && radiusValueEl) {
-      radiusSlider.addEventListener('input', function () {
-        var km = setStoredRadiusKm(radiusSlider.value);
-        radiusValueEl.textContent = km;
-      });
-    }
 
     var btnToggleInterests = $('btn-toggle-interests');
     if (btnToggleInterests) {
