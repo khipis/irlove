@@ -17,16 +17,10 @@
         <h1 class="logo">IRLove</h1>
         <p class="tagline" data-i18n="start_tagline">Zobacz kto jest w okolicy i umów się na spotkanie</p>
         <div class="theme-buttons" role="group" aria-label="Kolorystyka">
-          <button type="button" class="btn-theme" data-theme="1" title="Terracotta">1</button>
-          <button type="button" class="btn-theme" data-theme="2" title="Niebieski">2</button>
-          <button type="button" class="btn-theme" data-theme="3" title="Zielony">3</button>
-          <button type="button" class="btn-theme" data-theme="4" title="Fiolet">4</button>
-          <button type="button" class="btn-theme" data-theme="5" title="Róż">5</button>
-          <button type="button" class="btn-theme" data-theme="6" title="Bursztyn">6</button>
-          <button type="button" class="btn-theme" data-theme="7" title="Morski">7</button>
-          <button type="button" class="btn-theme" data-theme="8" title="Róża">8</button>
-          <button type="button" class="btn-theme" data-theme="9" title="Indygo">9</button>
-          <button type="button" class="btn-theme" data-theme="10" title="Mięta">10</button>
+          <button type="button" class="btn-theme" data-theme="1" title="Warm">🌅</button>
+          <button type="button" class="btn-theme" data-theme="2" title="Ocean">🌊</button>
+          <button type="button" class="btn-theme" data-theme="3" title="Forest">🌲</button>
+          <button type="button" class="btn-theme" data-theme="4" title="Twilight">🌙</button>
         </div>
         <p class="instruction" data-i18n="start_instruction">Uzupełnij profil i wejdź na mapę</p>
         <div class="profile-form">
@@ -41,6 +35,7 @@
             <input type="text" id="profile-avatar" maxlength="200" placeholder="👤" />
             <button type="button" id="btn-random-avatar" class="btn-random-avatar" title="" data-i18n-title="btn_random_avatar">🎲</button>
           </div>
+          <div id="avatar-toolbox" class="avatar-toolbox" aria-label="Wybierz avatar"></div>
           <label><span data-i18n="profile_tags">Dostępność</span></label>
           <div class="tag-buttons">
             <button type="button" class="btn-tag" data-tag="chat" data-i18n="profile_tag_chat">Pogadać</button>
@@ -65,12 +60,12 @@
           <span id="status-text" data-i18n="map_status_loading">Ładowanie…</span>
         </div>
         <p id="map-nearby-hint" class="map-nearby-hint" data-i18n="map_nearby">W pobliżu</p>
+        <div id="notifications-hint" class="notifications-hint">
+          <button type="button" id="btn-enable-notifications" class="btn-notifications" data-i18n="notifications_enable">🔔 Włącz powiadomienia</button>
+        </div>
       </div>
       <button type="button" id="btn-profile-map" class="btn-fab" data-i18n-title="btn_profile" title="Profil">👤</button>
       <button type="button" id="btn-back" class="btn-back" data-i18n="btn_back">Wstecz</button>
-      <div id="notifications-hint" class="notifications-hint hidden">
-        <button type="button" id="btn-enable-notifications" class="btn-small" data-i18n="notifications_enable">Włącz powiadomienia</button>
-      </div>
     </section>
 
     <!-- Chat overlay -->

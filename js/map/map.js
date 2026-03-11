@@ -47,6 +47,12 @@
         if (m && state.map && state.map.hasLayer(m)) state.map.removeLayer(m);
       });
       state.otherUserMarkers = {};
+      if (state.simulatedMarkers) {
+        state.simulatedMarkers.forEach(function (m) {
+          if (state.map && state.map.hasLayer(m)) state.map.removeLayer(m);
+        });
+        state.simulatedMarkers = [];
+      }
     }
     state.map = L.map('map-container').setView([center.lat, center.lng], 15);
     var mapEl = document.getElementById('map-container');
@@ -60,12 +66,59 @@
     var tagIcon = tagToSmallIcon(profile.tags);
     var userIcon = L.divIcon({
       className: 'user-marker irlove-user',
-      html: '<div class="user-marker-wrap"><span class="user-marker-tag-icon">' + tagIcon + '</span><span class="user-marker-avatar" title="' + (t('map_you') || 'You').replace(/"/g, '&quot;') + '">' + avatar + '</span></div>',
+      html: '<div class="user-marker-wrap"><span class="user-marker-tag-icon">' + tagIcon + '</span><span class="user-marker-avatar" title="' + escapeHtml(profile.displayName || t('map_you')) + '">' + avatar + '</span></div>',
       iconSize: [48, 56],
       iconAnchor: [24, 52]
     });
     state.userMarker = L.marker([center.lat, center.lng], { icon: userIcon }).addTo(state.map);
-    state.userMarker.bindTooltip(t('tooltip_you'), { permanent: false });
+    var tip = formatUserTooltip(profile.displayName || t('map_you'), profile.age, profile.height, profile.tags);
+    state.userMarker.bindTooltip(tip, { permanent: false, direction: 'top', className: 'marker-tooltip' });
+  }
+
+  function formatUserTooltip(name, age, height, tags) {
+    var parts = ['<strong>' + escapeHtml(name) + '</strong>'];
+    if (age) parts.push(age + ' lat');
+    if (height) parts.push(height + ' cm');
+    if (tags && tags.length) parts.push(tags.join(' · '));
+    return parts.join(' &nbsp;|&nbsp; ');
+  }
+
+  function escapeHtml(s) {
+    if (!s) return '';
+    var d = document.createElement('div');
+    d.textContent = s;
+    return d.innerHTML;
+  }
+
+  function addSimulatedUsers(center, count) {
+    if (!state.map || !center || !count) return;
+    var L = window.L;
+    var names = ['Ola', 'Kasia', 'Michał', 'Zuza', 'Tomek', 'Nina', 'Bartek', 'Ania'];
+    var avatars = ['😊', '🌸', '🔥', '🌈', '🦊', '🐱', '⭐', '🌙'];
+    var tagOpts = [['chat'], ['date'], ['beer'], ['chat', 'date'], ['beer', 'chat']];
+    for (var i = 0; i < count; i++) {
+      var angle = (i / count) * 2 * Math.PI + Math.random() * 0.8;
+      var dist = 0.00015 * (300 + Math.random() * 700);
+      var lat = center.lat + dist * Math.cos(angle);
+      var lng = center.lng + dist * Math.sin(angle);
+      var name = names[Math.floor(Math.random() * names.length)] + (20 + Math.floor(Math.random() * 25));
+      var age = 22 + Math.floor(Math.random() * 18);
+      var height = 165 + Math.floor(Math.random() * 25);
+      var tags = tagOpts[Math.floor(Math.random() * tagOpts.length)];
+      var avatar = avatars[Math.floor(Math.random() * avatars.length)];
+      var tagIcon = tagToSmallIcon(tags);
+      var icon = L.divIcon({
+        className: 'other-user-marker irlove-other irlove-simulated',
+        html: '<div class="other-marker-wrap"><span class="user-marker-tag-icon">' + tagIcon + '</span><span class="other-marker-avatar">' + avatar + '</span></div>',
+        iconSize: [40, 50],
+        iconAnchor: [20, 48]
+      });
+      var marker = L.marker([lat, lng], { icon: icon }).addTo(state.map);
+      var tip = formatUserTooltip(name, String(age), String(height), tags);
+      marker.bindTooltip(tip, { permanent: false, direction: 'top', className: 'marker-tooltip' });
+      if (!state.simulatedMarkers) state.simulatedMarkers = [];
+      state.simulatedMarkers.push(marker);
+    }
   }
 
   function tagToSmallIcon(tags) {
@@ -106,12 +159,14 @@
     var name = (data.displayName && String(data.displayName).trim()) ? String(data.displayName).trim() : '?';
     var icon = L.divIcon({
       className: 'other-user-marker irlove-other',
-      html: '<span class="other-marker-avatar" title="' + name.replace(/"/g, '&quot;') + '">' + avatar + '</span>',
-      iconSize: [36, 36],
-      iconAnchor: [18, 18]
+      html: '<div class="other-marker-wrap"><span class="user-marker-tag-icon">' + (tagToSmallIcon(tags) || '') + '</span><span class="other-marker-avatar" title="' + escapeHtml(name) + '">' + avatar + '</span></div>',
+      iconSize: [40, 50],
+      iconAnchor: [20, 48]
     });
     var marker = L.marker([lat, lng], { icon: icon }).addTo(state.map);
-    marker.bindTooltip(name, { permanent: false });
+    var prof = data.profile || data;
+    var tip = formatUserTooltip(name, prof.age, prof.height, tags);
+    marker.bindTooltip(tip, { permanent: false, direction: 'top', className: 'marker-tooltip' });
     marker._pub = pub;
     marker.on('click', function () {
       if (typeof App.openChat === 'function') App.openChat(pub, data);
@@ -140,4 +195,5 @@
   App.updateOtherUser = updateOtherUser;
   App.removeOtherUser = removeOtherUser;
   App.setUserAvatar = setUserAvatar;
+  App.addSimulatedUsers = addSimulatedUsers;
 })();

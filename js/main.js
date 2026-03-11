@@ -61,6 +61,7 @@
       var tag = btn.getAttribute('data-tag');
       btn.classList.toggle('selected', tags.indexOf(tag) >= 0);
     });
+    if (typeof renderAvatarToolbox === 'function') renderAvatarToolbox();
   }
 
   function saveProfileFromForm() {
@@ -88,7 +89,7 @@
   function getStoredTheme() {
     try {
       var t = localStorage.getItem(config.STORAGE_KEY_THEME);
-      return (t && t >= '1' && t <= '10') ? t : '1';
+      return (t && t >= '1' && t <= '4') ? t : '1';
     } catch (e) { return '1'; }
   }
 
@@ -109,6 +110,27 @@
   function randomAvatar() {
     var list = config.AVATAR_EMOJIS || ['👤', '😊', '🌸', '🔥'];
     return list[Math.floor(Math.random() * list.length)];
+  }
+
+  function renderAvatarToolbox() {
+    var box = document.getElementById('avatar-toolbox');
+    if (!box || !config.AVATAR_EMOJIS) return;
+    box.innerHTML = '';
+    var current = (getProfile() || {}).avatar || '👤';
+    config.AVATAR_EMOJIS.forEach(function (emoji) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'avatar-tool-btn' + (emoji === current ? ' selected' : '');
+      btn.textContent = emoji;
+      btn.setAttribute('aria-label', 'Avatar ' + emoji);
+      btn.addEventListener('click', function () {
+        box.querySelectorAll('.avatar-tool-btn').forEach(function (b) { b.classList.remove('selected'); });
+        btn.classList.add('selected');
+        var avatarEl = $('profile-avatar');
+        if (avatarEl) avatarEl.value = emoji;
+      });
+      box.appendChild(btn);
+    });
   }
 
   function fillRandomProfile() {
@@ -167,10 +189,17 @@
         state.userPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         state.profile = p;
         function showMapAndMaybeRelay() {
+          showScreen('screen-map');
           loadLeaflet().then(function () {
             initMap();
+            if (state.map && state.userPosition) {
+              state.map.invalidateSize();
+              var c = state.userPosition;
+              var R = 2000 / 111320;
+              state.map.fitBounds([[c.lat - R, c.lng - R], [c.lat + R, c.lng + R]], { padding: [24, 24], maxZoom: 17 });
+            }
             setUserAvatar(p.avatar, p.tags);
-            showScreen('screen-map');
+            if (typeof App.addSimulatedUsers === 'function') App.addSimulatedUsers(state.userPosition, 2 + Math.floor(Math.random() * 2));
             setStatus(t('map_status_online'));
             requestNotificationPermission();
             var gun = gunConnect();
@@ -285,17 +314,27 @@
 
   function requestNotificationPermission() {
     if (typeof Notification === 'undefined') return;
-    if (Notification.permission === 'granted') return;
     var hint = document.getElementById('notifications-hint');
-    if (hint) hint.classList.remove('hidden');
+    if (!hint) return;
+    if (Notification.permission === 'granted') {
+      hint.classList.add('hidden');
+    } else {
+      hint.classList.remove('hidden');
+    }
   }
 
   function enableNotifications() {
-    if (typeof Notification === 'undefined') return;
+    if (typeof Notification === 'undefined') {
+      App.showToast('Przeglądarka nie obsługuje powiadomień.', 'error');
+      return;
+    }
     Notification.requestPermission().then(function (p) {
       if (p === 'granted') {
         var hint = document.getElementById('notifications-hint');
         if (hint) hint.classList.add('hidden');
+        App.showToast(t('notifications_enable') + ' ✓');
+      } else if (p === 'denied') {
+        App.showToast('Powiadomienia zablokowane. Odblokuj w ustawieniach przeglądarki.', 'error');
       }
     });
   }
@@ -308,6 +347,7 @@
     ensureProfile();
     applyTheme(getStoredTheme());
     loadProfileIntoForm();
+    renderAvatarToolbox();
     applyLocale(refreshLabels);
 
     document.querySelectorAll('.btn-theme').forEach(function (btn) {
@@ -365,6 +405,7 @@
       btnProfile.addEventListener('click', function () {
         showScreen('screen-start');
         loadProfileIntoForm();
+        renderAvatarToolbox();
       });
     }
 
