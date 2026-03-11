@@ -99,15 +99,17 @@
     return d.innerHTML;
   }
 
-  function addSimulatedUsers(center, count) {
+  function addSimulatedUsers(center, count, radiusKm) {
     if (!state.map || !center || !count) return;
     var L = window.L;
+    radiusKm = radiusKm || config.RADIUS_KM || 2;
+    var maxDistDeg = (radiusKm * 1000) / 111320;
     var names = ['Ola', 'Kasia', 'Michał', 'Zuza', 'Tomek', 'Nina', 'Bartek', 'Ania'];
     var avatars = ['😊', '🌸', '🔥', '🌈', '🦊', '🐱', '⭐', '🌙'];
     var tagOpts = [['chat'], ['date'], ['beer'], ['chat', 'date'], ['beer', 'chat']];
     for (var i = 0; i < count; i++) {
-      var angle = (i / count) * 2 * Math.PI + Math.random() * 0.8;
-      var dist = 0.00015 * (300 + Math.random() * 700);
+      var angle = Math.random() * 2 * Math.PI;
+      var dist = maxDistDeg * (0.15 + Math.random() * 0.85);
       var lat = center.lat + dist * Math.cos(angle);
       var lng = center.lng + dist * Math.sin(angle);
       var name = names[Math.floor(Math.random() * names.length)] + (20 + Math.floor(Math.random() * 25));

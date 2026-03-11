@@ -64,6 +64,15 @@
       var tag = btn.getAttribute('data-tag');
       btn.classList.toggle('selected', tags.indexOf(tag) >= 0);
     });
+    var radiusKm = getStoredRadiusKm();
+    var slider = $('radius-slider');
+    var radiusValue = document.getElementById('radius-value');
+    if (slider) {
+      slider.value = radiusKm;
+      slider.min = config.RADIUS_KM_MIN;
+      slider.max = config.RADIUS_KM_MAX;
+    }
+    if (radiusValue) radiusValue.textContent = radiusKm;
     if (typeof renderAvatarToolbox === 'function') renderAvatarToolbox();
   }
 
@@ -127,6 +136,24 @@
     try {
       localStorage.setItem(config.STORAGE_KEY_THEME, theme);
     } catch (e) {}
+  }
+
+  function getStoredRadiusKm() {
+    try {
+      var v = parseInt(localStorage.getItem(config.STORAGE_KEY_RADIUS_KM), 10);
+      if (!isNaN(v) && v >= config.RADIUS_KM_MIN && v <= config.RADIUS_KM_MAX) return v;
+    } catch (e) {}
+    return config.RADIUS_KM_DEFAULT;
+  }
+
+  function setStoredRadiusKm(km) {
+    var n = parseInt(km, 10);
+    if (isNaN(n) || n < config.RADIUS_KM_MIN) n = config.RADIUS_KM_MIN;
+    if (n > config.RADIUS_KM_MAX) n = config.RADIUS_KM_MAX;
+    try {
+      localStorage.setItem(config.STORAGE_KEY_RADIUS_KM, String(n));
+    } catch (e) {}
+    return n;
   }
 
   function applyTheme(theme) {
@@ -236,17 +263,19 @@
         state.userPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude };
         state.profile = p;
         function showMapAndMaybeRelay() {
+          var radiusKm = getStoredRadiusKm();
+          config.RADIUS_M = radiusKm * 1000;
           showScreen('screen-map');
           loadLeaflet().then(function () {
             initMap();
             if (state.map && state.userPosition) {
               state.map.invalidateSize();
               var c = state.userPosition;
-              var R = 2000 / 111320;
+              var R = (radiusKm * 1000) / 111320;
               state.map.fitBounds([[c.lat - R, c.lng - R], [c.lat + R, c.lng + R]], { padding: [24, 24], maxZoom: 17 });
             }
             setUserAvatar(p.avatar, p.tags);
-            if (typeof App.addSimulatedUsers === 'function') App.addSimulatedUsers(state.userPosition, 2 + Math.floor(Math.random() * 2));
+            if (typeof App.addSimulatedUsers === 'function') App.addSimulatedUsers(state.userPosition, 2 + Math.floor(Math.random() * 2), radiusKm);
             setStatus(t('map_status_online'));
             requestNotificationPermission();
             var gun = gunConnect();
@@ -440,6 +469,15 @@
         this.classList.toggle('selected');
       });
     });
+
+    var radiusSlider = $('radius-slider');
+    var radiusValueEl = document.getElementById('radius-value');
+    if (radiusSlider && radiusValueEl) {
+      radiusSlider.addEventListener('input', function () {
+        var km = setStoredRadiusKm(radiusSlider.value);
+        radiusValueEl.textContent = km;
+      });
+    }
 
     var btnToggleInterests = $('btn-toggle-interests');
     if (btnToggleInterests) {

@@ -390,6 +390,44 @@ body[data-theme="4"] {
   color: var(--accent);
 }
 
+.radius-value {
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.radius-slider {
+  width: 100%;
+  margin-top: 0.35rem;
+  margin-bottom: 0.25rem;
+  height: 8px;
+  -webkit-appearance: none;
+  appearance: none;
+  background: var(--bg-soft);
+  border-radius: var(--radius-pill);
+  outline: none;
+}
+
+.radius-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 2px solid var(--bg);
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
+.radius-slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+  border: 2px solid var(--bg);
+  box-shadow: 0 2px 8px var(--accent-glow);
+}
+
 /* Buttons */
 .btn-primary {
   width: 100%;

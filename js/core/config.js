@@ -10,6 +10,10 @@
   window.IRLove.config = {
     RADIUS_KM: 2,
     RADIUS_M: 2000,
+    RADIUS_KM_MIN: 1,
+    RADIUS_KM_MAX: 8,
+    RADIUS_KM_DEFAULT: 2,
+    STORAGE_KEY_RADIUS_KM: 'irlove_radius_km',
     LOCATION_UPDATE_MS: 5000,
     ACTIVE_THRESHOLD_MS: 15000,
     STORAGE_KEY_PROFILE: 'irlove_profile',

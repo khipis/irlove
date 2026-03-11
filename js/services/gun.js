@@ -113,7 +113,8 @@
         return;
       }
       var dist = App.haversine(state.userPosition.lat, state.userPosition.lng, lat, lng);
-      if (dist > RADIUS_M) return;
+      var radiusM = config.RADIUS_M || RADIUS_M || 2000;
+      if (dist > radiusM) return;
       var profile = data.profile || {};
       var payload = {
         lat: lat,
