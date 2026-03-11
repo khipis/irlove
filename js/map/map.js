@@ -53,6 +53,10 @@
         });
         state.simulatedMarkers = [];
       }
+      if (state.radiusCircle && state.map && state.map.hasLayer(state.radiusCircle)) {
+        state.map.removeLayer(state.radiusCircle);
+      }
+      state.radiusCircle = null;
     }
     state.map = L.map('map-container').setView([center.lat, center.lng], 15);
     var mapEl = document.getElementById('map-container');
@@ -64,7 +68,8 @@
     var avatar = (profile.avatar && profile.avatar.trim()) ? profile.avatar.trim() : '👤';
     if (avatar.length > 2) avatar = '👤';
     var tagIcons = tagsToIconsString(profile.tags || []);
-    var statusText = (profile.status && String(profile.status).trim()) ? escapeHtml(String(profile.status).trim().substring(0, 40)) : '';
+    var statusMax = (config.STATUS_MAX_LENGTH != null) ? config.STATUS_MAX_LENGTH : 120;
+    var statusText = (profile.status && String(profile.status).trim()) ? escapeHtml(String(profile.status).trim().substring(0, statusMax)) : '';
     var bubbleHtml = '<div class="user-marker-bubble"><span class="user-marker-status-text">' + statusText + '</span><span class="user-marker-tag-icon">' + tagIcons + '</span></div>';
     var userIcon = L.divIcon({
       className: 'user-marker irlove-user',
@@ -75,6 +80,14 @@
     state.userMarker = L.marker([center.lat, center.lng], { icon: userIcon }).addTo(state.map);
     var tip = formatUserTooltip(profile.displayName || t('map_you'), profile.age, profile.height, profile.tags, profile.bio, profile.interests, profile.status);
     state.userMarker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [12, 0] });
+    state.radiusCircle = L.circle([center.lat, center.lng], {
+      radius: 1000,
+      color: 'rgba(224, 122, 95, 0.85)',
+      fillColor: 'transparent',
+      fillOpacity: 0,
+      weight: 1.5,
+      opacity: 0.9
+    }).addTo(state.map);
   }
 
   function formatUserTooltip(name, age, height, tags, bio, interests, status) {
@@ -129,7 +142,8 @@
       });
       var marker = L.marker([lat, lng], { icon: icon }).addTo(state.map);
       var bio = ['Lubię spotkania i nowe miejsca.', 'Cenię rozmowę przy kawie.', 'Szukam fajnych ludzi w okolicy.', 'Spontan i dobra zabawa.'][Math.floor(Math.random() * 4)];
-      var numInt = 2 + Math.floor(Math.random() * 4);
+      var maxInt = (config.INTERESTS_MAX != null) ? config.INTERESTS_MAX : 5;
+      var numInt = Math.min(2 + Math.floor(Math.random() * 4), maxInt);
       var intList = (config.INTEREST_EMOJIS || []).slice();
       var interests = [];
       for (var j = 0; j < numInt && intList.length; j++) {
@@ -164,6 +178,7 @@
   function updateUserPosition(lat, lng) {
     if (!state.userMarker) return;
     state.userMarker.setLatLng([lat, lng]);
+    if (state.radiusCircle) state.radiusCircle.setLatLng([lat, lng]);
     if (state.map) state.map.panTo([lat, lng], { animate: true, duration: 0.5 });
   }
 
@@ -223,7 +238,8 @@
     if (bubble) {
       var statusEl = bubble.querySelector('.user-marker-status-text');
       var tagEl = bubble.querySelector('.user-marker-tag-icon');
-      if (statusEl) statusEl.textContent = (status && String(status).trim()) ? String(status).trim().substring(0, 40) : '';
+      var statusMax = (config.STATUS_MAX_LENGTH != null) ? config.STATUS_MAX_LENGTH : 120;
+      if (statusEl) statusEl.textContent = (status && String(status).trim()) ? String(status).trim().substring(0, statusMax) : '';
       if (tagEl) tagEl.textContent = tagsToIconsString(tags || (state.profile && state.profile.tags) || []);
     }
   }

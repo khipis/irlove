@@ -92,12 +92,14 @@
       var em = btn.getAttribute('data-emoji');
       if (em) interests.push(em);
     });
+    var maxInterests = config.INTERESTS_MAX != null ? config.INTERESTS_MAX : 5;
+    interests = interests.slice(0, maxInterests);
     var p = {
       displayName: (nameEl && nameEl.value) ? nameEl.value.trim() : '',
       age: (ageEl && ageEl.value) ? ageEl.value.trim() : '',
       height: (heightEl && heightEl.value) ? heightEl.value.trim() : '',
       avatar: (avatarEl && avatarEl.value) ? avatarEl.value.trim() : '👤',
-      bio: (bioEl && bioEl.value) ? bioEl.value.trim() : '',
+      bio: (bioEl && bioEl.value) ? bioEl.value.trim().substring(0, config.BIO_MAX_LENGTH || 200) : '',
       tags: tags,
       interests: interests
     };
@@ -110,7 +112,8 @@
     var box = document.getElementById('interests-toolbox');
     if (!box || !config.INTEREST_EMOJIS) return;
     box.innerHTML = '';
-    var current = (getProfile() || {}).interests || [];
+    var maxInterests = config.INTERESTS_MAX != null ? config.INTERESTS_MAX : 5;
+    var current = ((getProfile() || {}).interests || []).slice(0, maxInterests);
     config.INTEREST_EMOJIS.forEach(function (emoji) {
       var btn = document.createElement('button');
       btn.type = 'button';
@@ -119,7 +122,12 @@
       btn.textContent = emoji;
       btn.setAttribute('aria-label', 'Zainteresowanie ' + emoji);
       btn.addEventListener('click', function () {
-        btn.classList.toggle('selected');
+        var selected = box.querySelectorAll('.interest-btn.selected').length;
+        if (btn.classList.contains('selected')) {
+          btn.classList.remove('selected');
+        } else if (selected < maxInterests) {
+          btn.classList.add('selected');
+        }
       });
       box.appendChild(btn);
     });
@@ -206,7 +214,8 @@
     var bios = ['Lubię kawę i rozmowy.', 'Szukam fajnych ludzi w okolicy.', 'Spontan i dobra zabawa.', 'Cenię spotkania na żywo.'];
     var bio = bios[Math.floor(Math.random() * bios.length)];
     var intList = (config.INTEREST_EMOJIS || []).slice();
-    var nInt = 2 + Math.floor(Math.random() * 5);
+    var maxInt = config.INTERESTS_MAX != null ? config.INTERESTS_MAX : 5;
+    var nInt = Math.min(2 + Math.floor(Math.random() * 4), maxInt);
     var interests = [];
     for (var ii = 0; ii < nInt && intList.length; ii++) {
       var idx = Math.floor(Math.random() * intList.length);
@@ -526,7 +535,8 @@
     var mapStatusInput = document.getElementById('map-status-input');
     if (mapStatusInput) {
       mapStatusInput.addEventListener('input', function () {
-        var val = (this.value || '').trim().substring(0, 50);
+        var maxLen = config.STATUS_MAX_LENGTH || 120;
+        var val = (this.value || '').trim().substring(0, maxLen);
         var p = getProfile() || {};
         p.status = val;
         setProfile(p);

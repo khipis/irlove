@@ -19,8 +19,10 @@
         <button type="button" class="btn-theme" data-theme="3" title="Forest">🌲</button>
         <button type="button" class="btn-theme" data-theme="4" title="Twilight">🌙</button>
       </div>
+      <header class="logo-header" aria-label="IRLove">
+        <h1 class="logo">IRLo<span class="logo-heart" aria-hidden="true">❤️</span>e</h1>
+      </header>
       <div class="start-content">
-        <h1 class="logo">IRLo<span class="logo-heart" aria-hidden="true">❤</span>e</h1>
         <p class="tagline" data-i18n="start_tagline">Zobacz kto jest w okolicy i umów się na spotkanie</p>
         <p class="instruction" data-i18n="start_instruction">Uzupełnij profil i wejdź na mapę</p>
         <div class="profile-form">
@@ -37,7 +39,7 @@
           </div>
           <div id="avatar-toolbox" class="avatar-toolbox" aria-label="Wybierz avatar"></div>
           <label><span data-i18n="profile_bio">Opis (1–2 zdania)</span></label>
-          <textarea id="profile-bio" class="profile-bio" maxlength="200" rows="1" placeholder="" data-i18n-placeholder="profile_bio_placeholder"></textarea>
+          <textarea id="profile-bio" class="profile-bio" maxlength="200" rows="1" placeholder="" data-i18n-placeholder="profile_bio_placeholder" title="max 200 znaków"></textarea>
           <label><span data-i18n="profile_interests">Zainteresowania</span></label>
           <button type="button" id="btn-toggle-interests" class="btn-toggle-panel" data-i18n="profile_interests_toggle">Wybierz emoji</button>
           <div id="interests-toolbox" class="interests-toolbox hidden" aria-label="Zainteresowania"></div>
@@ -67,7 +69,7 @@
           <span id="status-text" data-i18n="map_status_loading">Ładowanie…</span>
         </div>
         <div class="map-status-row">
-          <input type="text" id="map-status-input" class="map-status-input" maxlength="50" placeholder="" data-i18n-placeholder="map_status_placeholder" title="" data-i18n-title="map_status_placeholder" />
+          <input type="text" id="map-status-input" class="map-status-input" maxlength="120" placeholder="" data-i18n-placeholder="map_status_placeholder" title="" data-i18n-title="map_status_placeholder" />
         </div>
         <p id="map-nearby-hint" class="map-nearby-hint" data-i18n="map_nearby">W pobliżu</p>
         <div id="notifications-hint" class="notifications-hint">
