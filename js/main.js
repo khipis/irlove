@@ -52,11 +52,14 @@
     var ageEl = $('profile-age');
     var heightEl = $('profile-height');
     var avatarEl = $('profile-avatar');
+    var bioEl = $('profile-bio');
     if (nameEl) nameEl.value = p.displayName || '';
     if (ageEl) ageEl.value = p.age || '';
     if (heightEl) heightEl.value = p.height || '';
     if (avatarEl) avatarEl.value = p.avatar || '👤';
+    if (bioEl) bioEl.value = p.bio || '';
     var tags = p.tags || [];
+    if (typeof renderInterestsToolbox === 'function') renderInterestsToolbox();
     document.querySelectorAll('.btn-tag').forEach(function (btn) {
       var tag = btn.getAttribute('data-tag');
       btn.classList.toggle('selected', tags.indexOf(tag) >= 0);
@@ -69,21 +72,48 @@
     var ageEl = $('profile-age');
     var heightEl = $('profile-height');
     var avatarEl = $('profile-avatar');
+    var bioEl = $('profile-bio');
     var tags = [];
     document.querySelectorAll('.btn-tag.selected').forEach(function (btn) {
       var tag = btn.getAttribute('data-tag');
       if (tag) tags.push(tag);
+    });
+    var interests = [];
+    document.querySelectorAll('.interest-btn.selected').forEach(function (btn) {
+      var em = btn.getAttribute('data-emoji');
+      if (em) interests.push(em);
     });
     var p = {
       displayName: (nameEl && nameEl.value) ? nameEl.value.trim() : '',
       age: (ageEl && ageEl.value) ? ageEl.value.trim() : '',
       height: (heightEl && heightEl.value) ? heightEl.value.trim() : '',
       avatar: (avatarEl && avatarEl.value) ? avatarEl.value.trim() : '👤',
-      tags: tags
+      bio: (bioEl && bioEl.value) ? bioEl.value.trim() : '',
+      tags: tags,
+      interests: interests
     };
     setProfile(p);
     state.profile = p;
     return p;
+  }
+
+  function renderInterestsToolbox() {
+    var box = document.getElementById('interests-toolbox');
+    if (!box || !config.INTEREST_EMOJIS) return;
+    box.innerHTML = '';
+    var current = (getProfile() || {}).interests || [];
+    config.INTEREST_EMOJIS.forEach(function (emoji) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'interest-btn' + (current.indexOf(emoji) >= 0 ? ' selected' : '');
+      btn.setAttribute('data-emoji', emoji);
+      btn.textContent = emoji;
+      btn.setAttribute('aria-label', 'Zainteresowanie ' + emoji);
+      btn.addEventListener('click', function () {
+        btn.classList.toggle('selected');
+      });
+      box.appendChild(btn);
+    });
   }
 
   function getStoredTheme() {
@@ -146,6 +176,16 @@
       var t = tagOpts[Math.floor(Math.random() * tagOpts.length)];
       if (tags.indexOf(t) < 0) tags.push(t);
     }
+    var bios = ['Lubię kawę i rozmowy.', 'Szukam fajnych ludzi w okolicy.', 'Spontan i dobra zabawa.', 'Cenię spotkania na żywo.'];
+    var bio = bios[Math.floor(Math.random() * bios.length)];
+    var intList = (config.INTEREST_EMOJIS || []).slice();
+    var nInt = 2 + Math.floor(Math.random() * 5);
+    var interests = [];
+    for (var ii = 0; ii < nInt && intList.length; ii++) {
+      var idx = Math.floor(Math.random() * intList.length);
+      interests.push(intList[idx]);
+      intList.splice(idx, 1);
+    }
     var nameEl = $('profile-display-name');
     var ageEl = $('profile-age');
     var heightEl = $('profile-height');
@@ -154,9 +194,16 @@
     if (ageEl) ageEl.value = String(age);
     if (heightEl) heightEl.value = String(height);
     if (avatarEl) avatarEl.value = avatar;
+    var bioEl = $('profile-bio');
+    if (bioEl) bioEl.value = bio;
     document.querySelectorAll('.btn-tag').forEach(function (btn) {
       var tag = btn.getAttribute('data-tag');
       btn.classList.toggle('selected', tags.indexOf(tag) >= 0);
+    });
+    if (typeof renderInterestsToolbox === 'function') renderInterestsToolbox();
+    document.querySelectorAll('.interest-btn').forEach(function (btn) {
+      var em = btn.getAttribute('data-emoji');
+      btn.classList.toggle('selected', interests.indexOf(em) >= 0);
     });
     saveProfileFromForm();
   }
@@ -394,6 +441,14 @@
       });
     });
 
+    var btnToggleInterests = $('btn-toggle-interests');
+    if (btnToggleInterests) {
+      btnToggleInterests.addEventListener('click', function () {
+        var box = document.getElementById('interests-toolbox');
+        if (box) box.classList.toggle('hidden');
+      });
+    }
+
     var btnEnter = $('btn-enter-map');
     if (btnEnter) btnEnter.addEventListener('click', goToMap);
 
@@ -405,7 +460,7 @@
       btnProfile.addEventListener('click', function () {
         showScreen('screen-start');
         loadProfileIntoForm();
-        renderAvatarToolbox();
+        if (typeof renderAvatarToolbox === 'function') renderAvatarToolbox();
       });
     }
 

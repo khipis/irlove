@@ -36,6 +36,11 @@
             <button type="button" id="btn-random-avatar" class="btn-random-avatar" title="" data-i18n-title="btn_random_avatar">🎲</button>
           </div>
           <div id="avatar-toolbox" class="avatar-toolbox" aria-label="Wybierz avatar"></div>
+          <label><span data-i18n="profile_bio">Opis (1–2 zdania)</span></label>
+          <textarea id="profile-bio" class="profile-bio" maxlength="200" rows="2" placeholder="" data-i18n-placeholder="profile_bio_placeholder"></textarea>
+          <label><span data-i18n="profile_interests">Zainteresowania</span></label>
+          <button type="button" id="btn-toggle-interests" class="btn-toggle-panel" data-i18n="profile_interests_toggle">Wybierz emoji</button>
+          <div id="interests-toolbox" class="interests-toolbox hidden" aria-label="Zainteresowania"></div>
           <label><span data-i18n="profile_tags">Dostępność</span></label>
           <div class="tag-buttons">
             <button type="button" class="btn-tag" data-tag="chat" data-i18n="profile_tag_chat">Pogadać</button>

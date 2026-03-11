@@ -28,7 +28,9 @@
       age: '',
       height: '',
       avatar: '👤',
-      tags: []
+      bio: '',
+      tags: [],
+      interests: []
     };
   }
 

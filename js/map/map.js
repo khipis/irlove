@@ -71,16 +71,25 @@
       iconAnchor: [24, 52]
     });
     state.userMarker = L.marker([center.lat, center.lng], { icon: userIcon }).addTo(state.map);
-    var tip = formatUserTooltip(profile.displayName || t('map_you'), profile.age, profile.height, profile.tags);
-    state.userMarker.bindTooltip(tip, { permanent: false, direction: 'top', className: 'marker-tooltip' });
+    var tip = formatUserTooltip(profile.displayName || t('map_you'), profile.age, profile.height, profile.tags, profile.bio, profile.interests);
+    state.userMarker.bindTooltip(tip, { permanent: false, direction: 'top', className: 'marker-tooltip', offset: [0, -28] });
   }
 
-  function formatUserTooltip(name, age, height, tags) {
-    var parts = ['<strong>' + escapeHtml(name) + '</strong>'];
-    if (age) parts.push(age + ' lat');
-    if (height) parts.push(height + ' cm');
-    if (tags && tags.length) parts.push(tags.join(' · '));
-    return parts.join(' &nbsp;|&nbsp; ');
+  function formatUserTooltip(name, age, height, tags, bio, interests) {
+    var lines = [];
+    var line1 = '<strong class="marker-tooltip-name">' + escapeHtml(name) + '</strong>';
+    var meta = [];
+    if (age) meta.push(age + ' lat');
+    if (height) meta.push(height + ' cm');
+    if (meta.length) line1 += ' <span class="marker-tooltip-meta">' + meta.join(' · ') + '</span>';
+    lines.push('<div class="marker-tooltip-line">' + line1 + '</div>');
+    if (tags && tags.length) {
+      var tagLabels = tags.map(function (tag) { return t('profile_tag_' + tag); });
+      lines.push('<div class="marker-tooltip-line marker-tooltip-tags">' + tagLabels.map(function (l) { return escapeHtml(l); }).join(' · ') + '</div>');
+    }
+    if (bio && String(bio).trim()) lines.push('<div class="marker-tooltip-bio">' + escapeHtml(String(bio).trim()) + '</div>');
+    if (interests && interests.length) lines.push('<div class="marker-tooltip-interests">' + interests.map(function (e) { return escapeHtml(e); }).join(' ') + '</div>');
+    return '<div class="marker-tooltip-inner">' + lines.join('') + '</div>';
   }
 
   function escapeHtml(s) {
@@ -114,8 +123,17 @@
         iconAnchor: [20, 48]
       });
       var marker = L.marker([lat, lng], { icon: icon }).addTo(state.map);
-      var tip = formatUserTooltip(name, String(age), String(height), tags);
-      marker.bindTooltip(tip, { permanent: false, direction: 'top', className: 'marker-tooltip' });
+      var bio = ['Lubię spotkania i nowe miejsca.', 'Cenię rozmowę przy kawie.', 'Szukam fajnych ludzi w okolicy.', 'Spontan i dobra zabawa.'][Math.floor(Math.random() * 4)];
+      var numInt = 2 + Math.floor(Math.random() * 4);
+      var intList = (config.INTEREST_EMOJIS || []).slice();
+      var interests = [];
+      for (var j = 0; j < numInt && intList.length; j++) {
+        var idx = Math.floor(Math.random() * intList.length);
+        interests.push(intList[idx]);
+        intList.splice(idx, 1);
+      }
+      var tip = formatUserTooltip(name, String(age), String(height), tags, bio, interests);
+      marker.bindTooltip(tip, { permanent: false, direction: 'top', className: 'marker-tooltip', offset: [0, -28] });
       if (!state.simulatedMarkers) state.simulatedMarkers = [];
       state.simulatedMarkers.push(marker);
     }
@@ -165,8 +183,8 @@
     });
     var marker = L.marker([lat, lng], { icon: icon }).addTo(state.map);
     var prof = data.profile || data;
-    var tip = formatUserTooltip(name, prof.age, prof.height, tags);
-    marker.bindTooltip(tip, { permanent: false, direction: 'top', className: 'marker-tooltip' });
+    var tip = formatUserTooltip(name, prof.age, prof.height, tags, prof.bio, prof.interests);
+    marker.bindTooltip(tip, { permanent: false, direction: 'top', className: 'marker-tooltip', offset: [0, -28] });
     marker._pub = pub;
     marker.on('click', function () {
       if (typeof App.openChat === 'function') App.openChat(pub, data);
