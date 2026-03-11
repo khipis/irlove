@@ -21,6 +21,7 @@
   --border-focus: rgba(224, 122, 95, 0.5);
   --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
   --font-logo: 'Caveat', cursive;
+  --bg-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(224, 122, 95, 0.08) 0%, transparent 50%), radial-gradient(ellipse 80% 50% at 80% 100%, rgba(224, 122, 95, 0.05) 0%, transparent 45%);
 }
 
 * {
@@ -40,9 +41,48 @@ body {
   color: var(--text);
   overflow: hidden;
   -webkit-tap-highlight-color: transparent;
-  background-image:
-    radial-gradient(ellipse 120% 80% at 50% -20%, rgba(224, 122, 95, 0.08) 0%, transparent 50%),
-    radial-gradient(ellipse 80% 50% at 80% 100%, rgba(224, 122, 95, 0.05) 0%, transparent 45%);
+  background-image: var(--bg-gradient);
+}
+
+/* Theme 1 – Terracotta (default) */
+:root, body[data-theme="1"] {
+  --bg-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(224, 122, 95, 0.08) 0%, transparent 50%), radial-gradient(ellipse 80% 50% at 80% 100%, rgba(224, 122, 95, 0.05) 0%, transparent 45%);
+}
+body[data-theme="2"] {
+  --bg: #0c0e14; --bg-soft: #12161e; --bg-card: #181c26; --accent: #5b9bd5; --accent-soft: rgba(91, 155, 213, 0.2); --accent-hover: #7ab3e8; --accent-glow: rgba(91, 155, 213, 0.35); --border-focus: rgba(91, 155, 213, 0.5);
+  --bg-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(91, 155, 213, 0.08) 0%, transparent 50%), radial-gradient(ellipse 80% 50% at 80% 100%, rgba(91, 155, 213, 0.05) 0%, transparent 45%);
+}
+body[data-theme="3"] {
+  --bg: #0d120d; --bg-soft: #141c14; --bg-card: #1a261a; --accent: #5bb56b; --accent-soft: rgba(91, 181, 107, 0.2); --accent-hover: #7acc88; --accent-glow: rgba(91, 181, 107, 0.35); --border-focus: rgba(91, 181, 107, 0.5);
+  --bg-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(91, 181, 107, 0.08) 0%, transparent 50%), radial-gradient(ellipse 80% 50% at 80% 100%, rgba(91, 181, 107, 0.05) 0%, transparent 45%);
+}
+body[data-theme="4"] {
+  --bg: #100d14; --bg-soft: #18141e; --bg-card: #201a28; --accent: #9b7bbd; --accent-soft: rgba(155, 123, 189, 0.2); --accent-hover: #b399d4; --accent-glow: rgba(155, 123, 189, 0.35); --border-focus: rgba(155, 123, 189, 0.5);
+  --bg-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(155, 123, 189, 0.08) 0%, transparent 50%), radial-gradient(ellipse 80% 50% at 80% 100%, rgba(155, 123, 189, 0.05) 0%, transparent 45%);
+}
+body[data-theme="5"] {
+  --bg: #140d12; --bg-soft: #1c1418; --bg-card: #261a22; --accent: #e07a9e; --accent-soft: rgba(224, 122, 158, 0.2); --accent-hover: #e89ab8; --accent-glow: rgba(224, 122, 158, 0.35); --border-focus: rgba(224, 122, 158, 0.5);
+  --bg-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(224, 122, 158, 0.08) 0%, transparent 50%), radial-gradient(ellipse 80% 50% at 80% 100%, rgba(224, 122, 158, 0.05) 0%, transparent 45%);
+}
+body[data-theme="6"] {
+  --bg: #12100d; --bg-soft: #1a1814; --bg-card: #242018; --accent: #d4a84b; --accent-soft: rgba(212, 168, 75, 0.2); --accent-hover: #e0bc6e; --accent-glow: rgba(212, 168, 75, 0.35); --border-focus: rgba(212, 168, 75, 0.5);
+  --bg-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(212, 168, 75, 0.08) 0%, transparent 50%), radial-gradient(ellipse 80% 50% at 80% 100%, rgba(212, 168, 75, 0.05) 0%, transparent 45%);
+}
+body[data-theme="7"] {
+  --bg: #0d1212; --bg-soft: #141c1c; --bg-card: #1a2626; --accent: #4bb5a8; --accent-soft: rgba(75, 181, 168, 0.2); --accent-hover: #6ec9be; --accent-glow: rgba(75, 181, 168, 0.35); --border-focus: rgba(75, 181, 168, 0.5);
+  --bg-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(75, 181, 168, 0.08) 0%, transparent 50%), radial-gradient(ellipse 80% 50% at 80% 100%, rgba(75, 181, 168, 0.05) 0%, transparent 45%);
+}
+body[data-theme="8"] {
+  --bg: #140d10; --bg-soft: #1c1418; --bg-card: #261a20; --accent: #d46b8a; --accent-soft: rgba(212, 107, 138, 0.2); --accent-hover: #e08fa8; --accent-glow: rgba(212, 107, 138, 0.35); --border-focus: rgba(212, 107, 138, 0.5);
+  --bg-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(212, 107, 138, 0.08) 0%, transparent 50%), radial-gradient(ellipse 80% 50% at 80% 100%, rgba(212, 107, 138, 0.05) 0%, transparent 45%);
+}
+body[data-theme="9"] {
+  --bg: #0e0d14; --bg-soft: #16141e; --bg-card: #1e1a28; --accent: #7b8bd4; --accent-soft: rgba(123, 139, 212, 0.2); --accent-hover: #9aa4e0; --accent-glow: rgba(123, 139, 212, 0.35); --border-focus: rgba(123, 139, 212, 0.5);
+  --bg-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(123, 139, 212, 0.08) 0%, transparent 50%), radial-gradient(ellipse 80% 50% at 80% 100%, rgba(123, 139, 212, 0.05) 0%, transparent 45%);
+}
+body[data-theme="10"] {
+  --bg: #0d1410; --bg-soft: #141c18; --bg-card: #1a2620; --accent: #5bd4a8; --accent-soft: rgba(91, 212, 168, 0.2); --accent-hover: #7ae0bd; --accent-glow: rgba(91, 212, 168, 0.35); --border-focus: rgba(91, 212, 168, 0.5);
+  --bg-gradient: radial-gradient(ellipse 120% 80% at 50% -20%, rgba(91, 212, 168, 0.08) 0%, transparent 50%), radial-gradient(ellipse 80% 50% at 80% 100%, rgba(91, 212, 168, 0.05) 0%, transparent 45%);
 }
 
 #app {
@@ -101,6 +141,52 @@ body {
   font-weight: 500;
 }
 
+/* Theme switcher – 10 colour options */
+.theme-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: center;
+  margin-bottom: 1.25rem;
+}
+
+.btn-theme {
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 2px solid var(--border);
+  border-radius: 50%;
+  background: var(--bg-card);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s, transform 0.15s, box-shadow 0.2s;
+}
+
+.btn-theme:hover {
+  border-color: var(--accent);
+  color: var(--text);
+  transform: scale(1.08);
+}
+
+.btn-theme.selected {
+  border-color: rgba(255,255,255,0.9);
+  color: #fff;
+  box-shadow: 0 0 0 2px var(--bg), 0 0 12px rgba(0,0,0,0.3);
+}
+
+.btn-theme[data-theme="1"] { background: #e07a5f; }
+.btn-theme[data-theme="2"] { background: #5b9bd5; }
+.btn-theme[data-theme="3"] { background: #5bb56b; }
+.btn-theme[data-theme="4"] { background: #9b7bbd; }
+.btn-theme[data-theme="5"] { background: #e07a9e; }
+.btn-theme[data-theme="6"] { background: #d4a84b; }
+.btn-theme[data-theme="7"] { background: #4bb5a8; }
+.btn-theme[data-theme="8"] { background: #d46b8a; }
+.btn-theme[data-theme="9"] { background: #7b8bd4; }
+.btn-theme[data-theme="10"] { background: #5bd4a8; }
+
 /* Profile form – cards */
 .profile-form {
   text-align: left;
@@ -147,6 +233,37 @@ body {
 .profile-form input::placeholder {
   color: var(--text-muted);
   opacity: 0.7;
+}
+
+.avatar-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.avatar-row input {
+  flex: 1;
+}
+
+.btn-random-avatar {
+  flex-shrink: 0;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  font-size: 1.25rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  background: var(--bg-soft);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, transform 0.15s;
+}
+
+.btn-random-avatar:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+  transform: scale(1.05);
 }
 
 .tag-buttons {
@@ -204,6 +321,26 @@ body {
   transform: translateY(0);
 }
 
+.btn-fill-random {
+  width: 100%;
+  padding: 10px 16px;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: border-color 0.2s, color 0.2s, background 0.2s;
+}
+
+.btn-fill-random:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
 /* Lang switcher */
 .lang-switcher {
   display: flex;
@@ -247,6 +384,12 @@ body {
   right: 0;
   bottom: 0;
   z-index: 0;
+}
+
+/* Map – soft cute style (like previous app, less sugary) */
+.map-container.map-soft-cute .leaflet-tile-pane {
+  filter: hue-rotate(-8deg) saturate(1.12) brightness(0.97) contrast(1.02);
+  transition: filter 0.4s ease;
 }
 
 #map-overlay {
@@ -345,6 +488,19 @@ body {
 .other-user-marker.irlove-other {
   background: none !important;
   border: none !important;
+}
+
+.user-marker-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+
+.user-marker-tag-icon {
+  font-size: 14px;
+  line-height: 1;
+  opacity: 0.95;
 }
 
 .user-marker-avatar,

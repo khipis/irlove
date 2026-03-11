@@ -49,20 +49,31 @@
       state.otherUserMarkers = {};
     }
     state.map = L.map('map-container').setView([center.lat, center.lng], 15);
+    var mapEl = document.getElementById('map-container');
+    if (mapEl) mapEl.classList.add('map-soft-cute');
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
     }).addTo(state.map);
     var profile = state.profile || {};
     var avatar = (profile.avatar && profile.avatar.trim()) ? profile.avatar.trim() : '👤';
     if (avatar.length > 2) avatar = '👤';
+    var tagIcon = tagToSmallIcon(profile.tags);
     var userIcon = L.divIcon({
       className: 'user-marker irlove-user',
-      html: '<span class="user-marker-avatar" title="' + (t('map_you') || 'You').replace(/"/g, '&quot;') + '">' + avatar + '</span>',
-      iconSize: [40, 40],
-      iconAnchor: [20, 20]
+      html: '<div class="user-marker-wrap"><span class="user-marker-tag-icon">' + tagIcon + '</span><span class="user-marker-avatar" title="' + (t('map_you') || 'You').replace(/"/g, '&quot;') + '">' + avatar + '</span></div>',
+      iconSize: [48, 56],
+      iconAnchor: [24, 52]
     });
     state.userMarker = L.marker([center.lat, center.lng], { icon: userIcon }).addTo(state.map);
     state.userMarker.bindTooltip(t('tooltip_you'), { permanent: false });
+  }
+
+  function tagToSmallIcon(tags) {
+    if (!tags || !tags.length) return '';
+    if (tags.indexOf('beer') >= 0) return '🍺';
+    if (tags.indexOf('date') >= 0) return '❤️';
+    if (tags.indexOf('chat') >= 0) return '💬';
+    return '';
   }
 
   function updateUserPosition(lat, lng) {
@@ -116,9 +127,11 @@
     delete state.otherUserMarkers[pub];
   }
 
-  function setUserAvatar(avatar) {
+  function setUserAvatar(avatar, tags) {
     var el = document.querySelector('.user-marker-avatar');
     if (el) el.textContent = (avatar && avatar.trim()) ? avatar.trim().substring(0, 2) : '👤';
+    var tagEl = document.querySelector('.user-marker-tag-icon');
+    if (tagEl) tagEl.textContent = tagToSmallIcon(tags || (state.profile && state.profile.tags));
   }
 
   App.loadLeaflet = loadLeaflet;

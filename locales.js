@@ -37,6 +37,8 @@
       btn_back: 'Wstecz',
       btn_profile: 'Profil',
       btn_close: 'Zamknij',
+      btn_random_avatar: 'Losuj avatar',
+      btn_fill_random: 'Wypełnij losowo (test)',
       error_no_profile: 'Uzupełnij nick w profilu.',
       error_no_location: 'Nie udało się pobrać lokalizacji.'
     },
@@ -72,6 +74,8 @@
       btn_back: 'Back',
       btn_profile: 'Profile',
       btn_close: 'Close',
+      btn_random_avatar: 'Random avatar',
+      btn_fill_random: 'Fill randomly (test)',
       error_no_profile: 'Please set your display name in profile.',
       error_no_location: 'Could not get location.'
     }

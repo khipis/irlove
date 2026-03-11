@@ -16,6 +16,18 @@
       <div class="start-content">
         <h1 class="logo">IRLove</h1>
         <p class="tagline" data-i18n="start_tagline">Zobacz kto jest w okolicy i umów się na spotkanie</p>
+        <div class="theme-buttons" role="group" aria-label="Kolorystyka">
+          <button type="button" class="btn-theme" data-theme="1" title="Terracotta">1</button>
+          <button type="button" class="btn-theme" data-theme="2" title="Niebieski">2</button>
+          <button type="button" class="btn-theme" data-theme="3" title="Zielony">3</button>
+          <button type="button" class="btn-theme" data-theme="4" title="Fiolet">4</button>
+          <button type="button" class="btn-theme" data-theme="5" title="Róż">5</button>
+          <button type="button" class="btn-theme" data-theme="6" title="Bursztyn">6</button>
+          <button type="button" class="btn-theme" data-theme="7" title="Morski">7</button>
+          <button type="button" class="btn-theme" data-theme="8" title="Róża">8</button>
+          <button type="button" class="btn-theme" data-theme="9" title="Indygo">9</button>
+          <button type="button" class="btn-theme" data-theme="10" title="Mięta">10</button>
+        </div>
         <p class="instruction" data-i18n="start_instruction">Uzupełnij profil i wejdź na mapę</p>
         <div class="profile-form">
           <label><span data-i18n="profile_display_name">Nick / imię</span></label>
@@ -24,8 +36,11 @@
           <input type="text" id="profile-age" maxlength="4" placeholder="25" />
           <label><span data-i18n="profile_height">Wzrost (cm)</span></label>
           <input type="text" id="profile-height" maxlength="6" placeholder="170" />
-          <label><span data-i18n="profile_avatar">Avatar (emoji lub URL)</span></label>
-          <input type="text" id="profile-avatar" maxlength="200" placeholder="👤" />
+          <label><span data-i18n="profile_avatar">Avatar (emoji)</span></label>
+          <div class="avatar-row">
+            <input type="text" id="profile-avatar" maxlength="200" placeholder="👤" />
+            <button type="button" id="btn-random-avatar" class="btn-random-avatar" title="" data-i18n-title="btn_random_avatar">🎲</button>
+          </div>
           <label><span data-i18n="profile_tags">Dostępność</span></label>
           <div class="tag-buttons">
             <button type="button" class="btn-tag" data-tag="chat" data-i18n="profile_tag_chat">Pogadać</button>
@@ -33,6 +48,7 @@
             <button type="button" class="btn-tag" data-tag="beer" data-i18n="profile_tag_beer">Piwo</button>
           </div>
         </div>
+        <button type="button" id="btn-fill-random" class="btn-fill-random" data-i18n="btn_fill_random">Wypełnij losowo (test)</button>
         <button type="button" id="btn-enter-map" class="btn-primary" data-i18n="start_btn_enter">Wejdź na mapę</button>
         <div class="lang-switcher" role="group" aria-label="Language">
           <button type="button" class="btn-lang selected" data-lang="pl" title="Polski">PL</button>

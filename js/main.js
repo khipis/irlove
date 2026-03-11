@@ -85,11 +85,72 @@
     return p;
   }
 
+  function getStoredTheme() {
+    try {
+      var t = localStorage.getItem(config.STORAGE_KEY_THEME);
+      return (t && t >= '1' && t <= '10') ? t : '1';
+    } catch (e) { return '1'; }
+  }
+
+  function setStoredTheme(theme) {
+    try {
+      localStorage.setItem(config.STORAGE_KEY_THEME, theme);
+    } catch (e) {}
+  }
+
+  function applyTheme(theme) {
+    theme = theme || getStoredTheme();
+    document.body.setAttribute('data-theme', theme);
+    document.querySelectorAll('.btn-theme').forEach(function (btn) {
+      btn.classList.toggle('selected', btn.getAttribute('data-theme') === theme);
+    });
+  }
+
+  function randomAvatar() {
+    var list = config.AVATAR_EMOJIS || ['👤', '😊', '🌸', '🔥'];
+    return list[Math.floor(Math.random() * list.length)];
+  }
+
+  function fillRandomProfile() {
+    var names = ['Ania', 'Bartek', 'Kasia', 'Michał', 'Ola', 'Piotr', 'Zuza', 'Tomek', 'Nina', 'Kuba', 'User', 'Test'];
+    var name = names[Math.floor(Math.random() * names.length)] + (Math.floor(Math.random() * 90) + 10);
+    var age = 18 + Math.floor(Math.random() * 28);
+    var height = 160 + Math.floor(Math.random() * 31);
+    var avatar = randomAvatar();
+    var tagOpts = ['chat', 'date', 'beer'];
+    var nTags = 1 + Math.floor(Math.random() * 3);
+    var tags = [];
+    for (var i = 0; i < nTags; i++) {
+      var t = tagOpts[Math.floor(Math.random() * tagOpts.length)];
+      if (tags.indexOf(t) < 0) tags.push(t);
+    }
+    var nameEl = $('profile-display-name');
+    var ageEl = $('profile-age');
+    var heightEl = $('profile-height');
+    var avatarEl = $('profile-avatar');
+    if (nameEl) nameEl.value = name;
+    if (ageEl) ageEl.value = String(age);
+    if (heightEl) heightEl.value = String(height);
+    if (avatarEl) avatarEl.value = avatar;
+    document.querySelectorAll('.btn-tag').forEach(function (btn) {
+      var tag = btn.getAttribute('data-tag');
+      btn.classList.toggle('selected', tags.indexOf(tag) >= 0);
+    });
+    saveProfileFromForm();
+  }
+
   function goToMap() {
     var p = saveProfileFromForm();
     if (!p.displayName || !p.displayName.length) {
       App.showToast(t('error_no_profile'), 'error');
       return;
+    }
+    if (!p.avatar || !p.avatar.trim()) {
+      p.avatar = randomAvatar();
+      state.profile.avatar = p.avatar;
+      setProfile(state.profile);
+      var avatarEl = $('profile-avatar');
+      if (avatarEl) avatarEl.value = p.avatar;
     }
     if (state.watchId != null && navigator.geolocation.clearWatch) {
       navigator.geolocation.clearWatch(state.watchId);
@@ -108,7 +169,7 @@
         function showMapAndMaybeRelay() {
           loadLeaflet().then(function () {
             initMap();
-            setUserAvatar(p.avatar);
+            setUserAvatar(p.avatar, p.tags);
             showScreen('screen-map');
             setStatus(t('map_status_online'));
             requestNotificationPermission();
@@ -245,8 +306,31 @@
 
   function init() {
     ensureProfile();
+    applyTheme(getStoredTheme());
     loadProfileIntoForm();
     applyLocale(refreshLabels);
+
+    document.querySelectorAll('.btn-theme').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var theme = this.getAttribute('data-theme');
+        if (theme) {
+          setStoredTheme(theme);
+          applyTheme(theme);
+        }
+      });
+    });
+
+    var btnRandomAvatar = $('btn-random-avatar');
+    if (btnRandomAvatar) {
+      btnRandomAvatar.addEventListener('click', function () {
+        var avatar = randomAvatar();
+        var avatarEl = $('profile-avatar');
+        if (avatarEl) avatarEl.value = avatar;
+      });
+    }
+
+    var btnFillRandom = $('btn-fill-random');
+    if (btnFillRandom) btnFillRandom.addEventListener('click', fillRandomProfile);
 
     document.querySelectorAll('.btn-lang').forEach(function (btn) {
       btn.classList.toggle('selected', btn.getAttribute('data-lang') === (window.CURRENT_LOCALE || 'pl'));
