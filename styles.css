@@ -700,7 +700,7 @@ body[data-theme="4"] {
   font-size: 12px;
 }
 
-/* Tooltip na mapie – czytelny panel z detalami użytkownika */
+/* Tooltip na mapie – panel z boku, szerszy, treść trochę mniejsza */
 .leaflet-tooltip.marker-tooltip {
   padding: 0;
   font-size: 0;
@@ -708,14 +708,14 @@ body[data-theme="4"] {
   background: transparent;
   box-shadow: none;
   border-radius: 12px;
-  max-width: 280px;
+  max-width: 320px;
   white-space: normal;
 }
 
 .leaflet-tooltip.marker-tooltip .marker-tooltip-inner {
-  padding: 12px 14px;
-  font-size: 0.9rem;
-  line-height: 1.45;
+  padding: 10px 12px;
+  font-size: 0.82rem;
+  line-height: 1.4;
   border-radius: 12px;
   background: rgba(18, 18, 24, 0.98);
   border: 1px solid rgba(255, 255, 255, 0.15);
@@ -725,7 +725,7 @@ body[data-theme="4"] {
 }
 
 .leaflet-tooltip.marker-tooltip .marker-tooltip-line {
-  margin-bottom: 4px;
+  margin-bottom: 3px;
 }
 
 .leaflet-tooltip.marker-tooltip .marker-tooltip-line:last-child {
@@ -735,33 +735,34 @@ body[data-theme="4"] {
 .leaflet-tooltip.marker-tooltip .marker-tooltip-name {
   color: #e8a090;
   font-weight: 700;
-  font-size: 1rem;
+  font-size: 0.95rem;
 }
 
 .leaflet-tooltip.marker-tooltip .marker-tooltip-meta {
   color: rgba(240, 237, 232, 0.85);
   font-weight: 500;
+  font-size: 0.8rem;
 }
 
 .leaflet-tooltip.marker-tooltip .marker-tooltip-tags {
   color: rgba(240, 237, 232, 0.75);
-  font-size: 0.82rem;
+  font-size: 0.78rem;
 }
 
 .leaflet-tooltip.marker-tooltip .marker-tooltip-bio {
   color: rgba(240, 237, 232, 0.9);
-  font-size: 0.85rem;
-  margin-top: 6px;
-  padding-top: 6px;
+  font-size: 0.8rem;
+  margin-top: 5px;
+  padding-top: 5px;
   border-top: 1px solid rgba(255, 255, 255, 0.08);
   font-style: italic;
 }
 
 .leaflet-tooltip.marker-tooltip .marker-tooltip-interests {
-  margin-top: 6px;
-  font-size: 1.1rem;
+  margin-top: 5px;
+  font-size: 1rem;
   letter-spacing: 2px;
-  line-height: 1.4;
+  line-height: 1.35;
 }
 
 /* Chat overlay */

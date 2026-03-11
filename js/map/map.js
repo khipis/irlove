@@ -72,7 +72,7 @@
     });
     state.userMarker = L.marker([center.lat, center.lng], { icon: userIcon }).addTo(state.map);
     var tip = formatUserTooltip(profile.displayName || t('map_you'), profile.age, profile.height, profile.tags, profile.bio, profile.interests);
-    state.userMarker.bindTooltip(tip, { permanent: false, direction: 'top', className: 'marker-tooltip', offset: [0, -28] });
+    state.userMarker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [12, 0] });
   }
 
   function formatUserTooltip(name, age, height, tags, bio, interests) {
@@ -135,7 +135,7 @@
         intList.splice(idx, 1);
       }
       var tip = formatUserTooltip(name, String(age), String(height), tags, bio, interests);
-      marker.bindTooltip(tip, { permanent: false, direction: 'top', className: 'marker-tooltip', offset: [0, -28] });
+      marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [12, 0] });
       if (!state.simulatedMarkers) state.simulatedMarkers = [];
       state.simulatedMarkers.push(marker);
     }
@@ -186,7 +186,7 @@
     var marker = L.marker([lat, lng], { icon: icon }).addTo(state.map);
     var prof = data.profile || data;
     var tip = formatUserTooltip(name, prof.age, prof.height, tags, prof.bio, prof.interests);
-    marker.bindTooltip(tip, { permanent: false, direction: 'top', className: 'marker-tooltip', offset: [0, -28] });
+    marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [12, 0] });
     marker._pub = pub;
     marker.on('click', function () {
       if (typeof App.openChat === 'function') App.openChat(pub, data);
