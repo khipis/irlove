@@ -1,41 +1,21 @@
 /**
- * App state and DOM/geo helper functions.
+ * IRLove – app state and DOM/geo helpers.
  */
 (function () {
   'use strict';
-  window.Spacerek = window.Spacerek || {};
-  window.Spacerek.state = {
-    selectedKm: 1.9,
-    numAttractions: 5,
+  window.IRLove = window.IRLove || {};
+  window.IRLove.state = {
     userPosition: null,
-    targetPlace: null,
-    targetPlaces: [],
-    targetPlaceIndex: 0,
-    targetMarkers: [],
-    visitedMarkers: [],
-    decorationMarkers: [],
-    collectedIndices: {},
     map: null,
     userMarker: null,
+    otherUserMarkers: {},
     watchId: null,
-    debugFoundPlaces: [],
-    debugChosenIndex: -1,
-    mapStyle: 'adventure',
-    stats: { monstersMet: 0, carrotsCollected: 0, animalsMet: 0, npcsMet: 0 },
-    monstersKilled: 0,
-    metDecorationIndices: {},
-    metMonsterNames: [],
-    metAnimalNames: [],
-    metCarrotNames: [],
-    metNpcNames: [],
-    selectedDecorationIndex: null,
-    artifactsFound: [],
-    wounds: 0,
-    pendingMonsterIndex: null,
-    pendingMonsterMarker: null,
-    pendingNpcIndex: null,
-    pendingNpcMarker: null,
-    pendingEncounterType: null
+    gun: null,
+    user: null,
+    sea: null,
+    profile: null,
+    chatWith: null,
+    nearbyUsers: {}
   };
 
   function $(id) {
@@ -62,12 +42,6 @@
     if (el) el.classList.add('active');
   }
 
-  function escapeHtml(s) {
-    var div = document.createElement('div');
-    div.textContent = s;
-    return div.innerHTML;
-  }
-
   function haversine(lat1, lon1, lat2, lon2) {
     var R = 6371000;
     var dLat = (lat2 - lat1) * Math.PI / 180;
@@ -80,19 +54,11 @@
     return R * c;
   }
 
-  function getCurrentMode() {
-    var state = window.Spacerek.state;
-    var style = state.mapStyle || 'adventure';
-    if (style === 'adventure') return 'przygoda';
-    if (style === 'cute') return 'cute';
-    return 'spacerek';
-  }
-
   function showToast(message, type) {
     var container = document.getElementById('toast-container');
     if (!container || !message) return;
     var el = document.createElement('div');
-    el.className = 'toast' + (type === 'wound' ? ' toast-wound' : '');
+    el.className = 'toast' + (type === 'error' ? ' toast-error' : '');
     el.setAttribute('role', 'status');
     el.textContent = message;
     container.appendChild(el);
@@ -102,11 +68,9 @@
     }, 3200);
   }
 
-  window.Spacerek.$ = $;
-  window.Spacerek.show = show;
-  window.Spacerek.showScreen = showScreen;
-  window.Spacerek.escapeHtml = escapeHtml;
-  window.Spacerek.haversine = haversine;
-  window.Spacerek.getCurrentMode = getCurrentMode;
-  window.Spacerek.showToast = showToast;
+  window.IRLove.$ = $;
+  window.IRLove.show = show;
+  window.IRLove.showScreen = showScreen;
+  window.IRLove.haversine = haversine;
+  window.IRLove.showToast = showToast;
 })();

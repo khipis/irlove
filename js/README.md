@@ -1,12 +1,12 @@
-# JS module layout (vanilla, no ES modules – script order in index.html matters)
+# IRLove – frontend modules (vanilla JS)
 
-- **core/** – app state and config (`state.js`, `config.js`)
-- **data/** – static data: character names, monster/animal/artifact names (`character-data.js`, `monster-names.js`, `animal-names.js`, `artifact-names.js`)
-- **storage/** – localStorage: theme, experience, characters (`storage.js`)
-- **ui/** – UI and locale: experience panel, applyLocale (`experience.js`, `locale.js`)
-- **map/** – Leaflet map, markers, decorations, chests (`mapStyle.js`, `map.js`)
-- **services/** – external APIs: Overpass (places), Wikipedia (`places.js`, `wiki.js`)
-- **walk/** – walk flow, geolocation, stats, simulate arrival (`simulate.js`, `walk.js`)
-- **main.js** – entry: init, event binding
+Load order is defined in `index.html`. All modules attach to `window.IRLove`.
 
-All modules attach to `window.Spacerek`; load order is defined in `index.html`.
+- **core/** – `config.js` (RADIUS_KM, RELAY_URL, storage keys), `state.js` (map, user, Gun, profile)
+- **storage/** – `profile.js` (localStorage profile: displayName, age, height, avatar, tags)
+- **ui/** – `locale.js` (applyLocale, i18n)
+- **map/** – `map.js` (Leaflet + OSM, user marker, other users within 2 km, availability icons)
+- **services/** – `gun.js` (Gun relay, location sync, presence, SEA chat)
+- **main.js** – entry: profile form, go to map, chat overlay, notifications
+
+To set relay URL (e.g. after deploying server): set `window.IRLOVE_RELAY_URL = 'https://your-relay.example/gun'` before loading the app scripts.

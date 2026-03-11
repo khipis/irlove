@@ -5,241 +5,88 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="theme-color" content="#1a1a2e" />
   <meta name="mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Spacerek – spacer w ciemno</title>
+  <title>IRLove – spotkania na żywo</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
   <div id="app">
-    <!-- Start screen -->
+    <!-- Start / profile -->
     <section id="screen-start" class="screen active">
       <div class="start-content">
-        <h1>Spacerek</h1>
-        <p class="tagline" data-i18n="start_tagline">Odkryj miejsce w okolicy – spacer w ciemno</p>
-        <p class="instruction" id="instruction-distance">Wybierz zasięg spaceru:</p>
-        <div class="distance-buttons">
-          <button type="button" class="btn-distance" data-km="0.5">500 m</button>
-          <button type="button" class="btn-distance" data-km="1">1 km</button>
-          <button type="button" class="btn-distance" data-km="1.9">2 km</button>
-        </div>
-        <p class="instruction instruction-map-style" data-i18n="start_instruction_attractions">Liczba atrakcji do zebrania:</p>
-        <div class="attractions-row">
-          <input type="range" id="num-attractions" class="attractions-slider" min="1" max="10" value="5" />
-          <span id="num-attractions-value" class="attractions-value">5</span>
-        </div>
-        <p class="instruction instruction-map-style" data-i18n="start_instruction_map_style">Tryb:</p>
-        <div class="map-style-buttons">
-          <button type="button" class="btn-map-style" data-style="stroll" data-i18n="mode_stroll" data-i18n-title="mode_stroll" title="Walk">Walk</button>
-          <button type="button" class="btn-map-style" data-style="adventure" data-i18n="mode_adventure" data-i18n-title="mode_adventure" title="Przygoda">Przygoda</button>
-          <button type="button" class="btn-map-style" data-style="cute" data-i18n="mode_cute" data-i18n-title="mode_cute" title="Cute">Cute</button>
-        </div>
-        <div id="character-card" class="character-card hidden">
-          <p class="character-label" data-i18n="character_label">Twoja postać</p>
-          <div class="character-preview">
-            <span id="character-emoji" class="character-emoji" aria-hidden="true">🧙</span>
-            <div class="character-info">
-              <span id="character-name" class="character-name">—</span>
-              <p id="character-stats" class="character-stats">Poziom 1</p>
-              <input type="text" id="character-name-input" class="character-name-input hidden" maxlength="24" placeholder="Imię" />
-            </div>
-          </div>
-          <div class="character-actions">
-            <button type="button" id="btn-character-reroll" class="btn-character" data-i18n="character_reroll" data-i18n-title="character_reroll_title">🎲 Losuj</button>
-            <button type="button" id="btn-character-rename" class="btn-character" data-i18n="character_rename" data-i18n-title="character_rename_title">✏️ Zmień imię</button>
+        <h1>IRLove</h1>
+        <p class="tagline" data-i18n="start_tagline">Zobacz kto jest w okolicy i umów się na spotkanie</p>
+        <p class="instruction" data-i18n="start_instruction">Uzupełnij profil i wejdź na mapę</p>
+        <div class="profile-form">
+          <label><span data-i18n="profile_display_name">Nick / imię</span></label>
+          <input type="text" id="profile-display-name" maxlength="32" placeholder="" data-i18n-placeholder="profile_display_name" />
+          <label><span data-i18n="profile_age">Wiek</span></label>
+          <input type="text" id="profile-age" maxlength="4" placeholder="25" />
+          <label><span data-i18n="profile_height">Wzrost (cm)</span></label>
+          <input type="text" id="profile-height" maxlength="6" placeholder="170" />
+          <label><span data-i18n="profile_avatar">Avatar (emoji lub URL)</span></label>
+          <input type="text" id="profile-avatar" maxlength="200" placeholder="👤" />
+          <label><span data-i18n="profile_tags">Dostępność</span></label>
+          <div class="tag-buttons">
+            <button type="button" class="btn-tag" data-tag="chat" data-i18n="profile_tag_chat">Pogadać</button>
+            <button type="button" class="btn-tag" data-tag="date" data-i18n="profile_tag_date">Randka</button>
+            <button type="button" class="btn-tag" data-tag="beer" data-i18n="profile_tag_beer">Piwo</button>
           </div>
         </div>
-        <button type="button" id="btn-start" class="btn-primary" disabled data-i18n="start_btn_start">Rozpocznij spacer</button>
-        <button type="button" id="btn-experience" class="btn-experience" data-i18n-title="start_btn_experience_title" data-i18n="start_btn_experience" title="Twoje doświadczenie">🏆 Twoje doświadczenie</button>
-        <div class="lang-switcher" role="group" aria-label="Język">
+        <button type="button" id="btn-enter-map" class="btn-primary" data-i18n="start_btn_enter">Wejdź na mapę</button>
+        <div class="lang-switcher" role="group" aria-label="Language">
           <button type="button" class="btn-lang selected" data-lang="pl" title="Polski">PL</button>
           <button type="button" class="btn-lang" data-lang="en" title="English">EN</button>
         </div>
       </div>
     </section>
 
-    <!-- Map and walk screen -->
-    <section id="screen-walk" class="screen">
-      <div id="map-container" class="map-container map-style-adventure"></div>
+    <!-- Map -->
+    <section id="screen-map" class="screen">
+      <div id="map-container" class="map-container"></div>
       <div id="map-overlay">
         <div id="status-bar">
-          <span id="status-text" data-i18n="map_status_loading">Ładowanie lokalizacji…</span>
-          <span id="distance-text"></span>
+          <span id="status-text" data-i18n="map_status_loading">Ładowanie…</span>
         </div>
-        <div id="map-style-bar" class="map-style-bar hidden">
-          <span class="map-style-label" data-i18n="map_style_label">Tryb:</span>
-          <select id="map-style-select" class="map-style-select" data-i18n-title="map_style_select_title" title="Zmień tryb">
-            <option value="stroll">Walk</option>
-            <option value="adventure">Przygoda</option>
-            <option value="cute">Cute</option>
-          </select>
-        </div>
-        <div id="loading-place" class="loading-box hidden">
-          <div class="spinner"></div>
-          <p data-i18n="map_loading_searching">Szukam miejsca w okolicy…</p>
-        </div>
-        <div id="walking-info" class="hidden">
-          <p id="hint-attraction-num" class="hint-attraction-num">Zebrane: 0/5</p>
-          <p data-i18n="walk_walking_hint">Spaceruj w kierunku celu. Gdy dojdziesz, miejsce się ujawni.</p>
-          <p id="hint-distance">Odległość do celu: – m</p>
-        </div>
+        <p id="map-nearby-hint" class="map-nearby-hint" data-i18n="map_nearby">W pobliżu</p>
       </div>
-      <button type="button" id="btn-experience-map" class="btn-experience-fab hidden" data-i18n-title="walk_btn_experience_title" title="Twoje doświadczenie">🏆</button>
-      <div id="map-fab-buttons" class="map-fab-buttons hidden" data-display="flex">
-        <button type="button" id="btn-simulate-arrival" class="btn-simulate-arrival-fab" data-display="inline-flex" data-i18n-title="walk_btn_simulate_title" data-i18n="walk_btn_simulate_label" title="Idź do celu">Idź</button>
-        <button type="button" id="btn-go-to-decoration" class="btn-go-to-decoration-fab hidden" data-display="inline-flex" data-i18n-title="walk_btn_go_to_decoration_title" data-i18n="walk_btn_go_to_decoration" title="Do zaznaczonego lub najbliższego">🎯 Idź do potwora</button>
-      </div>
-      <div id="debug-panel" class="debug-panel">
-        <button type="button" id="btn-debug-toggle" class="debug-toggle" data-i18n-title="walk_btn_debug_title" title="Pokaż/ukryj debug">🐛 Debug</button>
-        <div class="debug-content">
-          <p id="debug-summary" class="debug-summary" data-i18n="debug_summary_empty">Brak wyszukania (rozpocznij spacer).</p>
-          <div id="debug-panel-body" class="debug-list"></div>
-        </div>
-      </div>
-      <div id="arrival-overlay" class="arrival-overlay hidden" data-display="flex">
-        <div class="arrival-content">
-          <div class="arrival-icon">✓</div>
-          <h2 class="arrival-title" data-i18n="arrival_title">Dotarłeś!</h2>
-          <p class="arrival-subtitle" data-i18n="arrival_subtitle">Odkrywamy to miejsce…</p>
-        </div>
-      </div>
-      <div id="reveal-overlay" class="reveal-overlay hidden" data-display="flex">
-        <div class="reveal-card">
-          <h2 data-i18n="reveal_title">Oto Twoje miejsce</h2>
-          <div id="reveal-photo" class="reveal-photo"></div>
-          <h3 id="reveal-name"></h3>
-          <p id="reveal-desc" class="reveal-desc"></p>
-          <div id="reveal-ciekawostki" class="reveal-ciekawostki hidden">
-            <h4 data-i18n="reveal_ciekawostka">Ciekawostka</h4>
-            <p id="reveal-funfact"></p>
-          </div>
-          <button type="button" id="btn-reveal-action" class="btn-primary" data-i18n="reveal_btn_next">Następna atrakcja</button>
-        </div>
-      </div>
-      <div id="chest-result-overlay" class="chest-result-overlay hidden" data-display="flex">
-        <div class="chest-result-card">
-          <span id="chest-result-icon" class="chest-result-icon" aria-hidden="true">🏺</span>
-          <h3 id="chest-result-title" class="chest-result-title">Skrzynia</h3>
-          <p id="chest-result-body" class="chest-result-body"></p>
-          <button type="button" id="btn-chest-result-close" class="btn-primary" data-i18n="chest_result_btn_close">OK</button>
-        </div>
-      </div>
-      <div id="monster-encounter-overlay" class="encounter-overlay hidden" data-display="flex">
-        <div class="encounter-card monster-encounter-card">
-          <h3 id="monster-encounter-name" class="encounter-name"></h3>
-          <dl class="monster-stats-dl">
-            <dt data-i18n="monster_level">Poziom</dt>
-            <dd id="monster-encounter-level"></dd>
-            <dt data-i18n="monster_strength">Siła</dt>
-            <dd id="monster-encounter-str"></dd>
-            <dt data-i18n="monster_dexterity">Zręczność</dt>
-            <dd id="monster-encounter-dex"></dd>
-            <dt data-i18n="monster_xp_reward">Nagroda XP</dt>
-            <dd id="monster-encounter-xp"></dd>
-          </dl>
-          <div class="encounter-actions">
-            <button type="button" id="btn-monster-run" class="btn-secondary" data-i18n="monster_btn_run">Uciekaj</button>
-            <button type="button" id="btn-monster-fight" class="btn-primary" data-i18n="monster_btn_fight">Walcz</button>
-          </div>
-        </div>
-      </div>
-      <div id="npc-encounter-overlay" class="encounter-overlay hidden" data-display="flex">
-        <div class="encounter-card npc-encounter-card">
-          <div class="encounter-title-row">
-            <span id="npc-encounter-avatar" class="npc-encounter-avatar" aria-hidden="true"></span>
-            <h3 id="npc-encounter-title" class="encounter-name" data-i18n="npc_encounter_title">Spotkanie</h3>
-          </div>
-          <div id="npc-conversation" class="npc-conversation" role="log" aria-live="polite"></div>
-          <div id="npc-player-stats" class="npc-player-stats hidden">
-            <p id="npc-monsters-hint" class="npc-carrots-hint npc-monsters-hint hidden"></p>
-            <p id="npc-carrots-hint" class="npc-carrots-hint hidden"></p>
-          </div>
-          <div class="npc-chat-row">
-            <input type="text" id="npc-chat-input" class="npc-chat-input" maxlength="200" placeholder="" data-i18n-placeholder="npc_chat_placeholder" />
-            <button type="button" id="btn-npc-send" class="btn-primary btn-npc-send" data-i18n="npc_btn_send">Wyślij</button>
-          </div>
-          <button type="button" id="btn-npc-ok" class="btn-secondary btn-npc-end" data-i18n="npc_btn_end">Zakończ rozmowę</button>
-        </div>
-      </div>
-      <div id="minigame-overlay" class="minigame-overlay hidden" data-display="flex">
-        <div class="minigame-card">
-          <div id="minigame-monster-emoji" class="minigame-monster-emoji" aria-hidden="true">👹</div>
-          <div id="minigame-content" class="minigame-content"></div>
-        </div>
+      <button type="button" id="btn-profile-map" class="btn-fab" data-i18n-title="btn_profile" title="Profil">👤</button>
+      <button type="button" id="btn-back" class="btn-back" data-i18n="btn_back">Wstecz</button>
+      <div id="notifications-hint" class="notifications-hint hidden">
+        <button type="button" id="btn-enable-notifications" class="btn-small" data-i18n="notifications_enable">Włącz powiadomienia</button>
       </div>
     </section>
 
-    <!-- Walk statistics at end -->
-    <div id="stats-overlay" class="experience-overlay hidden" data-display="flex">
-      <div class="experience-panel stats-panel">
-        <div class="experience-header">
-          <h2 data-i18n="stats_title">📊 Statystyki spaceru</h2>
-          <button type="button" id="btn-stats-close" class="btn-experience-close" data-i18n-title="experience_btn_close_title" title="Zamknij">×</button>
+    <!-- Chat overlay -->
+    <div id="chat-overlay" class="chat-overlay hidden">
+      <div class="chat-panel">
+        <div class="chat-header">
+          <span id="chat-with-name" data-i18n="chat_with">Z</span>
+          <button type="button" id="btn-chat-close" class="btn-close" data-i18n="btn_close">Zamknij</button>
         </div>
-        <ul id="stats-list" class="stats-list"></ul>
-        <button type="button" id="btn-stats-finish" class="btn-primary" data-i18n="stats_btn_finish">Zakończ</button>
-      </div>
-    </div>
-
-    <!-- Experience panel -->
-    <div id="experience-overlay" class="experience-overlay hidden" data-display="flex">
-      <div class="experience-panel">
-        <div class="experience-header">
-          <h2 data-i18n="experience_title">🏆 Twoje doświadczenie</h2>
-          <p class="experience-mode-name" id="experience-mode-name" aria-hidden="true"></p>
-          <button type="button" id="btn-experience-close" class="btn-experience-close" data-i18n-title="experience_btn_close_title" title="Zamknij">×</button>
-        </div>
-        <div class="experience-stats">
-          <p class="experience-total"><span id="experience-total-xp">0</span> XP</p>
-          <p class="experience-level"><span data-i18n="experience_level_prefix"></span><span id="experience-level-num">1</span></p>
-        </div>
-        <div id="experience-content" class="experience-content"></div>
-        <div class="experience-actions">
-          <button type="button" id="btn-clear-storage" class="btn-clear-storage" data-i18n-title="experience_btn_clear_title" data-i18n="experience_btn_clear_label" title="Usuń wszystkie zapisane dane">🗑️ Wyczyść dane (localStorage)</button>
+        <div id="chat-messages" class="chat-messages"></div>
+        <div class="chat-input-row">
+          <input type="text" id="chat-input" class="chat-input" maxlength="500" placeholder="" data-i18n-placeholder="chat_placeholder" />
+          <button type="button" id="btn-chat-send" class="btn-send" data-i18n="chat_send">Wyślij</button>
         </div>
       </div>
     </div>
 
-    <!-- Toast notifications (carrot, artifact, etc.) -->
     <div id="toast-container" class="toast-container" aria-live="polite"></div>
   </div>
 
+  <!-- Optional: set relay URL before app scripts (after deploying server) -->
+  <!-- <script>window.IRLOVE_RELAY_URL = 'https://your-relay.example/gun';</script> -->
   <script src="locales.js"></script>
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo=" crossorigin=""></script>
-  <!-- core: config, state -->
+  <script src="https://cdn.jsdelivr.net/npm/gun/gun.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gun/sea.js"></script>
   <script src="js/core/config.js"></script>
   <script src="js/core/state.js"></script>
-  <!-- data: character, monster, animal, artifact names -->
-  <script src="js/data/character-data.js"></script>
-  <script src="js/data/monster-names.js"></script>
-  <script src="js/data/animal-names.js"></script>
-  <script src="js/data/artifact-names.js"></script>
-  <script src="js/data/npc-names.js"></script>
-  <script src="js/data/npc-dialogues.js"></script>
-  <script src="js/data/conversation-replies.js"></script>
-  <!-- storage -->
-  <script src="js/storage/storage.js"></script>
-  <!-- ui: experience (XP panel), locale -->
-  <script src="js/ui/experience.js"></script>
+  <script src="js/storage/profile.js"></script>
   <script src="js/ui/locale.js"></script>
-  <!-- map: style, map + markers + decorations -->
-  <script src="js/map/mapStyle.js"></script>
   <script src="js/map/map.js"></script>
-  <!-- services: Overpass, Wikipedia -->
-  <script src="js/services/places.js"></script>
-  <script src="js/services/wiki.js"></script>
-  <!-- NPC dialogue: intent-based engine (offline, no LLM) -->
-  <script src="js/dialogue/intentClassifier.js"></script>
-  <script src="js/dialogue/dialogueData.js"></script>
-  <script src="js/dialogue/responseGenerator.js"></script>
-  <script src="js/dialogue/questGenerator.js"></script>
-  <script src="js/dialogue/dialogueManager.js"></script>
-  <script src="js/dialogue/dialogueEngine.js"></script>
-  <!-- walk: simulate, walk flow -->
-  <script src="js/walk/simulate.js"></script>
-  <script src="js/walk/walk.js"></script>
-  <script src="js/walk/minigames.js"></script>
-  <!-- entry -->
+  <script src="js/services/gun.js"></script>
   <script src="js/main.js"></script>
 </body>
 </html>

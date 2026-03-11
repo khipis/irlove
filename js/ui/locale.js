@@ -1,44 +1,28 @@
 /**
- * UI localization: applyLocale, distance instruction, label refresh.
+ * IRLove – apply locale (PL/EN), refresh labels.
  */
 (function () {
   'use strict';
-  var Sp = window.Spacerek;
-  var state = Sp.state;
+  var App = window.IRLove;
 
-  function t(key, replacements) {
-    return window.t ? window.t(key, replacements) : key;
-  }
-
-  function updateDistanceInstruction() {
-    var el = document.getElementById('instruction-distance');
-    if (!el) return;
-    el.textContent = (state.mapStyle === 'adventure' ? t('start_instruction_world_size') : t('start_instruction_distance'));
-  }
-
-  function applyLocale(refreshDynamicLabels) {
-    var lang = window.CURRENT_LOCALE || 'pl';
+  function applyLocale(refresh) {
+    var lang = window.CURRENT_LOCALE || (window.getStoredLang && window.getStoredLang()) || 'pl';
     document.documentElement.lang = lang === 'en' ? 'en' : 'pl';
-    if (document.title !== undefined) document.title = t('app_title');
+    if (document.title !== undefined && window.t) document.title = window.t('app_title');
     document.querySelectorAll('[data-i18n]').forEach(function (el) {
       var key = el.getAttribute('data-i18n');
-      if (key) el.textContent = t(key);
+      if (key && window.t) el.textContent = window.t(key);
     });
     document.querySelectorAll('[data-i18n-title]').forEach(function (el) {
       var key = el.getAttribute('data-i18n-title');
-      if (key) el.title = t(key);
+      if (key && window.t) el.title = window.t(key);
     });
-    var sel = document.getElementById('map-style-select');
-    if (sel) {
-      [].slice.call(sel.options).forEach(function (opt) {
-        var key = 'mode_' + opt.value;
-        if (window.t && window.t(key) !== key) opt.textContent = window.t(key);
-      });
-    }
-    updateDistanceInstruction();
-    if (typeof refreshDynamicLabels === 'function') refreshDynamicLabels();
+    document.querySelectorAll('[data-i18n-placeholder]').forEach(function (el) {
+      var key = el.getAttribute('data-i18n-placeholder');
+      if (key && window.t) el.placeholder = window.t(key);
+    });
+    if (typeof refresh === 'function') refresh();
   }
 
-  Sp.updateDistanceInstruction = updateDistanceInstruction;
-  Sp.applyLocale = applyLocale;
+  App.applyLocale = applyLocale;
 })();

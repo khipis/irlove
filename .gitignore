@@ -12,3 +12,7 @@ Thumbs.db
 # Env (jeśli kiedyś dodasz)
 .env
 .env.local
+
+# Relay server
+server/node_modules/
+server/data/

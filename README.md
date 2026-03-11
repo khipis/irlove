@@ -1,89 +1,83 @@
-# Spacerek – spacer w ciemno (PoC, darmowy)
+# IRLove / IRLike – Mini Local Dating App
 
-Aplikacja webowa do odkrywania ciekawych miejsc w okolicy poprzez losowy spacer.  
-**Wersja PoC:** bez kluczy API – mapa i miejsca z darmowych źródeł (OpenStreetMap).
+Lekka aplikacja w przeglądarce do spontanicznych spotkań IRL: użytkownicy widzą się na mapie w promieniu 2 km, mogą ustawić profil (nick, wiek, avatar, dostępność: pogadać / randka / piwo) i pisać szyfrowane wiadomości.
 
-**Repo:** [github.com/khipis/spacerek](https://github.com/khipis/spacerek)  
-**Strona (GitHub Pages):** [khipis.github.io/spacerek](https://khipis.github.io/spacerek)
-
-## Wypchnięcie kodu do repo i deploy
-
-W projekcie jest już **repo git** z jednym commitem i zdalnym **origin** → `https://github.com/khipis/spacerek.git`.
-
-1. **Pierwszy push (wykonaj u siebie w terminalu, żeby użyć swojego logowania do GitHub):**
-   ```bash
-   cd /Users/kkorolczuk/work/spacerek   # albo ścieżka do swojego folderu spacerek
-   git push -u origin main
-   ```
-   Jeśli wcześniej nie ustawiałeś zdalnego:  
-   `git remote add origin https://github.com/khipis/spacerek.git`  
-   Przy HTTPS GitHub poprosi o login i hasło (albo **Personal Access Token** zamiast hasła).
-
-2. **Włącz GitHub Pages (Actions):**  
-   Na GitHubie: repozytorium **khipis/spacerek** → **Settings** → **Pages** → **Build and deployment** → Source: **GitHub Actions**.  
-   Od tego momentu przy każdym `git push` do `main` workflow wdroży stronę pod adresem **https://khipis.github.io/spacerek/**.
-
-3. **Kolejne zmiany:** commit + push, deploy zrobi się sam.
-   ```bash
-   git add .
-   git commit -m "Opis zmian"
-   git push
-   ```
-
-## Uruchomienie lokalne
-
-**HTTPS** – geolokalizacja działa tylko przez HTTPS (lub localhost). Lokalnie:
-- `npx serve .` w katalogu projektu → `http://localhost:3000` (na localhost geolokacja często działa),
-- lub zdeployuj na jeden z hostów poniżej (HTTPS z automatu).
-
-## Wdrożenie na WWW (bezbolesne, darmowe)
-
-Aplikacja to zwykłe pliki: `index.html`, `styles.css`, `app.js`. Żadnego buildu – wystarczy wrzucić folder na hosting statyczny.
-
-### 1. Netlify Drop (najszybsze, bez konta w Git)
-1. Wejdź na [app.netlify.com/drop](https://app.netlify.com/drop).
-2. Zarejestruj się / zaloguj (darmowe konto).
-3. Przeciągnij **cały folder `spacerek`** (z plikami `index.html`, `styles.css`, `app.js`) w okno „Drag and drop your site output folder”.
-4. Netlify od razu da Ci link typu `https://random-name-123.netlify.app`. Gotowe.
-
-### 2. Vercel (równie proste)
-1. Zainstaluj CLI: `npm i -g vercel`.
-2. W katalogu `spacerek`: `vercel` (pierwszy raz zapyta o logowanie).
-3. Potwierdź katalog (`.`), Vercel wgra pliki i poda link.
-
-### 3. GitHub Pages (już skonfigurowane dla tego repo)
-Dla [khipis/spacerek](https://github.com/khipis/spacerek) deploy jest zautomatyzowany: po **Settings → Pages → Source: GitHub Actions** strona jest pod **https://khipis.github.io/spacerek/**.
-
-### 4. Cloudflare Pages
-1. [pages.cloudflare.com](https://pages.cloudflare.com) → **Create a project** → **Direct Upload**.
-2. Spakuj folder `spacerek` (zip) i wgraj. Cloudflare da Ci domenę `*.pages.dev`.
+**Języki:** PL | EN
 
 ---
 
-**Ważne:** Po wdrożeniu otwieraj aplikację przez **HTTPS** (wszyscy powyżej go dają). Na telefonie najlepiej wejść bezpośrednio w link – geolokalizacja wtedy działa.
+## Demo / deploy
 
-## Technologie (darmowe)
+- **GitHub Pages (auto-deploy):** po pushu na `main` strona jest pod **https://khipis.github.io/irlove/**  
+  W repozytorium: **Settings → Pages → Build and deployment → Source: GitHub Actions.**
 
-| Funkcja        | Źródło                |
-|----------------|------------------------|
-| Mapa           | **Leaflet** + kafelki **OpenStreetMap** |
-| Wyszukiwanie miejsc | **Overpass API** (dane OSM: parki, muzea, restauracje, atrakcje) |
-| Lokalizacja    | `navigator.geolocation` |
+Aby aplikacja działała w pełni (realtime, czat), potrzebny jest **relay Gun.js**. Wdróż serwer (patrz niżej) i ustaw URL relay w aplikacji:
 
-Żadnych kluczy API ani rejestracji.
+```html
+<script>window.IRLOVE_RELAY_URL = 'https://twoj-relay.example/gun';</script>
+```
 
-## Zasada działania
+przed załadowaniem skryptów w `index.html`, albo zmień domyślny URL w `js/core/config.js`.
 
-- Wybierasz zasięg: 1 km lub 2 km.
-- Aplikacja szuka w OpenStreetMap miejsc (parki, muzea, restauracje, kawiarnie, atrakcje, zabytki) w tym promieniu.
-- Losuje jedno miejsce i **nie pokazuje** jego lokalizacji.
-- Spacerujesz w dowolnym kierunku; aplikacja śledzi pozycję i odległość do celu.
-- Gdy dojdziesz na odległość **&lt; 50 m**, pokazuje się nazwa i krótki opis typu miejsca (bez zdjęć – OSM ich nie udostępnia w tym API).
+---
 
-## Pliki
+## Uruchomienie lokalne
 
-- `index.html` – struktura, ekran startowy i mapy
-- `styles.css` – stylowanie, responsywność 320–800 px
-- `app.js` – logika: geolokalizacja, Leaflet, Overpass API, odległość (Haversine), flow
+1. **Frontend (tylko mapa + profil, bez syncu):**  
+   Otwórz `index.html` przez serwer HTTP (np. `npx serve .` lub `python3 -m http.server 8000`).  
+   Geolokalizacja na localhost często działa bez HTTPS.
 
-Żadnych pakietów – tylko HTML, CSS i vanilla JS + Leaflet i OSM z CDN.
+2. **Z relay (realtime + czat):**  
+   Uruchom relay (patrz niżej), ustaw `IRLOVE_RELAY_URL` na `http://localhost:8765/gun` (lub swój URL) i odpal frontend przez HTTP/HTTPS.
+
+---
+
+## Relay Gun.js (serwer)
+
+Minimalny serwer do synchronizacji lokalizacji i wiadomości. **Nie przechowuje treści czatu w plaintext** – szyfrowanie E2E (Gun SEA) jest po stronie klienta.
+
+### Lokalnie
+
+```bash
+cd server
+npm install
+npm start
+```
+
+Serwer nasłuchuje na `http://localhost:8765`.  
+Dla testów z telefonem użyj tunelu (np. ngrok): `ngrok http 8765` i ustaw `IRLOVE_RELAY_URL` na podany adres HTTPS + `/gun`.
+
+### Wdrożenie (Railway, Render, Fly.io)
+
+- **Fly.io:** `fly launch` w katalogu `server`, ustaw zmienną `PORT` (zazwyczaj 8080).  
+- **Railway / Render:** dodaj projekt z repozytorium, root build = `server`, komenda start = `npm start`, port z zmiennej `PORT`.
+
+Po wdrożeniu ustaw w aplikacji:  
+`window.IRLOVE_RELAY_URL = 'https://twoja-aplikacja.fly.dev/gun';` (lub odpowiedni URL).
+
+---
+
+## Funkcje
+
+| Funkcja | Opis |
+|--------|------|
+| **Profil** | localStorage: nick, wiek, wzrost, avatar (emoji/URL), tagi: chat / date / beer |
+| **Mapa** | Leaflet + OpenStreetMap, promień 2 km, marker użytkownika i innych „online” |
+| **Obecność** | Aktualizacja pozycji co 5 s, widoczni tylko użytkownicy aktywni w ostatnich 15 s |
+| **Czat** | Gun.js SEA – szyfrowanie E2E, wiadomości tylko między wybranymi użytkownikami |
+| **Powiadomienia** | Opcjonalne powiadomienia przeglądarki o nowych osobach w pobliżu |
+
+---
+
+## Struktura projektu
+
+- `index.html`, `styles.css`, `locales.js` – wejście, style, teksty PL/EN  
+- `js/` – core (config, state), storage (profil), map (Leaflet), services (Gun), main.js  
+- `server/` – relay Gun.js (Node.js), do wdrożenia osobno  
+- `.github/workflows/deploy-pages.yml` – auto-deploy na GitHub Pages przy pushu do `main`
+
+---
+
+## Licencja
+
+MIT (lub według wyboru autora).

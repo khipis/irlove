@@ -1,307 +1,252 @@
 /**
- * App entry point: init, event binding, label refresh.
+ * IRLove – entry: profile, map, Gun auth, chat, notifications.
  */
 (function () {
   'use strict';
-  var Sp = window.Spacerek;
-  if (!Sp || !Sp.state || !Sp.$) {
-    var tip = 'Nie załadowano wszystkich plików. Otwórz aplikację przez serwer (w folderze projektu: python3 -m http.server 8000, potem http://localhost:8000).';
+  var App = window.IRLove;
+  var state = App.state;
+  var config = App.config;
+
+  if (!App || !App.state || !App.$) {
     if (typeof document !== 'undefined' && document.body) {
       var div = document.createElement('div');
       div.style.cssText = 'position:fixed;inset:0;background:#1a1a2e;color:#e8e4de;padding:2rem;font-family:sans-serif;display:flex;align-items:center;justify-content:center;text-align:center;z-index:99999;';
-      div.textContent = tip;
+      div.textContent = 'IRLove: nie załadowano modułów. Otwórz przez serwer (HTTPS).';
       document.body.appendChild(div);
-    } else {
-      alert(tip);
     }
     return;
   }
-  var state = Sp.state;
-  var $ = Sp.$;
-  var getStoredTheme = Sp.getStoredTheme;
-  var setStoredTheme = Sp.setStoredTheme;
-  var getStoredCharacter = Sp.getStoredCharacter;
-  var setStoredCharacter = Sp.setStoredCharacter;
-  var clearStorage = Sp.clearStorage;
-  var applyLocale = Sp.applyLocale;
-  var updateDistanceInstruction = Sp.updateDistanceInstruction;
-  var applyTheme = Sp.applyTheme;
-  var applyMapStyle = Sp.applyMapStyle;
-  var renderExperiencePanel = Sp.renderExperiencePanel;
-  var openExperiencePanel = Sp.openExperiencePanel;
-  var closeExperiencePanel = Sp.closeExperiencePanel;
-  var updateDistanceHint = Sp.updateDistanceHint;
-  var updateDebugPanel = Sp.updateDebugPanel;
-  var updateRevealButton = Sp.updateRevealButton;
-  var backToMap = Sp.backToMap;
-  var resetWalk = Sp.resetWalk;
-  var showWalkStats = Sp.showWalkStats;
-  var startWalk = Sp.startWalk;
-  var simulateArrival = Sp.simulateArrival;
+
+  var $ = App.$;
+  var showScreen = App.showScreen;
+  var applyLocale = App.applyLocale;
+  var getProfile = App.getProfile;
+  var setProfile = App.setProfile;
+  var ensureProfile = App.ensureProfile;
+  var loadLeaflet = App.loadLeaflet;
+  var initMap = App.initMap;
+  var updateUserPosition = App.updateUserPosition;
+  var setUserAvatar = App.setUserAvatar;
+  var gunConnect = App.gunConnect;
+  var getOrCreateAuth = App.getOrCreateAuth;
+  var gunAuth = App.gunAuth;
+  var gunPub = App.gunPub;
+  var startLocationSync = App.startLocationSync;
+  var stopLocationSync = App.stopLocationSync;
+  var subscribeToNearby = App.subscribeToNearby;
+  var sendMessage = App.sendMessage;
+  var subscribeInbox = App.subscribeInbox;
 
   function t(key, replacements) {
     return window.t ? window.t(key, replacements) : key;
   }
 
-  function rollAdventureStats() {
-    function roll(min, max) {
-      return min + Math.floor(Math.random() * (max - min + 1));
-    }
-    return {
-      level: 1,
-      strength: roll(3, 12),
-      dexterity: roll(3, 12),
-      intelligence: roll(3, 12)
+  function setStatus(text) {
+    var el = document.getElementById('status-text');
+    if (el) el.textContent = text;
+  }
+
+  function loadProfileIntoForm() {
+    var p = ensureProfile();
+    var nameEl = $('profile-display-name');
+    var ageEl = $('profile-age');
+    var heightEl = $('profile-height');
+    var avatarEl = $('profile-avatar');
+    if (nameEl) nameEl.value = p.displayName || '';
+    if (ageEl) ageEl.value = p.age || '';
+    if (heightEl) heightEl.value = p.height || '';
+    if (avatarEl) avatarEl.value = p.avatar || '👤';
+    var tags = p.tags || [];
+    document.querySelectorAll('.btn-tag').forEach(function (btn) {
+      var tag = btn.getAttribute('data-tag');
+      btn.classList.toggle('selected', tags.indexOf(tag) >= 0);
+    });
+  }
+
+  function saveProfileFromForm() {
+    var nameEl = $('profile-display-name');
+    var ageEl = $('profile-age');
+    var heightEl = $('profile-height');
+    var avatarEl = $('profile-avatar');
+    var tags = [];
+    document.querySelectorAll('.btn-tag.selected').forEach(function (btn) {
+      var tag = btn.getAttribute('data-tag');
+      if (tag) tags.push(tag);
+    });
+    var p = {
+      displayName: (nameEl && nameEl.value) ? nameEl.value.trim() : '',
+      age: (ageEl && ageEl.value) ? ageEl.value.trim() : '',
+      height: (heightEl && heightEl.value) ? heightEl.value.trim() : '',
+      avatar: (avatarEl && avatarEl.value) ? avatarEl.value.trim() : '👤',
+      tags: tags
     };
+    setProfile(p);
+    state.profile = p;
+    return p;
   }
 
-  function ensureCharacter(mode) {
-    if (mode !== 'adventure' && mode !== 'cute') return null;
-    var cur = getStoredCharacter(mode);
-    if (cur && cur.name && cur.emoji) {
-      if (mode === 'adventure' && cur.stats && (cur.stats.strength == null || cur.stats.dexterity == null || cur.stats.intelligence == null)) {
-        cur.stats = rollAdventureStats();
-        setStoredCharacter(mode, cur);
-      }
-      return cur;
-    }
-    var data = window.Spacerek.characterData && window.Spacerek.characterData[mode];
-    if (!data) return null;
-    var lang = (typeof window.getStoredLang === 'function' && window.getStoredLang()) || 'pl';
-    var names = data.names && data.names[lang];
-    var emojis = data.emojis || [];
-    var name = (names && names.length) ? names[Math.floor(Math.random() * names.length)] : (mode === 'adventure' ? 'Bohater' : 'Przyjaciel');
-    var emoji = emojis.length ? emojis[Math.floor(Math.random() * emojis.length)] : (mode === 'adventure' ? '🧙' : '🐰');
-    var stats = mode === 'adventure' ? rollAdventureStats() : { level: 1 };
-    var character = { name: name, emoji: emoji, stats: stats };
-    setStoredCharacter(mode, character);
-    return character;
-  }
-
-  function renderCharacterCard(mode) {
-    var card = $('character-card');
-    var emojiEl = $('character-emoji');
-    var nameEl = $('character-name');
-    var statsEl = $('character-stats');
-    var inputEl = $('character-name-input');
-    if (!card) return;
-    if (mode !== 'adventure' && mode !== 'cute') {
-      card.classList.add('hidden');
+  function goToMap() {
+    var p = saveProfileFromForm();
+    if (!p.displayName || !p.displayName.length) {
+      App.showToast(t('error_no_profile'), 'error');
       return;
     }
-    card.classList.remove('hidden');
-    var char = ensureCharacter(mode);
-    if (char) {
-      if (emojiEl) emojiEl.textContent = char.emoji;
-      if (nameEl) nameEl.textContent = char.name;
-      if (statsEl) {
-        var s = char.stats || {};
-        var level = s.level || 1;
-        if (mode === 'adventure' && (s.strength != null || s.dexterity != null || s.intelligence != null)) {
-          var str = s.strength != null ? s.strength : '?';
-          var dex = s.dexterity != null ? s.dexterity : '?';
-          var int_ = s.intelligence != null ? s.intelligence : '?';
-          statsEl.textContent = t('character_level', { level: level }) + ' · ' +
-            t('character_strength') + ' ' + str + ' ' +
-            t('character_dexterity') + ' ' + dex + ' ' +
-            t('character_intelligence') + ' ' + int_;
-        } else {
-          statsEl.textContent = t('character_level', { level: level });
-        }
+    if (state.watchId != null && navigator.geolocation.clearWatch) {
+      navigator.geolocation.clearWatch(state.watchId);
+      state.watchId = null;
+    }
+    setStatus(t('status_getting_location'));
+    if (!navigator.geolocation) {
+      setStatus(t('status_location_error'));
+      App.showToast(t('status_location_error'), 'error');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      function (pos) {
+        state.userPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        state.profile = p;
+        gunConnect();
+        var auth = getOrCreateAuth();
+        gunAuth(auth.alias, auth.pass, function (user) {
+          if (!user) {
+            setStatus('Auth failed');
+            return;
+          }
+          loadLeaflet().then(function () {
+            initMap();
+            setUserAvatar(p.avatar);
+            startLocationSync();
+            subscribeToNearby();
+            subscribeInbox(function (fromPub, text) {
+              if (state.chatWith === fromPub) {
+                appendChatMessage(fromPub, text, false);
+              } else {
+                App.showToast(t('notifications_new_user') + ': ' + text.substring(0, 30));
+              }
+            });
+            showScreen('screen-map');
+            setStatus(t('map_status_online'));
+            requestNotificationPermission();
+          }).catch(function () {
+            setStatus(t('status_location_error'));
+          });
+        });
+      },
+      function () {
+        setStatus(t('status_location_denied'));
+        App.showToast(t('status_location_denied'), 'error');
+      },
+      { enableHighAccuracy: true, timeout: 15000, maximumAge: 5000 }
+    );
+    var watchId = navigator.geolocation.watchPosition(
+      function (pos) {
+        state.userPosition = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+        if (updateUserPosition) updateUserPosition(pos.coords.latitude, pos.coords.longitude);
+      },
+      function () {},
+      { enableHighAccuracy: true, maximumAge: config.LOCATION_UPDATE_MS }
+    );
+    state.watchId = watchId;
+  }
+
+  function backToStart() {
+    stopLocationSync();
+    if (state.watchId != null && navigator.geolocation.clearWatch) {
+      navigator.geolocation.clearWatch(state.watchId);
+      state.watchId = null;
+    }
+    showScreen('screen-start');
+  }
+
+  App.openChat = function (pub, data) {
+    state.chatWith = pub;
+    state.chatWithProfile = data || {};
+    var name = (data && data.displayName) ? data.displayName : pub.substring(0, 8);
+    var el = $('chat-with-name');
+    if (el) el.textContent = (t('chat_with') || 'Z') + ' ' + name;
+    var messagesEl = $('chat-messages');
+    if (messagesEl) messagesEl.innerHTML = '';
+    var overlay = $('chat-overlay');
+    if (overlay) {
+      overlay.classList.remove('hidden');
+      overlay.style.display = 'flex';
+    }
+    var input = $('chat-input');
+    if (input) input.focus();
+  };
+
+  function closeChat() {
+    state.chatWith = null;
+    var overlay = $('chat-overlay');
+    if (overlay) {
+      overlay.classList.add('hidden');
+      overlay.style.display = 'none';
+    }
+  }
+
+  function appendChatMessage(fromPub, text, isMe) {
+    var messagesEl = $('chat-messages');
+    if (!messagesEl) return;
+    var div = document.createElement('div');
+    div.className = 'chat-msg ' + (isMe ? 'chat-msg-me' : 'chat-msg-them');
+    div.textContent = text;
+    messagesEl.appendChild(div);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+  }
+
+  function sendChatMessage() {
+    var input = $('chat-input');
+    var toPub = state.chatWith;
+    if (!input || !toPub) return;
+    var text = (input.value || '').trim();
+    if (!text) return;
+    input.value = '';
+    appendChatMessage(toPub, text, true);
+    sendMessage(toPub, text, function (ok) {
+      if (!ok) App.showToast('Send failed', 'error');
+    });
+  }
+
+  App.notifyNewNearby = function (pub, payload) {
+    if (!payload || !payload.displayName) return;
+    if (typeof Notification !== 'undefined' && Notification.permission === 'granted') {
+      try {
+        new Notification(t('notifications_new_user'), {
+          body: payload.displayName + ' ' + (payload.tags && payload.tags.length ? ' · ' + payload.tags.join(', ') : ''),
+          icon: '/favicon.ico'
+        });
+      } catch (e) {}
+    }
+  };
+
+  function requestNotificationPermission() {
+    if (typeof Notification === 'undefined') return;
+    if (Notification.permission === 'granted') return;
+    var hint = document.getElementById('notifications-hint');
+    if (hint) hint.classList.remove('hidden');
+  }
+
+  function enableNotifications() {
+    if (typeof Notification === 'undefined') return;
+    Notification.requestPermission().then(function (p) {
+      if (p === 'granted') {
+        var hint = document.getElementById('notifications-hint');
+        if (hint) hint.classList.add('hidden');
       }
-      if (inputEl) {
-        inputEl.value = char.name;
-        inputEl.classList.add('hidden');
-      }
-    }
-  }
-
-  function randomizeCharacter(mode) {
-    if (mode !== 'adventure' && mode !== 'cute') return;
-    var data = window.Spacerek.characterData && window.Spacerek.characterData[mode];
-    if (!data) return;
-    var lang = (typeof window.getStoredLang === 'function' && window.getStoredLang()) || 'pl';
-    var names = data.names && data.names[lang];
-    var emojis = data.emojis || [];
-    var name = (names && names.length) ? names[Math.floor(Math.random() * names.length)] : (mode === 'adventure' ? 'Bohater' : 'Przyjaciel');
-    var emoji = emojis.length ? emojis[Math.floor(Math.random() * emojis.length)] : (mode === 'adventure' ? '🧙' : '🐰');
-    var cur = getStoredCharacter(mode) || {};
-    var stats = mode === 'adventure' ? rollAdventureStats() : (cur.stats || { level: 1 });
-    var character = { name: name, emoji: emoji, stats: stats };
-    setStoredCharacter(mode, character);
-    renderCharacterCard(mode);
-    if (typeof applyMapStyle === 'function') applyMapStyle();
-  }
-
-  function saveCharacterName(mode, name) {
-    if (mode !== 'adventure' && mode !== 'cute') return;
-    var trimmed = (name || '').trim();
-    if (!trimmed) return;
-    var cur = getStoredCharacter(mode) || {};
-    var character = { name: trimmed, emoji: cur.emoji || (mode === 'adventure' ? '🧙' : '🐰'), stats: cur.stats || { level: 1 } };
-    setStoredCharacter(mode, character);
-    renderCharacterCard(mode);
-  }
-
-  function updateExperienceButtonIcon() {
-    var mode = state.mapStyle || 'adventure';
-    var char = getStoredCharacter(mode);
-    var emoji = (char && char.emoji) ? char.emoji : (mode === 'adventure' ? '\u{1F9D9}' : (mode === 'cute' ? '\u{1F430}' : '\u{1F6B6}'));
-    var btnExp = $('btn-experience');
-    var btnExpMap = $('btn-experience-map');
-    if (btnExp) {
-      var fullLabel = t('start_btn_experience');
-      var labelOnly = fullLabel.indexOf(' ') >= 0 ? fullLabel.substring(fullLabel.indexOf(' ') + 1).trim() : fullLabel;
-      btnExp.textContent = emoji + ' ' + labelOnly;
-    }
-    if (btnExpMap) {
-      var heroName = (char && char.name) ? char.name : (mode === 'adventure' ? t('mode_adventure') : (mode === 'cute' ? t('mode_cute') : t('mode_stroll')));
-      btnExpMap.textContent = emoji + ' ' + heroName;
-      btnExpMap.title = t('walk_btn_experience_title');
-    }
-  }
-
-  function refreshDynamicLabels() {
-    updateExperienceButtonIcon();
-    var userEl = document.querySelector('.user-marker-fun');
-    if (userEl) userEl.title = t('tooltip_you_short');
-    if (state.userMarker) {
-      var userTip = state.userMarker.getTooltip && state.userMarker.getTooltip();
-      if (userTip) userTip.setContent(t('tooltip_you'));
-    }
-    if (state.targetMarkers && state.targetMarkers.length) {
-      state.targetMarkers.forEach(function (m) {
-        var tip = m.getTooltip && m.getTooltip();
-        var tierKey = m._tier ? 'tier_' + m._tier : 'tier_epic';
-        if (tip) tip.setContent(t(tierKey));
-      });
-    }
-    if (state.visitedMarkers && state.visitedMarkers.length) {
-      state.visitedMarkers.forEach(function (m) {
-        var tip = m.getTooltip && m.getTooltip();
-        if (tip && m._placeName) tip.setContent(m._placeName + t('tooltip_visited'));
-      });
-    }
-    updateDistanceHint();
-    updateDebugPanel();
-    updateRevealButton();
-    renderExperiencePanel();
-    try {
-      if (typeof renderCharacterCard === 'function') renderCharacterCard(state.mapStyle);
-    } catch (e) { console.error('renderCharacterCard:', e); }
-  }
-
-  function initStartScreen() {
-    var btnStart = $('btn-start');
-    var buttons = document.querySelectorAll('.btn-distance');
-
-    buttons.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        buttons.forEach(function (b) { b.classList.remove('selected'); });
-        btn.classList.add('selected');
-        state.selectedKm = parseFloat(btn.getAttribute('data-km'));
-        btnStart.disabled = false;
-      });
     });
-    var defaultKmBtn = document.querySelector('.btn-distance[data-km="1.9"]');
-    if (defaultKmBtn) {
-      buttons.forEach(function (b) { b.classList.remove('selected'); });
-      defaultKmBtn.classList.add('selected');
-      state.selectedKm = 1.9;
-      btnStart.disabled = false;
-    } else if (state.selectedKm == null) {
-      state.selectedKm = 1.9;
-    }
+  }
 
-    var styleButtons = document.querySelectorAll('.btn-map-style');
-    function updateMapStyleSelection() {
-      styleButtons.forEach(function (b) {
-        b.classList.toggle('selected', b.getAttribute('data-style') === state.mapStyle);
-      });
-    }
-    styleButtons.forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        state.mapStyle = btn.getAttribute('data-style') || 'adventure';
-        setStoredTheme(state.mapStyle);
-        updateMapStyleSelection();
-        applyTheme();
-        updateDistanceInstruction();
-        ensureCharacter(state.mapStyle);
-        renderCharacterCard(state.mapStyle);
-        updateExperienceButtonIcon();
-      });
-    });
-    updateMapStyleSelection();
-
-    var numInput = document.getElementById('num-attractions');
-    var numValue = document.getElementById('num-attractions-value');
-    if (numInput && numValue) {
-      numInput.value = state.numAttractions;
-      numValue.textContent = state.numAttractions;
-      numInput.addEventListener('input', function () {
-        state.numAttractions = Math.min(10, Math.max(1, parseInt(numInput.value, 10) || 5));
-        numInput.value = state.numAttractions;
-        numValue.textContent = state.numAttractions;
-      });
-    }
-
-    btnStart.addEventListener('click', function () {
-      if (state.selectedKm == null) state.selectedKm = 1.9;
-      startWalk();
-    });
-
-    try {
-      ensureCharacter('adventure');
-      ensureCharacter('cute');
-      renderCharacterCard(state.mapStyle);
-    } catch (e) {
-      console.error('Character init:', e);
-    }
-
-    var btnReroll = $('btn-character-reroll');
-    var btnRename = $('btn-character-rename');
-    var nameSpan = $('character-name');
-    var nameInput = $('character-name-input');
-    if (btnReroll) {
-      btnReroll.addEventListener('click', function () {
-        randomizeCharacter(state.mapStyle);
-      });
-    }
-    if (btnRename && nameSpan && nameInput) {
-      btnRename.addEventListener('click', function () {
-        if (nameInput.classList.contains('hidden')) {
-          nameInput.value = (getStoredCharacter(state.mapStyle) || {}).name || '';
-          nameInput.classList.remove('hidden');
-          nameSpan.classList.add('hidden');
-          nameInput.focus();
-        } else {
-          nameInput.classList.add('hidden');
-          nameSpan.classList.remove('hidden');
-          saveCharacterName(state.mapStyle, nameInput.value);
-        }
-      });
-      nameInput.addEventListener('blur', function () {
-        if (!nameInput.classList.contains('hidden')) {
-          nameInput.classList.add('hidden');
-          nameSpan.classList.remove('hidden');
-          saveCharacterName(state.mapStyle, nameInput.value);
-        }
-      });
-      nameInput.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') {
-          nameInput.blur();
-        }
-      });
-    }
+  function refreshLabels() {
+    if (document.title !== undefined && window.t) document.title = window.t('app_title');
   }
 
   function init() {
-    state.mapStyle = getStoredTheme();
-    applyLocale(refreshDynamicLabels);
-    applyTheme();
+    ensureProfile();
+    loadProfileIntoForm();
+    applyLocale(refreshLabels);
 
-    document.querySelectorAll('.btn-lang').forEach(function (b) {
-      b.classList.toggle('selected', b.getAttribute('data-lang') === (window.CURRENT_LOCALE || 'pl'));
+    document.querySelectorAll('.btn-lang').forEach(function (btn) {
+      btn.classList.toggle('selected', btn.getAttribute('data-lang') === (window.CURRENT_LOCALE || 'pl'));
     });
     document.querySelectorAll('.btn-lang').forEach(function (btn) {
       btn.addEventListener('click', function () {
@@ -309,174 +254,51 @@
         if (!lang || !window.LOCALES || !window.LOCALES[lang]) return;
         window.CURRENT_LOCALE = lang;
         if (window.setStoredLang) window.setStoredLang(lang);
-        applyLocale(refreshDynamicLabels);
+        applyLocale(refreshLabels);
         document.querySelectorAll('.btn-lang').forEach(function (b) {
           b.classList.toggle('selected', b.getAttribute('data-lang') === lang);
         });
       });
     });
 
-    var btnReveal = $('btn-reveal-action');
-    if (btnReveal) {
-      btnReveal.addEventListener('click', function () {
-        var total = (state.targetPlaces && state.targetPlaces.length) || 0;
-        var collected = (state.collectedIndices && Object.keys(state.collectedIndices).length) || 0;
-        if (total === 0 || collected < total) {
-          if (typeof backToMap === 'function') backToMap();
-        } else {
-          if (typeof showWalkStats === 'function') {
-            try {
-              showWalkStats();
-            } catch (e) {
-              console.error('showWalkStats', e);
-              var ov = document.getElementById('stats-overlay');
-              if (ov) {
-                ov.classList.remove('hidden');
-                ov.style.display = 'flex';
-                ov.style.visibility = 'visible';
-                ov.style.zIndex = '100000';
-              }
-            }
-          }
-        }
+    document.querySelectorAll('.btn-tag').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        this.classList.toggle('selected');
+      });
+    });
+
+    var btnEnter = $('btn-enter-map');
+    if (btnEnter) btnEnter.addEventListener('click', goToMap);
+
+    var btnBack = $('btn-back');
+    if (btnBack) btnBack.addEventListener('click', backToStart);
+
+    var btnProfile = $('btn-profile-map');
+    if (btnProfile) {
+      btnProfile.addEventListener('click', function () {
+        showScreen('screen-start');
+        loadProfileIntoForm();
       });
     }
 
-    function closeStatsAndReset() {
-      var overlay = document.getElementById('stats-overlay');
-      if (overlay) {
-        overlay.classList.add('hidden');
-        overlay.style.display = 'none';
-      }
-      resetWalk();
-    }
-    var btnChestClose = $('btn-chest-result-close');
-    if (btnChestClose) {
-      btnChestClose.addEventListener('click', function () {
-        var overlay = $('chest-result-overlay');
-        if (overlay) {
-          overlay.classList.add('hidden');
-          overlay.style.display = 'none';
-          overlay.style.visibility = 'hidden';
-        }
-      });
-    }
+    var btnChatClose = $('btn-chat-close');
+    if (btnChatClose) btnChatClose.addEventListener('click', closeChat);
 
-    var btnMonsterRun = $('btn-monster-run');
-    var btnMonsterFight = $('btn-monster-fight');
-    if (btnMonsterRun) btnMonsterRun.addEventListener('click', function () {
-      if (typeof Sp.finishMonsterEncounter === 'function') Sp.finishMonsterEncounter('run');
-    });
-    if (btnMonsterFight) btnMonsterFight.addEventListener('click', function () {
-      var overlay = $('monster-encounter-overlay');
-      if (overlay) {
-        overlay.classList.add('hidden');
-        overlay.style.display = 'none';
-      }
-      var marker = state.pendingMonsterMarker;
-      var monsterChar = (marker && marker._decorationChar) ? marker._decorationChar : '👹';
-      if (typeof Sp.startMinigame === 'function') {
-        Sp.startMinigame(monsterChar, function () {
-          Sp.finishMonsterEncounter('fight');
-        }, function () {
-          Sp.finishMonsterEncounter('lose');
-        }, marker);
-      } else {
-        if (typeof Sp.finishMonsterEncounter === 'function') Sp.finishMonsterEncounter('fight');
-      }
-    });
+    var btnChatSend = $('btn-chat-send');
+    if (btnChatSend) btnChatSend.addEventListener('click', sendChatMessage);
 
-    var btnNpcOk = $('btn-npc-ok');
-    if (btnNpcOk) btnNpcOk.addEventListener('click', function () {
-      if (typeof Sp.finishEncounter === 'function') Sp.finishEncounter();
-    });
-    var btnNpcSend = $('btn-npc-send');
-    if (btnNpcSend) btnNpcSend.addEventListener('click', function () {
-      if (typeof Sp.handleEncounterSend === 'function') Sp.handleEncounterSend();
-    });
-    var npcChatInput = document.getElementById('npc-chat-input');
-    if (npcChatInput) {
-      npcChatInput.addEventListener('keydown', function (e) {
+    var chatInput = $('chat-input');
+    if (chatInput) {
+      chatInput.addEventListener('keydown', function (e) {
         if (e.key === 'Enter') {
           e.preventDefault();
-          if (typeof Sp.handleEncounterSend === 'function') Sp.handleEncounterSend();
+          sendChatMessage();
         }
       });
     }
 
-    var btnStatsClose = $('btn-stats-close');
-    var btnStatsFinish = $('btn-stats-finish');
-    if (btnStatsClose) btnStatsClose.addEventListener('click', closeStatsAndReset);
-    if (btnStatsFinish) btnStatsFinish.addEventListener('click', closeStatsAndReset);
-
-    var btnDebug = $('btn-debug-toggle');
-    if (btnDebug) {
-      btnDebug.addEventListener('click', function () {
-        var panel = $('debug-panel');
-        if (panel) panel.classList.toggle('debug-open');
-      });
-    }
-
-    var btnSimulate = $('btn-simulate-arrival');
-    if (btnSimulate) btnSimulate.addEventListener('click', simulateArrival);
-
-    var btnGoToDecoration = $('btn-go-to-decoration');
-    if (btnGoToDecoration) {
-      btnGoToDecoration.addEventListener('click', function () {
-        var idx = state.selectedDecorationIndex;
-        if (idx != null && !state.metDecorationIndices[idx]) {
-          Sp.goToDecoration(idx);
-        } else {
-          var nearest = Sp.getNearestUnmetDecoration && Sp.getNearestUnmetDecoration();
-          if (nearest) {
-            Sp.goToDecoration(nearest.index);
-          } else {
-            if (Sp.setStatus) Sp.setStatus(t('walk_go_to_decoration_none'), '');
-          }
-        }
-      });
-    }
-
-    var styleSelect = document.getElementById('map-style-select');
-    if (styleSelect) {
-      styleSelect.addEventListener('change', function () {
-        state.mapStyle = styleSelect.value || 'adventure';
-        setStoredTheme(state.mapStyle);
-        applyMapStyle();
-      });
-    }
-
-    initStartScreen();
-
-    var isIOS = typeof navigator !== 'undefined' && /iPad|iPhone|iPod/.test(navigator.userAgent || '');
-    var insecure = typeof location !== 'undefined' && (
-      location.protocol === 'file:' ||
-      (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1')
-    );
-    if (isIOS && insecure) {
-      var banner = document.createElement('div');
-      banner.id = 'ios-unsafe-banner';
-      banner.className = 'ios-unsafe-banner';
-      banner.setAttribute('role', 'alert');
-      banner.setAttribute('data-i18n', 'ios_banner');
-      banner.textContent = window.t ? window.t('ios_banner') : 'Na iPhonie aplikacja działa tylko przez HTTPS. Na komputerze: python3 -m http.server 8000. Na telefonie otwórz adres https z tunelu (ngrok) lub wdróż na serwer z SSL.';
-      var startContent = document.querySelector('#screen-start .start-content');
-      if (startContent) startContent.insertBefore(banner, startContent.firstChild);
-    }
-
-    var btnExp = $('btn-experience');
-    var btnExpMap = $('btn-experience-map');
-    if (btnExp) btnExp.addEventListener('click', openExperiencePanel);
-    if (btnExpMap) btnExpMap.addEventListener('click', openExperiencePanel);
-    var btnExpClose = $('btn-experience-close');
-    if (btnExpClose) btnExpClose.addEventListener('click', closeExperiencePanel);
-    var btnClear = $('btn-clear-storage');
-    if (btnClear) {
-      btnClear.addEventListener('click', function () {
-        clearStorage(renderExperiencePanel);
-        closeExperiencePanel();
-      });
-    }
+    var btnNotifications = $('btn-enable-notifications');
+    if (btnNotifications) btnNotifications.addEventListener('click', enableNotifications);
   }
 
   if (document.readyState === 'loading') {

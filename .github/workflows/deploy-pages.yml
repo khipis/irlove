@@ -1,5 +1,5 @@
-# Wdrożenie na GitHub Pages przy każdym pushu do main
-# Strona: https://khipis.github.io/spacerek/
+# Deploy to GitHub Pages on push to main
+# App: https://khipis.github.io/irlove/
 name: Deploy to GitHub Pages
 
 on:
