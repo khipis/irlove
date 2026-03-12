@@ -88,6 +88,14 @@
     });
   }
 
+  function publishAttention(type) {
+    var pub = getPub();
+    if (!pub || !type) return;
+    try {
+      state.gun.get('users').get(pub).get('attention').put({ type: type, at: Date.now() });
+    } catch (e) {}
+  }
+
   function startLocationSync() {
     if (locationInterval) clearInterval(locationInterval);
     function tick() {
@@ -186,6 +194,7 @@
   App.gunAuth = authOrCreate;
   App.gunPub = getPub;
   App.publishLocation = publishLocation;
+  App.publishAttention = publishAttention;
   App.startLocationSync = startLocationSync;
   App.stopLocationSync = stopLocationSync;
   App.subscribeToNearby = subscribeToNearby;

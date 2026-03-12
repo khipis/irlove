@@ -257,6 +257,53 @@
     }
   }
 
+  var attentionTimeout;
+  var particlesTimeout;
+
+  function spawnParticles(wrap, options) {
+    var container = wrap.querySelector('.powerup-particles');
+    if (container) container.remove();
+    var count = options.count != null ? options.count : 14;
+    var emojis = options.emojis || ['❤️', '💕', '💗'];
+    var duration = options.duration != null ? options.duration : 2600;
+    var containerEl = document.createElement('div');
+    containerEl.className = 'powerup-particles powerup-particles-' + (options.className || 'hearts');
+    for (var i = 0; i < count; i++) {
+      var p = document.createElement('span');
+      p.className = 'powerup-particle';
+      p.textContent = emojis[i % emojis.length];
+      p.style.setProperty('--i', i);
+      p.style.setProperty('--delay', (i * 0.05) + 's');
+      p.style.setProperty('--x', ((i % 5) - 2) * 18 + (Math.random() * 20 - 10) + 'px');
+      containerEl.appendChild(p);
+    }
+    wrap.style.position = 'relative';
+    wrap.appendChild(containerEl);
+    if (particlesTimeout) clearTimeout(particlesTimeout);
+    particlesTimeout = setTimeout(function () {
+      containerEl.remove();
+      particlesTimeout = null;
+    }, duration);
+  }
+
+  function playAttentionOnMe(type) {
+    var wrap = document.querySelector('.user-marker-wrap');
+    if (!wrap) return;
+    if (attentionTimeout) clearTimeout(attentionTimeout);
+    config.POWERUPS && config.POWERUPS.forEach(function (p) { wrap.classList.remove('powerup-' + p.id); });
+    wrap.classList.add('powerup-' + type);
+    if (type === 'hearts') spawnParticles(wrap, { count: 16, emojis: ['❤️', '💕', '💗', '💖'], className: 'hearts' });
+    else if (type === 'anger') spawnParticles(wrap, { count: 14, emojis: ['😤', '💢', '🤬', '🔥'], className: 'anger' });
+    else if (type === 'sad') spawnParticles(wrap, { count: 12, emojis: ['😢', '😭', '💔', '🥺'], className: 'sad' });
+    else if (type === 'surprise') spawnParticles(wrap, { count: 14, emojis: ['😲', '😮', '✨', '💫'], className: 'surprise' });
+    else if (type === 'laugh') spawnParticles(wrap, { count: 14, emojis: ['😂', '🤣', '😁', '🎉'], className: 'laugh' });
+    var hasParticles = type === 'hearts' || type === 'anger' || type === 'sad' || type === 'surprise' || type === 'laugh';
+    attentionTimeout = setTimeout(function () {
+      wrap.classList.remove('powerup-' + type);
+      attentionTimeout = null;
+    }, hasParticles ? 2600 : 2500);
+  }
+
   App.loadLeaflet = loadLeaflet;
   App.initMap = initMap;
   App.updateUserPosition = updateUserPosition;
@@ -264,4 +311,5 @@
   App.removeOtherUser = removeOtherUser;
   App.setUserAvatar = setUserAvatar;
   App.addSimulatedUsers = addSimulatedUsers;
+  App.playAttentionOnMe = playAttentionOnMe;
 })();

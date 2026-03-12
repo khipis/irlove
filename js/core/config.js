@@ -20,6 +20,15 @@
     STORAGE_KEY_PROFILE: 'irlove_profile',
     STORAGE_KEY_LANG: 'irlove_lang',
     RELAY_URL: null,
+    POWERUPS: [
+      { id: 'wave', emoji: '👋' },
+      { id: 'hearts', emoji: '💕' },
+      { id: 'fire', emoji: '🔥' },
+      { id: 'anger', emoji: '😤' },
+      { id: 'sad', emoji: '😢' },
+      { id: 'surprise', emoji: '😲' },
+      { id: 'laugh', emoji: '😂' }
+    ],
     AVAILABILITY_TAGS: ['chat', 'date', 'beer', 'coffee', 'walk', 'sport'],
     TAG_EMOJI: { chat: '💬', date: '❤️', beer: '🍺', coffee: '☕', walk: '🚶', sport: '🏃' },
     /* Głowy młodych/dorosłych: kobiety, mężczyźni, różne kolory skóry (bez dzieci i seniorów) */

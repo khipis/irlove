@@ -649,6 +649,132 @@ button.mood-current:hover {
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 
+.powerup-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+  max-width: 360px;
+}
+
+.powerup-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  font-size: 1.25rem;
+  cursor: pointer;
+  transition: transform 0.15s, border-color 0.2s, background 0.2s;
+}
+
+.powerup-btn:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  transform: scale(1.1);
+}
+
+.powerup-btn:active {
+  transform: scale(0.95);
+}
+
+.powerup-btn.powerup-cooldown,
+.powerup-btn:disabled {
+  opacity: 0.4;
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* Cząsteczki – fontanna serc, konfetti, gwiazdki, kwiatki */
+.powerup-particles {
+  position: absolute;
+  left: 50%;
+  bottom: 0;
+  transform: translateX(-50%);
+  pointer-events: none;
+  width: 1px;
+  height: 1px;
+  overflow: visible;
+}
+
+.powerup-particle {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  font-size: 1.1rem;
+  opacity: 0;
+  animation: particle-fountain 2.4s ease-out forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+.powerup-particles-anger .powerup-particle,
+.powerup-particles-sad .powerup-particle,
+.powerup-particles-surprise .powerup-particle,
+.powerup-particles-laugh .powerup-particle { animation-name: particle-fountain; }
+
+@keyframes particle-fountain {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+  15% {
+    opacity: 1;
+    transform: translate(var(--x, 0), -15px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--x, 0) * 1.8), -85px) scale(0.8);
+  }
+}
+
+@keyframes particle-confetti {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.3) rotate(0deg);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(var(--x, 0), -20px) scale(1) rotate(180deg);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--x, 0) * 2.5), -90px) scale(0.6) rotate(720deg);
+  }
+}
+
+@keyframes particle-stars {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0);
+  }
+  10% {
+    opacity: 1;
+    transform: translate(var(--x, 0), -10px) scale(1.2);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--x, 0) * 1.5), -80px) scale(0.4);
+  }
+}
+
+@keyframes particle-blossom {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.5);
+  }
+  20% {
+    opacity: 0.9;
+    transform: translate(var(--x, 0), -25px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--x, 0) * 1.4), -75px) scale(0.7);
+  }
+}
+
 .map-nearby-hint {
   margin: 0.5rem 0 0;
   font-size: 0.875rem;
@@ -718,6 +844,109 @@ button.mood-current:hover {
   flex-direction: column;
   align-items: center;
   gap: 4px;
+  transition: transform 0.3s ease, filter 0.3s ease;
+}
+
+.leaflet-marker-icon.user-marker {
+  overflow: visible !important;
+}
+
+.user-marker-wrap {
+  overflow: visible;
+}
+
+/* Power-upy – animacje zwracania uwagi na swoim markerze */
+.user-marker-wrap.powerup-wave {
+  animation: powerup-bounce 0.5s ease 2;
+}
+
+.user-marker-wrap.powerup-sparkle {
+  animation: powerup-glow 0.6s ease 2;
+}
+
+.user-marker-wrap.powerup-pulse {
+  animation: powerup-pulse 0.4s ease 3;
+}
+
+.user-marker-wrap.powerup-heart {
+  animation: powerup-bounce 0.5s ease 2;
+}
+
+.user-marker-wrap.powerup-party {
+  animation: powerup-party 0.5s ease 2;
+}
+
+.user-marker-wrap.powerup-hearts,
+.user-marker-wrap.powerup-anger,
+.user-marker-wrap.powerup-sad,
+.user-marker-wrap.powerup-surprise,
+.user-marker-wrap.powerup-laugh {
+  animation: powerup-soft-pulse 0.6s ease 2;
+}
+
+.user-marker-wrap.powerup-fire {
+  animation: powerup-fire 0.5s ease-in-out 3;
+}
+
+@keyframes powerup-bounce {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+}
+
+@keyframes powerup-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px transparent); }
+  50% { filter: drop-shadow(0 0 20px var(--accent)) drop-shadow(0 0 30px rgba(224, 122, 95, 0.5)); }
+}
+
+@keyframes powerup-pulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.2); opacity: 0.95; }
+}
+
+@keyframes powerup-party {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.15) rotate(-8deg); }
+  75% { transform: scale(1.15) rotate(8deg); }
+}
+
+@keyframes powerup-soft-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+@keyframes powerup-fire {
+  0%, 100% { transform: scale(1); filter: brightness(1); }
+  50% { transform: scale(1.2); filter: brightness(1.4) drop-shadow(0 0 15px #ff6b35); }
+}
+
+@keyframes powerup-lightning {
+  0%, 100% { filter: brightness(1); }
+  50% { filter: brightness(2.5) contrast(1.2); }
+}
+
+@keyframes powerup-rainbow {
+  0% { filter: hue-rotate(0deg) scale(1); }
+  25% { filter: hue-rotate(90deg) scale(1.1); }
+  50% { filter: hue-rotate(180deg) scale(1.15); }
+  75% { filter: hue-rotate(270deg) scale(1.1); }
+  100% { filter: hue-rotate(360deg) scale(1); }
+}
+
+@keyframes powerup-dance {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  25% { transform: scale(1.1) rotate(-12deg); }
+  75% { transform: scale(1.1) rotate(12deg); }
+}
+
+@keyframes powerup-rock {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.2) rotate(5deg); }
+}
+
+@keyframes powerup-boom {
+  0% { transform: scale(1); filter: brightness(1); }
+  40% { transform: scale(1.35); filter: brightness(1.8); }
+  100% { transform: scale(1.1); filter: brightness(1); }
 }
 
 /* Chmurka komiksowa nad markerem (status) – skaluje się do treści */

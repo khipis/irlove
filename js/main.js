@@ -32,6 +32,8 @@
   var getOrCreateAuth = App.getOrCreateAuth;
   var gunAuth = App.gunAuth;
   var gunPub = App.gunPub;
+  var publishAttention = App.publishAttention;
+  var playAttentionOnMe = App.playAttentionOnMe;
   var startLocationSync = App.startLocationSync;
   var stopLocationSync = App.stopLocationSync;
   var subscribeToNearby = App.subscribeToNearby;
@@ -606,6 +608,34 @@
         state.profile = p;
         if (typeof setUserAvatar === 'function') setUserAvatar(p.avatar, p.tags, p.status);
         if (p.status) scheduleStatusClear(); else clearTimeout(statusClearTimeout);
+      });
+    }
+
+    var powerupRow = document.getElementById('powerup-row');
+    if (powerupRow && config.POWERUPS && config.POWERUPS.length) {
+      state.powerupCooldowns = state.powerupCooldowns || {};
+      var POWERUP_COOLDOWN_MS = 30000;
+      config.POWERUPS.forEach(function (p) {
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'powerup-btn';
+        btn.setAttribute('data-powerup', p.id);
+        btn.setAttribute('title', (typeof t === 'function' ? t('powerup_' + p.id) : '') || p.id);
+        btn.textContent = p.emoji;
+        btn.setAttribute('aria-label', (typeof t === 'function' ? t('powerup_' + p.id) : '') || p.id);
+        btn.addEventListener('click', function () {
+          if (state.powerupCooldowns[p.id]) return;
+          if (publishAttention) publishAttention(p.id);
+          if (playAttentionOnMe) playAttentionOnMe(p.id);
+          btn.disabled = true;
+          btn.classList.add('powerup-cooldown');
+          state.powerupCooldowns[p.id] = setTimeout(function () {
+            btn.disabled = false;
+            btn.classList.remove('powerup-cooldown');
+            delete state.powerupCooldowns[p.id];
+          }, POWERUP_COOLDOWN_MS);
+        });
+        powerupRow.appendChild(btn);
       });
     }
 
