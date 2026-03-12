@@ -79,7 +79,7 @@
     });
     state.userMarker = L.marker([center.lat, center.lng], { icon: userIcon }).addTo(state.map);
     var tip = formatUserTooltip(profile.displayName || t('map_you'), profile.age, profile.height, profile.tags, profile.bio, profile.interests, profile.status, profile.mood, profile.gender);
-    state.userMarker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [68, 58] });
+    state.userMarker.bindTooltip(tip, getTooltipOptions());
     state.radiusCircle = L.circle([center.lat, center.lng], {
       radius: 2000,
       color: 'rgba(224, 122, 95, 0.85)',
@@ -119,6 +119,17 @@
     return d.innerHTML;
   }
 
+  function getTooltipOptions() {
+    var w = typeof window !== 'undefined' ? window.innerWidth : 1024;
+    var narrow = w <= 640;
+    return {
+      permanent: false,
+      direction: narrow ? 'top' : 'right',
+      className: 'marker-tooltip',
+      offset: narrow ? [0, -36] : [68, 58]
+    };
+  }
+
   function addSimulatedUsers(center, count, radiusKm) {
     if (!state.map || !center || !count) return;
     var L = window.L;
@@ -156,7 +167,7 @@
         intList.splice(idx, 1);
       }
       var tip = formatUserTooltip(name, String(age), String(height), tags, bio, interests, '', '', '');
-      marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [68, 58] });
+      marker.bindTooltip(tip, getTooltipOptions());
       if (!state.simulatedMarkers) state.simulatedMarkers = [];
       state.simulatedMarkers.push(marker);
     }
@@ -226,7 +237,7 @@
     var marker = L.marker([lat, lng], { icon: icon }).addTo(state.map);
     var prof = data.profile || data;
     var tip = formatUserTooltip(name, prof.age, prof.height, tags, prof.bio, prof.interests, prof.status, prof.mood, prof.gender);
-    marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [68, 58] });
+    marker.bindTooltip(tip, getTooltipOptions());
     marker._pub = pub;
     marker.on('click', function () {
       if (typeof App.openChat === 'function') App.openChat(pub, data);

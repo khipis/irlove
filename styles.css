@@ -1157,6 +1157,39 @@ button.mood-current:hover {
   line-height: 1.4;
 }
 
+@media (max-width: 640px) {
+  .leaflet-tooltip.marker-tooltip {
+    max-width: calc(100vw - 24px);
+  }
+  .leaflet-tooltip.marker-tooltip .marker-tooltip-inner {
+    min-width: 0;
+    max-width: calc(100vw - 32px);
+    padding: 10px 12px;
+    font-size: 0.8rem;
+  }
+  .leaflet-tooltip.marker-tooltip .marker-tooltip-name {
+    font-size: 0.9rem;
+  }
+
+  /* Zainteresowania – wszystkie 10 w jednej linii na telefonie */
+  .btn-interests {
+    padding: 0.6rem 0.5rem;
+    gap: 0.2rem;
+  }
+  .btn-interests .interests-selected {
+    gap: 0.15rem;
+    flex-wrap: nowrap;
+    justify-content: center;
+    min-width: 0;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .btn-interests .interests-selected .interest-chip {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+}
+
 /* ---- Chat overlay ---- */
 .chat-overlay {
   display: none;
