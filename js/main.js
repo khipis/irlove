@@ -69,7 +69,7 @@
       moodPreview.textContent = mo || '—';
       moodPreview.classList.toggle('placeholder', !mo);
     }
-    if (bioEl) bioEl.value = (p.bio || '').substring(0, config.BIO_MAX_LENGTH != null ? config.BIO_MAX_LENGTH : 120);
+    if (bioEl) bioEl.value = (p.bio || '').substring(0, config.BIO_MAX_LENGTH != null ? config.BIO_MAX_LENGTH : 110);
     var gender = (p.gender && p.gender.trim()) ? p.gender.trim() : '';
     document.querySelectorAll('.btn-gender').forEach(function (btn) {
       btn.classList.toggle('selected', btn.getAttribute('data-gender') === gender);
@@ -111,7 +111,7 @@
       gender: gender,
       avatar: (avatarEl && avatarEl.value) ? avatarEl.value.trim() : '👤',
       mood: (moodEl && moodEl.value) ? moodEl.value.trim() : '',
-      bio: (bioEl && bioEl.value) ? bioEl.value.trim().substring(0, config.BIO_MAX_LENGTH || 120) : '',
+      bio: (bioEl && bioEl.value) ? bioEl.value.trim().substring(0, config.BIO_MAX_LENGTH || 110) : '',
       tags: tags,
       interests: interests
     };
@@ -566,7 +566,7 @@
     var mapStatusInput = document.getElementById('map-status-input');
     if (mapStatusInput) {
       mapStatusInput.addEventListener('input', function () {
-        var maxLen = config.STATUS_MAX_LENGTH || 80;
+        var maxLen = config.STATUS_MAX_LENGTH || 55;
         var val = (this.value || '').trim().substring(0, maxLen);
         if (this.value !== val) this.value = val;
         var p = getProfile() || {};
@@ -579,10 +579,13 @@
 
     var bioEl = document.getElementById('profile-bio');
     if (bioEl) {
-      var bioMax = config.BIO_MAX_LENGTH != null ? config.BIO_MAX_LENGTH : 120;
+      var bioMax = config.BIO_MAX_LENGTH != null ? config.BIO_MAX_LENGTH : 110;
       bioEl.setAttribute('maxlength', String(bioMax));
+      bioEl.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') e.preventDefault();
+      });
       function enforceBioMax() {
-        var val = (bioEl.value || '').substring(0, bioMax);
+        var val = (bioEl.value || '').replace(/\r?\n/g, ' ').substring(0, bioMax);
         if (bioEl.value !== val) bioEl.value = val;
       }
       bioEl.addEventListener('input', enforceBioMax);

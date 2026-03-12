@@ -734,6 +734,14 @@ button.mood-current:hover {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  transition: max-width 0.2s ease;
+}
+
+.user-marker-wrap:hover .user-marker-bubble {
+  max-width: 260px;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
 }
 
 .user-marker-bubble .user-marker-status-text {
@@ -743,6 +751,13 @@ button.mood-current:hover {
   overflow: hidden;
   text-overflow: ellipsis;
   flex-shrink: 1;
+}
+
+.user-marker-wrap:hover .user-marker-bubble .user-marker-status-text {
+  white-space: normal;
+  overflow: visible;
+  text-overflow: clip;
+  word-wrap: break-word;
 }
 
 .user-marker-bubble .user-marker-tag-icon,
@@ -829,10 +844,19 @@ button.mood-current:hover {
   font-size: 0.8125rem;
 }
 
+.leaflet-tooltip.marker-tooltip .marker-tooltip-gender {
+  color: rgba(245, 244, 242, 0.85);
+  font-size: 0.8125rem;
+}
+
 .leaflet-tooltip.marker-tooltip .marker-tooltip-status {
   color: rgba(245, 244, 242, 0.9);
   font-size: 0.8125rem;
   font-style: italic;
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
 }
 
 .leaflet-tooltip.marker-tooltip .marker-tooltip-tags {

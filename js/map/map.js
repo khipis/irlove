@@ -68,7 +68,7 @@
     var avatar = (profile.avatar && profile.avatar.trim()) ? profile.avatar.trim() : '👤';
     if (avatar.length > 2) avatar = '👤';
     var tagIcons = tagsToIconsString(profile.tags || []);
-    var statusMax = (config.STATUS_MAX_LENGTH != null) ? config.STATUS_MAX_LENGTH : 80;
+    var statusMax = (config.STATUS_MAX_LENGTH != null) ? config.STATUS_MAX_LENGTH : 55;
     var statusText = (profile.status && String(profile.status).trim()) ? escapeHtml(String(profile.status).trim().substring(0, statusMax)) : '';
     var bubbleHtml = '<div class="user-marker-bubble"><span class="user-marker-status-text">' + statusText + '</span><span class="user-marker-tag-icon">' + tagIcons + '</span></div>';
     var userIcon = L.divIcon({
@@ -95,13 +95,14 @@
     var line1 = '<strong class="marker-tooltip-name">' + escapeHtml(name) + '</strong>';
     if (mood && String(mood).trim()) line1 += ' <span class="marker-tooltip-mood">' + escapeHtml(String(mood).trim()) + '</span>';
     var meta = [];
-    if (gender === 'f') meta.push(t('profile_gender_f'));
-    else if (gender === 'm') meta.push(t('profile_gender_m'));
-    else if (gender === 'other') meta.push(t('profile_gender_other'));
     if (age) meta.push(age + ' lat');
     if (height) meta.push(height + ' cm');
     if (meta.length) line1 += ' <span class="marker-tooltip-meta">' + meta.join(' · ') + '</span>';
     lines.push('<div class="marker-tooltip-line">' + line1 + '</div>');
+    if (gender === 'f' || gender === 'm' || gender === 'other') {
+      var genderLabel = (gender === 'f') ? t('profile_gender_f') : (gender === 'm') ? t('profile_gender_m') : t('profile_gender_other');
+      lines.push('<div class="marker-tooltip-line marker-tooltip-gender">' + escapeHtml(t('profile_gender')) + ': ' + escapeHtml(genderLabel) + '</div>');
+    }
     if (status && String(status).trim()) lines.push('<div class="marker-tooltip-line marker-tooltip-status">' + escapeHtml(String(status).trim()) + '</div>');
     if (tags && tags.length) {
       var tagLabels = tags.map(function (tag) { return t('profile_tag_' + tag); });
@@ -242,7 +243,7 @@
     if (bubble) {
       var statusEl = bubble.querySelector('.user-marker-status-text');
       var tagEl = bubble.querySelector('.user-marker-tag-icon');
-      var statusMax = (config.STATUS_MAX_LENGTH != null) ? config.STATUS_MAX_LENGTH : 80;
+      var statusMax = (config.STATUS_MAX_LENGTH != null) ? config.STATUS_MAX_LENGTH : 55;
       if (statusEl) statusEl.textContent = (status && String(status).trim()) ? String(status).trim().substring(0, statusMax) : '';
       if (tagEl) tagEl.textContent = tagsToIconsString(tags || (state.profile && state.profile.tags) || []);
     }
