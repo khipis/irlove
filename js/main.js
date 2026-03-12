@@ -66,6 +66,10 @@
     if (moodEl) moodEl.value = mo;
     if (moodPreview) moodPreview.textContent = mo;
     if (bioEl) bioEl.value = p.bio || '';
+    var gender = (p.gender && p.gender.trim()) ? p.gender.trim() : '';
+    document.querySelectorAll('.btn-gender').forEach(function (btn) {
+      btn.classList.toggle('selected', btn.getAttribute('data-gender') === gender);
+    });
     var tags = p.tags || [];
     if (typeof renderInterestsToolbox === 'function') renderInterestsToolbox();
     document.querySelectorAll('.btn-tag').forEach(function (btn) {
@@ -83,6 +87,8 @@
     var avatarEl = $('profile-avatar');
     var moodEl = $('profile-mood');
     var bioEl = $('profile-bio');
+    var genderEl = document.querySelector('.btn-gender.selected');
+    var gender = (genderEl && genderEl.getAttribute('data-gender')) ? genderEl.getAttribute('data-gender') : '';
     var tags = [];
     document.querySelectorAll('.btn-tag.selected').forEach(function (btn) {
       var tag = btn.getAttribute('data-tag');
@@ -96,9 +102,10 @@
     var maxInterests = config.INTERESTS_MAX != null ? config.INTERESTS_MAX : 5;
     interests = interests.slice(0, maxInterests);
     var p = {
-      displayName: (nameEl && nameEl.value) ? nameEl.value.trim() : '',
+      displayName: (nameEl && nameEl.value) ? nameEl.value.trim().substring(0, config.DISPLAY_NAME_MAX_LENGTH || 40) : '',
       age: (ageEl && ageEl.value) ? ageEl.value.trim() : '',
       height: (heightEl && heightEl.value) ? heightEl.value.trim() : '',
+      gender: gender,
       avatar: (avatarEl && avatarEl.value) ? avatarEl.value.trim() : '👤',
       mood: (moodEl && moodEl.value) ? moodEl.value.trim() : '',
       bio: (bioEl && bioEl.value) ? bioEl.value.trim().substring(0, config.BIO_MAX_LENGTH || 200) : '',
@@ -331,7 +338,6 @@
             setUserAvatar(p.avatar, p.tags, p.status);
             if (typeof App.addSimulatedUsers === 'function') App.addSimulatedUsers(state.userPosition, 2 + Math.floor(Math.random() * 2), radiusKm);
             setStatus(t('map_status_online'));
-            requestNotificationPermission();
             var gun = gunConnect();
             if (gun) {
               var auth = getOrCreateAuth();
@@ -442,33 +448,6 @@
     }
   };
 
-  function requestNotificationPermission() {
-    if (typeof Notification === 'undefined') return;
-    var hint = document.getElementById('notifications-hint');
-    if (!hint) return;
-    if (Notification.permission === 'granted') {
-      hint.classList.add('hidden');
-    } else {
-      hint.classList.remove('hidden');
-    }
-  }
-
-  function enableNotifications() {
-    if (typeof Notification === 'undefined') {
-      App.showToast('Przeglądarka nie obsługuje powiadomień.', 'error');
-      return;
-    }
-    Notification.requestPermission().then(function (p) {
-      if (p === 'granted') {
-        var hint = document.getElementById('notifications-hint');
-        if (hint) hint.classList.add('hidden');
-        App.showToast(t('notifications_enable') + ' ✓');
-      } else if (p === 'denied') {
-        App.showToast('Powiadomienia zablokowane. Odblokuj w ustawieniach przeglądarki.', 'error');
-      }
-    });
-  }
-
   function refreshLabels() {
     if (document.title !== undefined && window.t) document.title = window.t('app_title');
   }
@@ -519,6 +498,13 @@
       });
     });
 
+    document.querySelectorAll('.btn-gender').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        document.querySelectorAll('.btn-gender').forEach(function (b) { b.classList.remove('selected'); });
+        this.classList.add('selected');
+      });
+    });
+
     var btnToggleInterests = $('btn-toggle-interests');
     if (btnToggleInterests) {
       btnToggleInterests.addEventListener('click', function () {
@@ -558,9 +544,6 @@
         }
       });
     }
-
-    var btnNotifications = $('btn-enable-notifications');
-    if (btnNotifications) btnNotifications.addEventListener('click', enableNotifications);
 
     var mapStatusInput = document.getElementById('map-status-input');
     if (mapStatusInput) {

@@ -78,6 +78,7 @@
       displayName: profile.displayName || '',
       age: profile.age || '',
       height: profile.height || '',
+      gender: profile.gender || '',
       avatar: profile.avatar || '👤',
       mood: profile.mood || '',
       status: profile.status || '',

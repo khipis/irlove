@@ -13,6 +13,7 @@
     RADIUS_KM_DEFAULT: 2,
     STATUS_MAX_LENGTH: 120,
     BIO_MAX_LENGTH: 200,
+    DISPLAY_NAME_MAX_LENGTH: 40,
     INTERESTS_MAX: 5,
     LOCATION_UPDATE_MS: 5000,
     ACTIVE_THRESHOLD_MS: 15000,
@@ -35,19 +36,8 @@
       '👱', '👱🏻', '👱🏼', '👱🏽', '👱🏾', '👱🏿',
       '👱‍♀️', '👱‍♂️'
     ],
-    /* Buźki – aktualny humor/nastrój */
-    MOOD_EMOJIS: [
-      '😀', '😃', '😄', '😁', '😆', '😅', '🤣', '😂',
-      '🙂', '🙃', '😉', '😊', '😇', '🥰', '😍', '🤩',
-      '😘', '😗', '☺️', '😚', '😙', '🥲', '😋', '😛',
-      '😜', '🤪', '😝', '🤑', '🤗', '🤭', '🤫', '🤔',
-      '🤐', '🤨', '😐', '😑', '😶', '😏', '😒', '🙄',
-      '😬', '🤥', '😌', '😔', '😪', '🤤', '😴', '😷',
-      '🤒', '🤕', '🤢', '🤮', '🤧', '🥵', '🥶', '🥴',
-      '😵', '🤯', '🤠', '🥳', '🥸', '😎', '🤓', '🧐',
-      '😕', '😟', '🙁', '☹️', '😮', '😯', '😲', '😳',
-      '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '😈'
-    ],
+    /* Buźki – nastrój (5–8 humorów) */
+    MOOD_EMOJIS: ['😀', '😊', '😌', '😐', '😕', '😢', '😤', '🥳'],
     /* Prawdziwe zainteresowania: muzyka, książki, film, gry, sztuka, jedzenie, sport, natura, podróże, zwierzęta, tech */
     INTEREST_EMOJIS: [
       '📚', '📖', '✍️', '🎵', '🎶', '🎸', '🎹', '🎤', '🎧', '🎬', '📺',

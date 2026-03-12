@@ -78,7 +78,7 @@
       iconAnchor: [24, 68]
     });
     state.userMarker = L.marker([center.lat, center.lng], { icon: userIcon }).addTo(state.map);
-    var tip = formatUserTooltip(profile.displayName || t('map_you'), profile.age, profile.height, profile.tags, profile.bio, profile.interests, profile.status, profile.mood);
+    var tip = formatUserTooltip(profile.displayName || t('map_you'), profile.age, profile.height, profile.tags, profile.bio, profile.interests, profile.status, profile.mood, profile.gender);
     state.userMarker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [12, 0] });
     state.radiusCircle = L.circle([center.lat, center.lng], {
       radius: 2000,
@@ -90,11 +90,14 @@
     }).addTo(state.map);
   }
 
-  function formatUserTooltip(name, age, height, tags, bio, interests, status, mood) {
+  function formatUserTooltip(name, age, height, tags, bio, interests, status, mood, gender) {
     var lines = [];
     var line1 = '<strong class="marker-tooltip-name">' + escapeHtml(name) + '</strong>';
     if (mood && String(mood).trim()) line1 += ' <span class="marker-tooltip-mood">' + escapeHtml(String(mood).trim()) + '</span>';
     var meta = [];
+    if (gender === 'f') meta.push(t('profile_gender_f'));
+    else if (gender === 'm') meta.push(t('profile_gender_m'));
+    else if (gender === 'other') meta.push(t('profile_gender_other'));
     if (age) meta.push(age + ' lat');
     if (height) meta.push(height + ' cm');
     if (meta.length) line1 += ' <span class="marker-tooltip-meta">' + meta.join(' · ') + '</span>';
@@ -152,7 +155,7 @@
         interests.push(intList[idx]);
         intList.splice(idx, 1);
       }
-      var tip = formatUserTooltip(name, String(age), String(height), tags, bio, interests, '', '');
+      var tip = formatUserTooltip(name, String(age), String(height), tags, bio, interests, '', '', '');
       marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [12, 0] });
       if (!state.simulatedMarkers) state.simulatedMarkers = [];
       state.simulatedMarkers.push(marker);
@@ -213,7 +216,7 @@
     });
     var marker = L.marker([lat, lng], { icon: icon }).addTo(state.map);
     var prof = data.profile || data;
-    var tip = formatUserTooltip(name, prof.age, prof.height, tags, prof.bio, prof.interests, prof.status, prof.mood);
+    var tip = formatUserTooltip(name, prof.age, prof.height, tags, prof.bio, prof.interests, prof.status, prof.mood, prof.gender);
     marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [12, 0] });
     marker._pub = pub;
     marker.on('click', function () {

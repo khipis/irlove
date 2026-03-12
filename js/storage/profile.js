@@ -27,6 +27,7 @@
       displayName: '',
       age: '',
       height: '',
+      gender: '',
       avatar: '👤',
       mood: '',
       bio: '',
