@@ -3,119 +3,111 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="theme-color" content="#1a1a2e" />
+  <meta name="theme-color" content="#0f0f12" />
   <meta name="mobile-web-app-capable" content="yes" />
   <title>IRLove – spotkania na żywo</title>
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY=" crossorigin="" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            irlove: {
-            bg: '#0d0d12',
-            'bg-soft': '#14141c',
-            card: '#1a1a24',
-            accent: '#e07a5f',
-            'accent-hover': '#e89a82',
-            'text': '#f0ede8',
-            muted: '#9a958d',
-            border: 'rgba(255,255,255,0.08)',
-          }},
-          fontFamily: {
-            sans: ['DM Sans', 'system-ui', 'sans-serif'],
-            logo: ['Caveat', 'cursive'],
-          },
-        },
-      },
-    };
-  </script>
   <link rel="stylesheet" href="styles.css" />
 </head>
-<body class="min-h-dvh h-full overflow-hidden bg-[var(--bg)] text-[var(--text)] font-sans" style="background-image: var(--bg-gradient); -webkit-tap-highlight-color: transparent;">
-  <div id="app" class="h-full min-h-dvh relative overflow-hidden">
+<body>
+  <div id="app" class="app">
     <!-- Start / profile -->
-    <section id="screen-start" class="screen active flex-col items-center justify-start py-0 px-3.5 overflow-y-auto min-h-0 text-center">
-      <div class="theme-sidebar" role="group" aria-label="Kolorystyka">
-        <button type="button" class="btn-theme w-10 h-10 p-0 text-xl rounded-2xl border-2 border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-muted)] cursor-pointer transition-all" data-theme="1" title="Warm">🌅</button>
-        <button type="button" class="btn-theme w-10 h-10 p-0 text-xl rounded-2xl border-2 border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-muted)] cursor-pointer transition-all" data-theme="2" title="Ocean">🌊</button>
-        <button type="button" class="btn-theme w-10 h-10 p-0 text-xl rounded-2xl border-2 border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-muted)] cursor-pointer transition-all" data-theme="3" title="Forest">🌲</button>
-        <button type="button" class="btn-theme w-10 h-10 p-0 text-xl rounded-2xl border-2 border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-muted)] cursor-pointer transition-all" data-theme="4" title="Twilight">🌙</button>
-      </div>
-      <header class="logo-header shrink-0 py-6 px-4 pb-3 text-center" aria-label="IRLove">
-        <h1 class="logo font-logo font-semibold text-4xl sm:text-5xl leading-tight tracking-wide m-0 text-[var(--text)]">IRLo<span class="logo-heart inline-block" aria-hidden="true">❤️</span>e</h1>
+    <section id="screen-start" class="screen screen--start active">
+      <header class="logo-header" aria-label="IRLove">
+        <h1 class="logo"><span class="logo-a">IRLo</span><span class="logo-heart" aria-hidden="true">♥</span><span class="logo-b">e</span></h1>
       </header>
-      <div class="start-content w-full max-w-[380px] shrink-0">
-        <div class="profile-form text-left mb-5 bg-[var(--bg-card)] rounded-2xl p-4 pb-5 border border-[var(--border)] shadow-lg">
-          <label class="block text-xs font-semibold text-[var(--text-muted)] mt-3 mb-1 first:mt-0"><span data-i18n="profile_display_name">Nick / imię</span></label>
-          <input type="text" id="profile-display-name" maxlength="32" placeholder="" data-i18n-placeholder="profile_display_name" class="w-full py-2 px-2.5 border border-[var(--border)] rounded-lg bg-[var(--bg-soft)] text-[var(--text)] text-sm placeholder:text-[var(--text-muted)] placeholder:opacity-70 focus:outline-none focus:border-[var(--border-focus)] focus:ring-[3px] focus:ring-[var(--accent-soft)]" />
-          <label class="block text-xs font-semibold text-[var(--text-muted)] mt-3 mb-1"><span data-i18n="profile_age">Wiek</span></label>
-          <input type="text" id="profile-age" maxlength="4" placeholder="25" class="w-full py-2 px-2.5 border border-[var(--border)] rounded-lg bg-[var(--bg-soft)] text-[var(--text)] text-sm placeholder:text-[var(--text-muted)] placeholder:opacity-70 focus:outline-none focus:border-[var(--border-focus)] focus:ring-[3px] focus:ring-[var(--accent-soft)]" />
-          <label class="block text-xs font-semibold text-[var(--text-muted)] mt-3 mb-1"><span data-i18n="profile_height">Wzrost (cm)</span></label>
-          <input type="text" id="profile-height" maxlength="6" placeholder="170" class="w-full py-2 px-2.5 border border-[var(--border)] rounded-lg bg-[var(--bg-soft)] text-[var(--text)] text-sm placeholder:text-[var(--text-muted)] placeholder:opacity-70 focus:outline-none focus:border-[var(--border-focus)] focus:ring-[3px] focus:ring-[var(--accent-soft)]" />
-          <label class="block text-xs font-semibold text-[var(--text-muted)] mt-3 mb-1"><span data-i18n="profile_avatar">Avatar (emoji)</span></label>
-          <div class="avatar-row flex gap-2 items-center">
-            <input type="text" id="profile-avatar" maxlength="200" placeholder="👤" class="flex-1 py-2 px-2.5 border border-[var(--border)] rounded-lg bg-[var(--bg-soft)] text-[var(--text)] text-sm" />
-            <button type="button" id="btn-random-avatar" class="btn-random-avatar shrink-0 w-11 h-11 p-0 text-xl rounded-lg border border-[var(--border)] bg-[var(--bg-soft)] text-[var(--text-muted)] cursor-pointer hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--accent-soft)] transition-all" title="" data-i18n-title="btn_random_avatar">🎲</button>
+      <div class="start-content">
+        <div class="profile-form">
+          <label class="form-label"><span data-i18n="profile_display_name">Nick / imię</span></label>
+          <input type="text" id="profile-display-name" class="form-input" maxlength="32" placeholder="" data-i18n-placeholder="profile_display_name" />
+          <label class="form-label"><span data-i18n="profile_age">Wiek</span></label>
+          <input type="number" id="profile-age" class="form-input" min="16" max="105" placeholder="25" inputmode="numeric" />
+          <label class="form-label"><span data-i18n="profile_height">Wzrost (cm)</span></label>
+          <input type="number" id="profile-height" class="form-input" min="30" max="240" placeholder="170" inputmode="numeric" />
+          <label class="form-label"><span data-i18n="profile_avatar">Avatar</span></label>
+          <div class="avatar-current-row">
+            <span class="avatar-current" id="profile-avatar-preview" aria-hidden="true">👤</span>
+            <button type="button" id="btn-toggle-avatar" class="btn-secondary" data-i18n="profile_choose">Wybierz</button>
           </div>
-          <div id="avatar-toolbox" class="avatar-toolbox flex flex-wrap gap-1.5 mt-2 max-h-22 overflow-y-auto" aria-label="Wybierz avatar"></div>
-          <label class="block text-xs font-semibold text-[var(--text-muted)] mt-3 mb-1"><span data-i18n="profile_bio">Opis (1–2 zdania)</span></label>
-          <textarea id="profile-bio" class="profile-bio w-full py-2 px-2.5 border border-[var(--border)] rounded-lg bg-[var(--bg-soft)] text-[var(--text)] text-sm resize-none min-h-11 max-h-15 focus:outline-none focus:border-[var(--border-focus)] focus:ring-[3px] focus:ring-[var(--accent-soft)]" maxlength="200" rows="1" placeholder="" data-i18n-placeholder="profile_bio_placeholder" title="max 200 znaków"></textarea>
-          <label class="block text-xs font-semibold text-[var(--text-muted)] mt-3 mb-1"><span data-i18n="profile_interests">Zainteresowania</span></label>
-          <button type="button" id="btn-toggle-interests" class="btn-toggle-panel inline-flex items-center py-2.5 px-4 text-sm font-medium border border-[var(--border)] rounded-lg bg-[var(--bg-soft)] text-[var(--text-muted)] cursor-pointer mt-2 hover:border-[var(--accent)] hover:text-[var(--text)] hover:bg-[var(--accent-soft)] transition-colors" data-i18n="profile_interests_toggle">Wybierz emoji</button>
-          <div id="interests-toolbox" class="interests-toolbox hidden flex flex-wrap gap-1.5 mt-2 max-h-32 overflow-y-auto py-2" aria-label="Zainteresowania"></div>
-          <label class="block text-xs font-semibold text-[var(--text-muted)] mt-3 mb-1"><span data-i18n="profile_tags">Dostępność</span></label>
-          <div class="tag-buttons flex flex-wrap gap-1.5 mt-1.5">
-            <button type="button" class="btn-tag py-1.5 px-3 text-xs font-medium rounded-full border border-[var(--border)] bg-[var(--bg-soft)] text-[var(--text-muted)] cursor-pointer hover:border-[var(--accent)] hover:text-[var(--text)] hover:bg-[var(--accent-soft)] transition-colors" data-tag="chat" data-i18n="profile_tag_chat">Pogadać</button>
-            <button type="button" class="btn-tag py-1.5 px-3 text-xs font-medium rounded-full border border-[var(--border)] bg-[var(--bg-soft)] text-[var(--text-muted)] cursor-pointer hover:border-[var(--accent)] hover:text-[var(--text)] hover:bg-[var(--accent-soft)] transition-colors" data-tag="date" data-i18n="profile_tag_date">Randka</button>
-            <button type="button" class="btn-tag py-1.5 px-3 text-xs font-medium rounded-full border border-[var(--border)] bg-[var(--bg-soft)] text-[var(--text-muted)] cursor-pointer hover:border-[var(--accent)] hover:text-[var(--text)] hover:bg-[var(--accent-soft)] transition-colors" data-tag="beer" data-i18n="profile_tag_beer">Piwo</button>
+          <div id="avatar-toolbox" class="toolbox-overlay hidden" aria-label="Wybierz avatar">
+            <div class="toolbox-overlay-inner">
+              <div class="toolbox-grid" id="avatar-toolbox-grid"></div>
+              <button type="button" class="toolbox-close" data-i18n="btn_close">Zamknij</button>
+            </div>
+          </div>
+          <label class="form-label"><span data-i18n="profile_mood">Humor / nastrój</span></label>
+          <div class="mood-current-row">
+            <span class="mood-current" id="profile-mood-preview" aria-hidden="true"></span>
+            <button type="button" id="btn-toggle-mood" class="btn-secondary" data-i18n="profile_choose">Wybierz</button>
+          </div>
+          <div id="mood-toolbox" class="toolbox-overlay hidden" aria-label="Wybierz humor">
+            <div class="toolbox-overlay-inner">
+              <div class="toolbox-grid" id="mood-toolbox-grid"></div>
+              <button type="button" class="toolbox-close" data-i18n="btn_close">Zamknij</button>
+            </div>
+          </div>
+          <input type="hidden" id="profile-avatar" />
+          <input type="hidden" id="profile-mood" />
+          <label class="form-label"><span data-i18n="profile_bio">Opis</span></label>
+          <textarea id="profile-bio" class="form-input form-input--textarea" maxlength="200" rows="1" placeholder="" data-i18n-placeholder="profile_bio_placeholder" title="max 200 znaków"></textarea>
+          <label class="form-label"><span data-i18n="profile_interests">Zainteresowania</span></label>
+          <div class="interests-row">
+            <button type="button" id="btn-toggle-interests" class="btn-secondary" data-i18n="profile_choose">Wybierz</button>
+            <div id="interests-selected" class="interests-selected" aria-live="polite"></div>
+          </div>
+          <div id="interests-toolbox" class="interests-toolbox hidden" aria-label="Zainteresowania"></div>
+          <label class="form-label"><span data-i18n="profile_tags">Dostępność</span></label>
+          <div class="tag-buttons">
+            <button type="button" class="btn-tag" data-tag="chat" data-i18n="profile_tag_chat">💬 Pogadać</button>
+            <button type="button" class="btn-tag" data-tag="date" data-i18n="profile_tag_date">❤️ Randka</button>
+            <button type="button" class="btn-tag" data-tag="beer" data-i18n="profile_tag_beer">🍺 Piwo</button>
           </div>
         </div>
-        <button type="button" id="btn-fill-random" class="btn-fill-random w-full py-1.5 px-3 mb-2 text-xs font-medium rounded-lg border border-dashed border-[var(--border)] bg-transparent text-[var(--text-muted)] cursor-pointer hover:border-[var(--accent)] hover:text-[var(--accent)] hover:bg-[var(--accent-soft)] transition-colors" data-i18n="btn_fill_random">Wypełnij losowo (test)</button>
-        <button type="button" id="btn-enter-map" class="btn-primary w-full py-3 px-5 text-base font-semibold rounded-full border-0 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-white cursor-pointer shadow-lg hover:-translate-y-px hover:shadow-xl active:translate-y-0 transition-all" data-i18n="start_btn_enter">Wejdź na mapę</button>
-        <div class="lang-switcher flex gap-2 justify-center mt-2.5">
-          <button type="button" class="btn-lang py-2 px-4 text-sm font-medium rounded-full border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-muted)] cursor-pointer hover:text-[var(--text)] transition-colors" data-lang="pl" title="Polski">PL</button>
-          <button type="button" class="btn-lang py-2 px-4 text-sm font-medium rounded-full border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text-muted)] cursor-pointer hover:text-[var(--text)] transition-colors" data-lang="en" title="English">EN</button>
+        <button type="button" id="btn-enter-map" class="btn-primary" data-i18n="start_btn_enter">Wejdź na mapę</button>
+        <div class="lang-switcher">
+          <button type="button" class="btn-lang" data-lang="pl" title="Polski">PL</button>
+          <button type="button" class="btn-lang" data-lang="en" title="English">EN</button>
         </div>
       </div>
     </section>
 
     <!-- Map -->
-    <section id="screen-map" class="screen flex-col items-stretch justify-stretch p-0 min-h-0 overflow-y-auto">
-      <div id="map-container" class="map-container absolute inset-0 z-0"></div>
-      <div id="map-overlay" class="absolute top-0 left-0 right-0 pt-4 px-5 pb-0 bg-gradient-to-b from-black/90 to-transparent z-10 pointer-events-none [&>*]:pointer-events-auto">
-        <div id="status-bar" class="text-sm font-medium text-[var(--text)]">
-          <span id="status-text" data-i18n="map_status_loading">Ładowanie…</span>
+    <section id="screen-map" class="screen screen--map">
+      <div id="map-container" class="map-container"></div>
+      <div id="map-overlay" class="map-overlay">
+        <div class="map-status-center">
+          <div id="status-bar" class="status-bar">
+            <span id="status-text" data-i18n="map_status_loading">Ładowanie…</span>
+          </div>
+          <div class="map-status-row">
+            <input type="text" id="map-status-input" class="map-status-input" maxlength="120" placeholder="" data-i18n-placeholder="map_status_placeholder" title="" data-i18n-title="map_status_placeholder" />
+          </div>
         </div>
-        <div class="map-status-row mt-2">
-          <input type="text" id="map-status-input" class="map-status-input w-full max-w-[280px] py-2 px-3 text-sm border border-[var(--border)] rounded-full bg-[var(--bg-card)] text-[var(--text)] placeholder:text-[var(--text-muted)] placeholder:opacity-80 outline-none focus:border-[var(--accent)] focus:ring-2 focus:ring-[var(--accent-soft)] transition-all" maxlength="120" placeholder="" data-i18n-placeholder="map_status_placeholder" title="" data-i18n-title="map_status_placeholder" />
-        </div>
-        <p id="map-nearby-hint" class="map-nearby-hint text-xs text-[var(--text-muted)] mt-1" data-i18n="map_nearby">W pobliżu</p>
-        <div id="notifications-hint" class="notifications-hint mt-2.5">
-          <button type="button" id="btn-enable-notifications" class="btn-notifications py-2.5 px-4 text-sm font-semibold rounded-full border border-[var(--border)] bg-[var(--bg-card)] text-[var(--text)] cursor-pointer hover:border-[var(--accent)] hover:bg-[var(--accent-soft)] hover:shadow-md transition-all" data-i18n="notifications_enable">🔔 Włącz powiadomienia</button>
+        <p id="map-nearby-hint" class="map-nearby-hint" data-i18n="map_nearby">W pobliżu</p>
+        <div id="notifications-hint" class="notifications-hint">
+          <button type="button" id="btn-enable-notifications" class="btn-notifications" data-i18n="notifications_enable">🔔 Włącz powiadomienia</button>
         </div>
       </div>
-      <button type="button" id="btn-profile-map" class="btn-fab absolute bottom-7 right-6 w-14 h-14 rounded-full border-0 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-white text-2xl cursor-pointer z-20 shadow-xl hover:scale-105 transition-all" data-i18n-title="btn_profile" title="Profil">👤</button>
-      <button type="button" id="btn-back" class="btn-back absolute top-4 left-4 py-3 px-4 text-sm font-medium rounded-full border border-[var(--border)] bg-[var(--bg-card)]/90 backdrop-blur-sm text-[var(--text)] cursor-pointer z-20 hover:bg-[var(--bg-card)] hover:border-[var(--border-focus)] transition-colors" data-i18n="btn_back">Wstecz</button>
+      <button type="button" id="btn-profile-map" class="btn-fab" data-i18n-title="btn_profile" title="Profil">👤</button>
+      <button type="button" id="btn-back" class="btn-back" data-i18n="btn_back">← Wstecz</button>
     </section>
 
     <!-- Chat overlay -->
-    <div id="chat-overlay" class="chat-overlay hidden fixed inset-0 bg-black/65 backdrop-blur-sm z-[1000] items-end justify-center p-0">
-      <div class="chat-panel w-full max-w-md max-h-[72vh] flex flex-col bg-[var(--bg-card)] rounded-t-2xl border border-b-0 border-[var(--border)] shadow-2xl">
-        <div class="chat-header flex items-center justify-between py-4 px-5 border-b border-[var(--border)]">
-          <span id="chat-with-name" class="font-semibold text-base" data-i18n="chat_with">Z</span>
-          <button type="button" id="btn-chat-close" class="btn-close py-2 px-3.5 text-sm font-medium rounded-lg border-0 bg-[var(--bg-soft)] text-[var(--text-muted)] cursor-pointer hover:text-[var(--text)] hover:bg-[var(--border)] transition-colors" data-i18n="btn_close">Zamknij</button>
+    <div id="chat-overlay" class="chat-overlay hidden">
+      <div class="chat-panel">
+        <div class="chat-header">
+          <span id="chat-with-name" data-i18n="chat_with">Z</span>
+          <button type="button" id="btn-chat-close" class="btn-close" data-i18n="btn_close">Zamknij</button>
         </div>
-        <div id="chat-messages" class="chat-messages flex-1 overflow-y-auto py-4 px-5 min-h-[120px] max-h-[280px]"></div>
-        <div class="chat-input-row flex gap-2.5 py-3.5 px-5 pb-5 border-t border-[var(--border)]">
-          <input type="text" id="chat-input" class="chat-input flex-1 py-3.5 px-4 border border-[var(--border)] rounded-full bg-[var(--bg-soft)] text-[var(--text)] text-base placeholder:text-[var(--text-muted)] focus:outline-none focus:border-[var(--border-focus)] focus:ring-[3px] focus:ring-[var(--accent-soft)] transition-all" maxlength="500" placeholder="" data-i18n-placeholder="chat_placeholder" />
-          <button type="button" id="btn-chat-send" class="btn-send py-3.5 px-5 text-sm font-semibold rounded-full border-0 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-hover)] text-white cursor-pointer shadow-lg hover:-translate-y-px transition-all" data-i18n="chat_send">Wyślij</button>
+        <div id="chat-messages" class="chat-messages"></div>
+        <div class="chat-input-row">
+          <input type="text" id="chat-input" class="chat-input" maxlength="500" placeholder="" data-i18n-placeholder="chat_placeholder" />
+          <button type="button" id="btn-chat-send" class="btn-send" data-i18n="chat_send">Wyślij</button>
         </div>
       </div>
     </div>
 
-    <div id="toast-container" class="toast-container fixed bottom-7 left-1/2 -translate-x-1/2 z-[2000] flex flex-col gap-2.5 pointer-events-none" aria-live="polite"></div>
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
   </div>
 
   <script src="locales.js"></script>

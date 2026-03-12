@@ -79,6 +79,7 @@
       age: profile.age || '',
       height: profile.height || '',
       avatar: profile.avatar || '👤',
+      mood: profile.mood || '',
       status: profile.status || '',
       bio: profile.bio || '',
       interests: profile.interests || [],

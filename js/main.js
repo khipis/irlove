@@ -52,11 +52,19 @@
     var ageEl = $('profile-age');
     var heightEl = $('profile-height');
     var avatarEl = $('profile-avatar');
+    var moodEl = $('profile-mood');
     var bioEl = $('profile-bio');
+    var avatarPreview = $('profile-avatar-preview');
+    var moodPreview = $('profile-mood-preview');
     if (nameEl) nameEl.value = p.displayName || '';
     if (ageEl) ageEl.value = p.age || '';
     if (heightEl) heightEl.value = p.height || '';
-    if (avatarEl) avatarEl.value = p.avatar || '👤';
+    var av = (p.avatar && p.avatar.trim()) ? p.avatar.trim() : '👤';
+    if (avatarEl) avatarEl.value = av;
+    if (avatarPreview) avatarPreview.textContent = av;
+    var mo = (p.mood && p.mood.trim()) ? p.mood.trim() : '';
+    if (moodEl) moodEl.value = mo;
+    if (moodPreview) moodPreview.textContent = mo;
     if (bioEl) bioEl.value = p.bio || '';
     var tags = p.tags || [];
     if (typeof renderInterestsToolbox === 'function') renderInterestsToolbox();
@@ -65,6 +73,7 @@
       btn.classList.toggle('selected', tags.indexOf(tag) >= 0);
     });
     if (typeof renderAvatarToolbox === 'function') renderAvatarToolbox();
+    if (typeof renderMoodToolbox === 'function') renderMoodToolbox();
   }
 
   function saveProfileFromForm() {
@@ -72,6 +81,7 @@
     var ageEl = $('profile-age');
     var heightEl = $('profile-height');
     var avatarEl = $('profile-avatar');
+    var moodEl = $('profile-mood');
     var bioEl = $('profile-bio');
     var tags = [];
     document.querySelectorAll('.btn-tag.selected').forEach(function (btn) {
@@ -90,6 +100,7 @@
       age: (ageEl && ageEl.value) ? ageEl.value.trim() : '',
       height: (heightEl && heightEl.value) ? heightEl.value.trim() : '',
       avatar: (avatarEl && avatarEl.value) ? avatarEl.value.trim() : '👤',
+      mood: (moodEl && moodEl.value) ? moodEl.value.trim() : '',
       bio: (bioEl && bioEl.value) ? bioEl.value.trim().substring(0, config.BIO_MAX_LENGTH || 200) : '',
       tags: tags,
       interests: interests
@@ -97,6 +108,29 @@
     setProfile(p);
     state.profile = p;
     return p;
+  }
+
+  function updateInterestsSelectedDisplay() {
+    var container = document.getElementById('interests-selected');
+    if (!container) return;
+    var interests = [];
+    var box = document.getElementById('interests-toolbox');
+    if (box && box.querySelectorAll) {
+      box.querySelectorAll('.interest-btn.selected').forEach(function (btn) {
+        var em = btn.getAttribute('data-emoji');
+        if (em) interests.push(em);
+      });
+    } else {
+      interests = ((getProfile() || {}).interests || []).slice(0, config.INTERESTS_MAX != null ? config.INTERESTS_MAX : 5);
+    }
+    container.innerHTML = '';
+    interests.forEach(function (emoji) {
+      var span = document.createElement('span');
+      span.className = 'interest-chip';
+      span.textContent = emoji;
+      span.setAttribute('aria-hidden', 'true');
+      container.appendChild(span);
+    });
   }
 
   function renderInterestsToolbox() {
@@ -119,30 +153,11 @@
         } else if (selected < maxInterests) {
           btn.classList.add('selected');
         }
+        updateInterestsSelectedDisplay();
       });
       box.appendChild(btn);
     });
-  }
-
-  function getStoredTheme() {
-    try {
-      var t = localStorage.getItem(config.STORAGE_KEY_THEME);
-      return (t && t >= '1' && t <= '4') ? t : '1';
-    } catch (e) { return '1'; }
-  }
-
-  function setStoredTheme(theme) {
-    try {
-      localStorage.setItem(config.STORAGE_KEY_THEME, theme);
-    } catch (e) {}
-  }
-
-  function applyTheme(theme) {
-    theme = theme || getStoredTheme();
-    document.body.setAttribute('data-theme', theme);
-    document.querySelectorAll('.btn-theme').forEach(function (btn) {
-      btn.classList.toggle('selected', btn.getAttribute('data-theme') === theme);
-    });
+    updateInterestsSelectedDisplay();
   }
 
   function randomAvatar() {
@@ -151,24 +166,58 @@
   }
 
   function renderAvatarToolbox() {
-    var box = document.getElementById('avatar-toolbox');
-    if (!box || !config.AVATAR_EMOJIS) return;
-    box.innerHTML = '';
+    var grid = document.getElementById('avatar-toolbox-grid');
+    var overlay = document.getElementById('avatar-toolbox');
+    if (!grid || !config.AVATAR_EMOJIS) return;
+    grid.innerHTML = '';
     var current = (getProfile() || {}).avatar || '👤';
     config.AVATAR_EMOJIS.forEach(function (emoji) {
       var btn = document.createElement('button');
       btn.type = 'button';
-      btn.className = 'avatar-tool-btn' + (emoji === current ? ' selected' : '');
+      btn.className = 'toolbox-btn' + (emoji === current ? ' selected' : '');
       btn.textContent = emoji;
       btn.setAttribute('aria-label', 'Avatar ' + emoji);
       btn.addEventListener('click', function () {
-        box.querySelectorAll('.avatar-tool-btn').forEach(function (b) { b.classList.remove('selected'); });
+        grid.querySelectorAll('.toolbox-btn').forEach(function (b) { b.classList.remove('selected'); });
         btn.classList.add('selected');
         var avatarEl = $('profile-avatar');
+        var preview = $('profile-avatar-preview');
         if (avatarEl) avatarEl.value = emoji;
+        if (preview) preview.textContent = emoji;
+        if (overlay) overlay.classList.add('hidden');
       });
-      box.appendChild(btn);
+      grid.appendChild(btn);
     });
+  }
+
+  function renderMoodToolbox() {
+    var grid = document.getElementById('mood-toolbox-grid');
+    var overlay = document.getElementById('mood-toolbox');
+    if (!grid || !config.MOOD_EMOJIS) return;
+    grid.innerHTML = '';
+    var current = (getProfile() || {}).mood || '';
+    config.MOOD_EMOJIS.forEach(function (emoji) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'toolbox-btn' + (emoji === current ? ' selected' : '');
+      btn.textContent = emoji;
+      btn.setAttribute('aria-label', 'Humor ' + emoji);
+      btn.addEventListener('click', function () {
+        grid.querySelectorAll('.toolbox-btn').forEach(function (b) { b.classList.remove('selected'); });
+        btn.classList.add('selected');
+        var moodEl = $('profile-mood');
+        var preview = $('profile-mood-preview');
+        if (moodEl) moodEl.value = emoji;
+        if (preview) { preview.textContent = emoji; preview.style.display = ''; }
+        if (overlay) overlay.classList.add('hidden');
+      });
+      grid.appendChild(btn);
+    });
+  }
+
+  function randomMood() {
+    var list = config.MOOD_EMOJIS || ['😀', '😊', '😌', '😐'];
+    return list[Math.floor(Math.random() * list.length)];
   }
 
   function fillRandomProfile() {
@@ -177,6 +226,7 @@
     var age = 18 + Math.floor(Math.random() * 28);
     var height = 160 + Math.floor(Math.random() * 31);
     var avatar = randomAvatar();
+    var mood = randomMood();
     var tagOpts = ['chat', 'date', 'beer'];
     var nTags = 1 + Math.floor(Math.random() * 3);
     var tags = [];
@@ -199,10 +249,16 @@
     var ageEl = $('profile-age');
     var heightEl = $('profile-height');
     var avatarEl = $('profile-avatar');
+    var moodEl = $('profile-mood');
+    var avatarPreview = $('profile-avatar-preview');
+    var moodPreview = $('profile-mood-preview');
     if (nameEl) nameEl.value = name;
     if (ageEl) ageEl.value = String(age);
     if (heightEl) heightEl.value = String(height);
     if (avatarEl) avatarEl.value = avatar;
+    if (avatarPreview) avatarPreview.textContent = avatar;
+    if (moodEl) moodEl.value = mood;
+    if (moodPreview) moodPreview.textContent = mood;
     var bioEl = $('profile-bio');
     if (bioEl) bioEl.value = bio;
     document.querySelectorAll('.btn-tag').forEach(function (btn) {
@@ -214,6 +270,8 @@
       var em = btn.getAttribute('data-emoji');
       btn.classList.toggle('selected', interests.indexOf(em) >= 0);
     });
+    if (typeof renderAvatarToolbox === 'function') renderAvatarToolbox();
+    if (typeof renderMoodToolbox === 'function') renderMoodToolbox();
     saveProfileFromForm();
   }
 
@@ -223,12 +281,24 @@
       App.showToast(t('error_no_profile'), 'error');
       return;
     }
+    var ageNum = parseInt(p.age, 10);
+    if (isNaN(ageNum) || ageNum < 16 || ageNum > 105) {
+      App.showToast(t('error_age_invalid'), 'error');
+      return;
+    }
+    var heightNum = parseInt(p.height, 10);
+    if (isNaN(heightNum) || heightNum < 30 || heightNum > 240) {
+      App.showToast(t('error_height_invalid'), 'error');
+      return;
+    }
     if (!p.avatar || !p.avatar.trim()) {
       p.avatar = randomAvatar();
       state.profile.avatar = p.avatar;
       setProfile(state.profile);
       var avatarEl = $('profile-avatar');
+      var avatarPreview = $('profile-avatar-preview');
       if (avatarEl) avatarEl.value = p.avatar;
+      if (avatarPreview) avatarPreview.textContent = p.avatar;
     }
     if (state.watchId != null && navigator.geolocation.clearWatch) {
       navigator.geolocation.clearWatch(state.watchId);
@@ -405,32 +475,27 @@
 
   function init() {
     ensureProfile();
-    applyTheme(getStoredTheme());
     loadProfileIntoForm();
     renderAvatarToolbox();
+    renderMoodToolbox();
     applyLocale(refreshLabels);
 
-    document.querySelectorAll('.btn-theme').forEach(function (btn) {
-      btn.addEventListener('click', function () {
-        var theme = this.getAttribute('data-theme');
-        if (theme) {
-          setStoredTheme(theme);
-          applyTheme(theme);
-        }
+    var avatarOverlay = $('avatar-toolbox');
+    var btnToggleAvatar = $('btn-toggle-avatar');
+    if (btnToggleAvatar && avatarOverlay) {
+      btnToggleAvatar.addEventListener('click', function () { avatarOverlay.classList.remove('hidden'); });
+    }
+    var moodOverlay = $('mood-toolbox');
+    var btnToggleMood = $('btn-toggle-mood');
+    if (btnToggleMood && moodOverlay) {
+      btnToggleMood.addEventListener('click', function () { moodOverlay.classList.remove('hidden'); });
+    }
+    document.querySelectorAll('#avatar-toolbox .toolbox-close, #mood-toolbox .toolbox-close').forEach(function (closeBtn) {
+      closeBtn.addEventListener('click', function () {
+        var overlay = this.closest('.toolbox-overlay');
+        if (overlay) overlay.classList.add('hidden');
       });
     });
-
-    var btnRandomAvatar = $('btn-random-avatar');
-    if (btnRandomAvatar) {
-      btnRandomAvatar.addEventListener('click', function () {
-        var avatar = randomAvatar();
-        var avatarEl = $('profile-avatar');
-        if (avatarEl) avatarEl.value = avatar;
-      });
-    }
-
-    var btnFillRandom = $('btn-fill-random');
-    if (btnFillRandom) btnFillRandom.addEventListener('click', fillRandomProfile);
 
     document.querySelectorAll('.btn-lang').forEach(function (btn) {
       btn.classList.toggle('selected', btn.getAttribute('data-lang') === (window.CURRENT_LOCALE || 'pl'));
@@ -474,6 +539,7 @@
         showScreen('screen-start');
         loadProfileIntoForm();
         if (typeof renderAvatarToolbox === 'function') renderAvatarToolbox();
+        if (typeof renderMoodToolbox === 'function') renderMoodToolbox();
       });
     }
 

@@ -28,6 +28,7 @@
       age: '',
       height: '',
       avatar: '👤',
+      mood: '',
       bio: '',
       status: '',
       tags: [],
