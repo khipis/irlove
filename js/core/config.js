@@ -20,8 +20,8 @@
     STORAGE_KEY_PROFILE: 'irlove_profile',
     STORAGE_KEY_LANG: 'irlove_lang',
     RELAY_URL: null,
-    AVAILABILITY_TAGS: ['chat', 'date', 'beer'],
-    TAG_EMOJI: { chat: '💬', date: '❤️', beer: '🍺' },
+    AVAILABILITY_TAGS: ['chat', 'date', 'beer', 'coffee'],
+    TAG_EMOJI: { chat: '💬', date: '❤️', beer: '🍺', coffee: '☕' },
     /* Głowy młodych/dorosłych: kobiety, mężczyźni, różne kolory skóry (bez dzieci i seniorów) */
     AVATAR_EMOJIS: [
       '👤',

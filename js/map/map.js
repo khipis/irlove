@@ -58,7 +58,7 @@
       }
       state.radiusCircle = null;
     }
-    state.map = L.map('map-container').setView([center.lat, center.lng], 15);
+    state.map = L.map('map-container').setView([center.lat, center.lng], 17);
     var mapEl = document.getElementById('map-container');
     if (mapEl) mapEl.classList.add('map-soft-cute');
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -79,7 +79,7 @@
     });
     state.userMarker = L.marker([center.lat, center.lng], { icon: userIcon }).addTo(state.map);
     var tip = formatUserTooltip(profile.displayName || t('map_you'), profile.age, profile.height, profile.tags, profile.bio, profile.interests, profile.status, profile.mood, profile.gender);
-    state.userMarker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [28, 34] });
+    state.userMarker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [52, 48] });
     state.radiusCircle = L.circle([center.lat, center.lng], {
       radius: 2000,
       color: 'rgba(224, 122, 95, 0.85)',
@@ -126,7 +126,7 @@
     var maxDistDeg = (radiusKm * 1000) / 111320;
     var names = ['Ola', 'Kasia', 'Michał', 'Zuza', 'Tomek', 'Nina', 'Bartek', 'Ania'];
     var avatars = config.AVATAR_EMOJIS || ['👤', '😊', '🙂', '👩🏻', '👨🏽'];
-    var tagOpts = [['chat'], ['date'], ['beer'], ['chat', 'date'], ['beer', 'chat']];
+    var tagOpts = [['chat'], ['date'], ['beer'], ['coffee'], ['chat', 'date'], ['beer', 'chat'], ['coffee', 'chat']];
     for (var i = 0; i < count; i++) {
       var angle = Math.random() * 2 * Math.PI;
       var dist = maxDistDeg * (0.15 + Math.random() * 0.85);
@@ -156,7 +156,7 @@
         intList.splice(idx, 1);
       }
       var tip = formatUserTooltip(name, String(age), String(height), tags, bio, interests, '', '', '');
-      marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [28, 34] });
+      marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [52, 48] });
       if (!state.simulatedMarkers) state.simulatedMarkers = [];
       state.simulatedMarkers.push(marker);
     }
@@ -166,6 +166,7 @@
     if (!tags || !tags.length) return '';
     if (tags.indexOf('beer') >= 0) return '🍺';
     if (tags.indexOf('date') >= 0) return '❤️';
+    if (tags.indexOf('coffee') >= 0) return '☕';
     if (tags.indexOf('chat') >= 0) return '💬';
     return '';
   }
@@ -176,6 +177,7 @@
     if (tags.indexOf('chat') >= 0) out.push('💬');
     if (tags.indexOf('date') >= 0) out.push('❤️');
     if (tags.indexOf('beer') >= 0) out.push('🍺');
+    if (tags.indexOf('coffee') >= 0) out.push('☕');
     return out.join('');
   }
 
@@ -190,6 +192,7 @@
     if (!tags || !tags.length) return '👤';
     if (tags.indexOf('beer') >= 0) return '🍺';
     if (tags.indexOf('date') >= 0) return '❤️';
+    if (tags.indexOf('coffee') >= 0) return '☕';
     if (tags.indexOf('chat') >= 0) return '💬';
     return '👤';
   }
@@ -217,7 +220,7 @@
     var marker = L.marker([lat, lng], { icon: icon }).addTo(state.map);
     var prof = data.profile || data;
     var tip = formatUserTooltip(name, prof.age, prof.height, tags, prof.bio, prof.interests, prof.status, prof.mood, prof.gender);
-    marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [28, 34] });
+    marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [52, 48] });
     marker._pub = pub;
     marker.on('click', function () {
       if (typeof App.openChat === 'function') App.openChat(pub, data);

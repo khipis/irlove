@@ -255,7 +255,7 @@
     var height = 160 + Math.floor(Math.random() * 31);
     var avatar = randomAvatar();
     var mood = randomMood();
-    var tagOpts = ['chat', 'date', 'beer'];
+    var tagOpts = ['chat', 'date', 'beer', 'coffee'];
     var nTags = 1 + Math.floor(Math.random() * 3);
     var tags = [];
     for (var i = 0; i < nTags; i++) {
@@ -351,7 +351,8 @@
               state.map.invalidateSize();
               var c = state.userPosition;
               var R = (radiusKm * 1000) / 111320;
-              state.map.fitBounds([[c.lat - R, c.lng - R], [c.lat + R, c.lng + R]], { padding: [24, 24], maxZoom: 17 });
+              var zoomFactor = 0.65;
+              state.map.fitBounds([[c.lat - R * zoomFactor, c.lng - R * zoomFactor], [c.lat + R * zoomFactor, c.lng + R * zoomFactor]], { padding: [24, 24], maxZoom: 18 });
             }
             var statusInput = document.getElementById('map-status-input');
             if (statusInput) statusInput.value = p.status || '';
