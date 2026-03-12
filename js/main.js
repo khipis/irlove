@@ -18,6 +18,7 @@
   }
 
   var $ = App.$;
+  var MAX_INTERESTS = 10;
   var showScreen = App.showScreen;
   var applyLocale = App.applyLocale;
   var getProfile = App.getProfile;
@@ -68,7 +69,7 @@
       moodPreview.textContent = mo || '—';
       moodPreview.classList.toggle('placeholder', !mo);
     }
-    if (bioEl) bioEl.value = p.bio || '';
+    if (bioEl) bioEl.value = (p.bio || '').substring(0, config.BIO_MAX_LENGTH != null ? config.BIO_MAX_LENGTH : 200);
     var gender = (p.gender && p.gender.trim()) ? p.gender.trim() : '';
     document.querySelectorAll('.btn-gender').forEach(function (btn) {
       btn.classList.toggle('selected', btn.getAttribute('data-gender') === gender);
@@ -102,8 +103,7 @@
       var em = btn.getAttribute('data-emoji');
       if (em) interests.push(em);
     });
-    var maxInterests = config.INTERESTS_MAX != null ? config.INTERESTS_MAX : 5;
-    interests = interests.slice(0, maxInterests);
+    interests = interests.slice(0, MAX_INTERESTS);
     var p = {
       displayName: (nameEl && nameEl.value) ? nameEl.value.trim().substring(0, config.DISPLAY_NAME_MAX_LENGTH || 40) : '',
       age: (ageEl && ageEl.value) ? ageEl.value.trim() : '',
@@ -131,7 +131,7 @@
         if (em) interests.push(em);
       });
     } else {
-      interests = ((getProfile() || {}).interests || []).slice(0, config.INTERESTS_MAX != null ? config.INTERESTS_MAX : 5);
+      interests = ((getProfile() || {}).interests || []).slice(0, MAX_INTERESTS);
     }
     container.innerHTML = '';
     interests.forEach(function (emoji) {
@@ -147,8 +147,7 @@
     var box = document.getElementById('interests-toolbox');
     if (!box || !config.INTEREST_EMOJIS) return;
     box.innerHTML = '';
-    var maxInterests = config.INTERESTS_MAX != null ? config.INTERESTS_MAX : 5;
-    var current = ((getProfile() || {}).interests || []).slice(0, maxInterests);
+    var current = ((getProfile() || {}).interests || []).slice(0, MAX_INTERESTS);
     config.INTEREST_EMOJIS.forEach(function (emoji) {
       var btn = document.createElement('button');
       btn.type = 'button';
@@ -160,14 +159,31 @@
         var selected = box.querySelectorAll('.interest-btn.selected').length;
         if (btn.classList.contains('selected')) {
           btn.classList.remove('selected');
-        } else if (selected < maxInterests) {
+        } else if (selected < MAX_INTERESTS) {
           btn.classList.add('selected');
         }
         updateInterestsSelectedDisplay();
+        persistInterestsFromDOM();
       });
       box.appendChild(btn);
     });
     updateInterestsSelectedDisplay();
+  }
+
+  function persistInterestsFromDOM() {
+    var box = document.getElementById('interests-toolbox');
+    var interests = [];
+    if (box && box.querySelectorAll) {
+      box.querySelectorAll('.interest-btn.selected').forEach(function (btn) {
+        var em = btn.getAttribute('data-emoji');
+        if (em) interests.push(em);
+      });
+    }
+    interests = interests.slice(0, MAX_INTERESTS);
+    var p = getProfile() || ensureProfile();
+    p = { displayName: p.displayName, age: p.age, height: p.height, gender: p.gender, avatar: p.avatar || '👤', mood: p.mood || '', bio: p.bio || '', status: p.status || '', tags: p.tags || [], interests: interests };
+    setProfile(p);
+    if (state.profile) state.profile.interests = interests;
   }
 
   function randomAvatar() {
@@ -247,8 +263,7 @@
     var bios = ['Lubię kawę i rozmowy.', 'Szukam fajnych ludzi w okolicy.', 'Spontan i dobra zabawa.', 'Cenię spotkania na żywo.'];
     var bio = bios[Math.floor(Math.random() * bios.length)];
     var intList = (config.INTEREST_EMOJIS || []).slice();
-    var maxInt = config.INTERESTS_MAX != null ? config.INTERESTS_MAX : 5;
-    var nInt = Math.min(2 + Math.floor(Math.random() * 4), maxInt);
+    var nInt = Math.min(2 + Math.floor(Math.random() * 4), MAX_INTERESTS);
     var interests = [];
     for (var ii = 0; ii < nInt && intList.length; ii++) {
       var idx = Math.floor(Math.random() * intList.length);
@@ -553,12 +568,28 @@
       mapStatusInput.addEventListener('input', function () {
         var maxLen = config.STATUS_MAX_LENGTH || 120;
         var val = (this.value || '').trim().substring(0, maxLen);
+        if (this.value !== val) this.value = val;
         var p = getProfile() || {};
         p.status = val;
         setProfile(p);
         state.profile = p;
         if (typeof setUserAvatar === 'function') setUserAvatar(p.avatar, p.tags, val);
       });
+    }
+
+    var bioEl = document.getElementById('profile-bio');
+    if (bioEl) {
+      var bioMax = config.BIO_MAX_LENGTH != null ? config.BIO_MAX_LENGTH : 200;
+      bioEl.setAttribute('maxlength', String(bioMax));
+      function enforceBioMax() {
+        var val = (bioEl.value || '').substring(0, bioMax);
+        if (bioEl.value !== val) bioEl.value = val;
+      }
+      bioEl.addEventListener('input', enforceBioMax);
+      bioEl.addEventListener('paste', function () { setTimeout(enforceBioMax, 10); });
+      bioEl.addEventListener('change', enforceBioMax);
+      bioEl.addEventListener('blur', enforceBioMax);
+      enforceBioMax();
     }
   }
 

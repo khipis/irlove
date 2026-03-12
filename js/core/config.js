@@ -22,29 +22,24 @@
     RELAY_URL: null,
     AVAILABILITY_TAGS: ['chat', 'date', 'beer'],
     TAG_EMOJI: { chat: '💬', date: '❤️', beer: '🍺' },
-    /* Wszystkie główki ludzkie: kobiety, mężczyźni, każdy kolor skóry */
+    /* Głowy młodych/dorosłych: kobiety, mężczyźni, różne kolory skóry (bez dzieci i seniorów) */
     AVATAR_EMOJIS: [
       '👤',
       '👩', '👩🏻', '👩🏼', '👩🏽', '👩🏾', '👩🏿',
       '👨', '👨🏻', '👨🏼', '👨🏽', '👨🏾', '👨🏿',
       '👧', '👧🏻', '👧🏼', '👧🏽', '👧🏾', '👧🏿',
       '👦', '👦🏻', '👦🏼', '👦🏽', '👦🏾', '👦🏿',
-      '👶', '👶🏻', '👶🏼', '👶🏽', '👶🏾', '👶🏿',
-      '👵', '👵🏻', '👵🏼', '👵🏽', '👵🏾', '👵🏿',
-      '👴', '👴🏻', '👴🏼', '👴🏽', '👴🏾', '👴🏿',
       '🧑', '🧑🏻', '🧑🏼', '🧑🏽', '🧑🏾', '🧑🏿',
       '👱', '👱🏻', '👱🏼', '👱🏽', '👱🏾', '👱🏿',
       '👱‍♀️', '👱‍♂️'
     ],
     /* Buźki – nastrój (5–8 humorów) */
     MOOD_EMOJIS: ['😀', '😊', '😌', '😐', '😕', '😢', '😤', '🥳'],
-    /* Prawdziwe zainteresowania: muzyka, książki, film, gry, sztuka, jedzenie, sport, natura, podróże, zwierzęta, tech */
+    /* Zainteresowania – po jednym emoji na kategorię (książki, muzyka, film, gry, sztuka, jedzenie, sport, natura, podróże, zwierzęta, tech) */
     INTEREST_EMOJIS: [
-      '📚', '📖', '✍️', '🎵', '🎶', '🎸', '🎹', '🎤', '🎧', '🎬', '📺',
-      '🎮', '🕹️', '🎲', '🃏', '🧩', '🎨', '🖼️', '📷', '📸',
-      '☕', '🍕', '🍺', '🍳', '🥗',
-      '🏃', '🚴', '⚽', '🏀', '🎾', '🏋️', '🧘', '🛹', '🥋', '🥊', '🏊', '⛷️', '🎿', '🪂', '🎯',
-      '🌸', '🌿', '🪴', '✈️', '🏖️', '⛺', '🐕', '🐈',
+      '📚', '🎵', '🎬', '🎮', '🎨', '📷', '☕', '🍕', '🍺',
+      '🏃', '⚽', '🏋️', '🧘', '🥋', '🏊', '⛷️', '🎯',
+      '🌸', '🌿', '✈️', '⛺', '🐕', '🐈',
       '💻', '🔬', '📝', '🚗', '🛵'
     ]
   };

@@ -146,7 +146,7 @@
       });
       var marker = L.marker([lat, lng], { icon: icon }).addTo(state.map);
       var bio = ['Lubię spotkania i nowe miejsca.', 'Cenię rozmowę przy kawie.', 'Szukam fajnych ludzi w okolicy.', 'Spontan i dobra zabawa.'][Math.floor(Math.random() * 4)];
-      var maxInt = (config.INTERESTS_MAX != null) ? config.INTERESTS_MAX : 5;
+      var maxInt = (config.INTERESTS_MAX != null) ? config.INTERESTS_MAX : 10;
       var numInt = Math.min(2 + Math.floor(Math.random() * 4), maxInt);
       var intList = (config.INTEREST_EMOJIS || []).slice();
       var interests = [];
