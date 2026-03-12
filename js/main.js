@@ -69,7 +69,7 @@
       moodPreview.textContent = mo || '—';
       moodPreview.classList.toggle('placeholder', !mo);
     }
-    if (bioEl) bioEl.value = (p.bio || '').substring(0, config.BIO_MAX_LENGTH != null ? config.BIO_MAX_LENGTH : 200);
+    if (bioEl) bioEl.value = (p.bio || '').substring(0, config.BIO_MAX_LENGTH != null ? config.BIO_MAX_LENGTH : 120);
     var gender = (p.gender && p.gender.trim()) ? p.gender.trim() : '';
     document.querySelectorAll('.btn-gender').forEach(function (btn) {
       btn.classList.toggle('selected', btn.getAttribute('data-gender') === gender);
@@ -111,7 +111,7 @@
       gender: gender,
       avatar: (avatarEl && avatarEl.value) ? avatarEl.value.trim() : '👤',
       mood: (moodEl && moodEl.value) ? moodEl.value.trim() : '',
-      bio: (bioEl && bioEl.value) ? bioEl.value.trim().substring(0, config.BIO_MAX_LENGTH || 200) : '',
+      bio: (bioEl && bioEl.value) ? bioEl.value.trim().substring(0, config.BIO_MAX_LENGTH || 120) : '',
       tags: tags,
       interests: interests
     };
@@ -566,7 +566,7 @@
     var mapStatusInput = document.getElementById('map-status-input');
     if (mapStatusInput) {
       mapStatusInput.addEventListener('input', function () {
-        var maxLen = config.STATUS_MAX_LENGTH || 120;
+        var maxLen = config.STATUS_MAX_LENGTH || 80;
         var val = (this.value || '').trim().substring(0, maxLen);
         if (this.value !== val) this.value = val;
         var p = getProfile() || {};
@@ -579,7 +579,7 @@
 
     var bioEl = document.getElementById('profile-bio');
     if (bioEl) {
-      var bioMax = config.BIO_MAX_LENGTH != null ? config.BIO_MAX_LENGTH : 200;
+      var bioMax = config.BIO_MAX_LENGTH != null ? config.BIO_MAX_LENGTH : 120;
       bioEl.setAttribute('maxlength', String(bioMax));
       function enforceBioMax() {
         var val = (bioEl.value || '').substring(0, bioMax);

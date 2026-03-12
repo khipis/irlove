@@ -68,7 +68,7 @@
     var avatar = (profile.avatar && profile.avatar.trim()) ? profile.avatar.trim() : '👤';
     if (avatar.length > 2) avatar = '👤';
     var tagIcons = tagsToIconsString(profile.tags || []);
-    var statusMax = (config.STATUS_MAX_LENGTH != null) ? config.STATUS_MAX_LENGTH : 120;
+    var statusMax = (config.STATUS_MAX_LENGTH != null) ? config.STATUS_MAX_LENGTH : 80;
     var statusText = (profile.status && String(profile.status).trim()) ? escapeHtml(String(profile.status).trim().substring(0, statusMax)) : '';
     var bubbleHtml = '<div class="user-marker-bubble"><span class="user-marker-status-text">' + statusText + '</span><span class="user-marker-tag-icon">' + tagIcons + '</span></div>';
     var userIcon = L.divIcon({
@@ -242,7 +242,7 @@
     if (bubble) {
       var statusEl = bubble.querySelector('.user-marker-status-text');
       var tagEl = bubble.querySelector('.user-marker-tag-icon');
-      var statusMax = (config.STATUS_MAX_LENGTH != null) ? config.STATUS_MAX_LENGTH : 120;
+      var statusMax = (config.STATUS_MAX_LENGTH != null) ? config.STATUS_MAX_LENGTH : 80;
       if (statusEl) statusEl.textContent = (status && String(status).trim()) ? String(status).trim().substring(0, statusMax) : '';
       if (tagEl) tagEl.textContent = tagsToIconsString(tags || (state.profile && state.profile.tags) || []);
     }
