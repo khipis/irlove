@@ -211,6 +211,7 @@
         if (avatarEl) avatarEl.value = emoji;
         if (preview) preview.textContent = emoji;
         if (overlay) overlay.classList.add('hidden');
+        saveProfileFromForm();
       });
       grid.appendChild(btn);
     });
@@ -236,6 +237,7 @@
         if (moodEl) moodEl.value = emoji;
         if (preview) { preview.textContent = emoji; preview.classList.remove('placeholder'); }
         if (overlay) overlay.classList.add('hidden');
+        saveProfileFromForm();
       });
       grid.appendChild(btn);
     });
@@ -513,6 +515,7 @@
     document.querySelectorAll('.btn-tag').forEach(function (btn) {
       btn.addEventListener('click', function () {
         this.classList.toggle('selected');
+        saveProfileFromForm();
       });
     });
 
@@ -520,7 +523,21 @@
       btn.addEventListener('click', function () {
         document.querySelectorAll('.btn-gender').forEach(function (b) { b.classList.remove('selected'); });
         this.classList.add('selected');
+        saveProfileFromForm();
       });
+    });
+
+    var profileSaveTimeout;
+    function debouncedSaveProfile() {
+      clearTimeout(profileSaveTimeout);
+      profileSaveTimeout = setTimeout(saveProfileFromForm, 400);
+    }
+    ['profile-display-name', 'profile-age', 'profile-height'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) {
+        el.addEventListener('input', debouncedSaveProfile);
+        el.addEventListener('blur', saveProfileFromForm);
+      }
     });
 
     var btnToggleInterests = $('btn-toggle-interests');
@@ -567,13 +584,13 @@
     if (mapStatusInput) {
       mapStatusInput.addEventListener('input', function () {
         var maxLen = config.STATUS_MAX_LENGTH || 55;
-        var val = (this.value || '').trim().substring(0, maxLen);
+        var val = (this.value || '').substring(0, maxLen);
         if (this.value !== val) this.value = val;
         var p = getProfile() || {};
-        p.status = val;
+        p.status = (val || '').trim();
         setProfile(p);
         state.profile = p;
-        if (typeof setUserAvatar === 'function') setUserAvatar(p.avatar, p.tags, val);
+        if (typeof setUserAvatar === 'function') setUserAvatar(p.avatar, p.tags, p.status);
       });
     }
 
@@ -582,16 +599,33 @@
       var bioMax = config.BIO_MAX_LENGTH != null ? config.BIO_MAX_LENGTH : 110;
       bioEl.setAttribute('maxlength', String(bioMax));
       bioEl.addEventListener('keydown', function (e) {
-        if (e.key === 'Enter') e.preventDefault();
+        if (e.key === 'Enter') { e.preventDefault(); return false; }
+      });
+      bioEl.addEventListener('keypress', function (e) {
+        if (e.key === 'Enter' || e.which === 13) { e.preventDefault(); return false; }
       });
       function enforceBioMax() {
         var val = (bioEl.value || '').replace(/\r?\n/g, ' ').substring(0, bioMax);
         if (bioEl.value !== val) bioEl.value = val;
       }
-      bioEl.addEventListener('input', enforceBioMax);
+      function persistBioToProfile() {
+        var p = getProfile() || ensureProfile();
+        p.bio = (bioEl.value || '').trim().replace(/\r?\n/g, ' ').substring(0, bioMax);
+        setProfile(p);
+        if (state.profile) state.profile.bio = p.bio;
+      }
+      var bioSaveTimeout;
+      bioEl.addEventListener('input', function () {
+        enforceBioMax();
+        clearTimeout(bioSaveTimeout);
+        bioSaveTimeout = setTimeout(persistBioToProfile, 400);
+      });
       bioEl.addEventListener('paste', function () { setTimeout(enforceBioMax, 10); });
       bioEl.addEventListener('change', enforceBioMax);
-      bioEl.addEventListener('blur', enforceBioMax);
+      bioEl.addEventListener('blur', function () {
+        enforceBioMax();
+        persistBioToProfile();
+      });
       enforceBioMax();
     }
   }

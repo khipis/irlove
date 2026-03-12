@@ -720,21 +720,51 @@ button.mood-current:hover {
   gap: 4px;
 }
 
+/* Chmurka komiksowa nad markerem (status) */
 .user-marker-bubble {
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 6px;
-  padding: 5px 12px;
-  border-radius: 999px;
-  background: rgba(15, 15, 18, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: var(--shadow);
+  padding: 6px 14px 10px;
+  border-radius: 16px 16px 16px 4px;
+  background: #fff;
+  color: #1a1a1a;
+  border: 2px solid #333;
+  box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.2);
   max-width: 160px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   transition: max-width 0.2s ease;
+}
+
+.user-marker-bubble::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -10px;
+  transform: translateX(-50%);
+  border: 10px solid transparent;
+  border-top-color: #333;
+  border-bottom: none;
+  width: 0;
+  height: 0;
+}
+
+.user-marker-bubble::before {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: -6px;
+  transform: translateX(-50%);
+  border: 8px solid transparent;
+  border-top-color: #fff;
+  border-bottom: none;
+  width: 0;
+  height: 0;
+  z-index: 1;
 }
 
 .user-marker-wrap:hover .user-marker-bubble {
@@ -745,12 +775,13 @@ button.mood-current:hover {
 }
 
 .user-marker-bubble .user-marker-status-text {
-  font-size: 0.7rem;
-  color: var(--text);
-  font-weight: 500;
+  font-size: 0.75rem;
+  color: #1a1a1a;
+  font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   flex-shrink: 1;
+  font-family: var(--font-sans);
 }
 
 .user-marker-wrap:hover .user-marker-bubble .user-marker-status-text {
@@ -841,11 +872,6 @@ button.mood-current:hover {
 .leaflet-tooltip.marker-tooltip .marker-tooltip-meta {
   color: rgba(245, 244, 242, 0.85);
   font-weight: 500;
-  font-size: 0.8125rem;
-}
-
-.leaflet-tooltip.marker-tooltip .marker-tooltip-gender {
-  color: rgba(245, 244, 242, 0.85);
   font-size: 0.8125rem;
 }
 

@@ -79,7 +79,7 @@
     });
     state.userMarker = L.marker([center.lat, center.lng], { icon: userIcon }).addTo(state.map);
     var tip = formatUserTooltip(profile.displayName || t('map_you'), profile.age, profile.height, profile.tags, profile.bio, profile.interests, profile.status, profile.mood, profile.gender);
-    state.userMarker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [12, 0] });
+    state.userMarker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [28, 34] });
     state.radiusCircle = L.circle([center.lat, center.lng], {
       radius: 2000,
       color: 'rgba(224, 122, 95, 0.85)',
@@ -95,14 +95,13 @@
     var line1 = '<strong class="marker-tooltip-name">' + escapeHtml(name) + '</strong>';
     if (mood && String(mood).trim()) line1 += ' <span class="marker-tooltip-mood">' + escapeHtml(String(mood).trim()) + '</span>';
     var meta = [];
+    if (gender === 'f') meta.push('♀');
+    else if (gender === 'm') meta.push('♂');
+    else if (gender === 'other') meta.push('🌈');
     if (age) meta.push(age + ' lat');
     if (height) meta.push(height + ' cm');
     if (meta.length) line1 += ' <span class="marker-tooltip-meta">' + meta.join(' · ') + '</span>';
     lines.push('<div class="marker-tooltip-line">' + line1 + '</div>');
-    if (gender === 'f' || gender === 'm' || gender === 'other') {
-      var genderLabel = (gender === 'f') ? t('profile_gender_f') : (gender === 'm') ? t('profile_gender_m') : t('profile_gender_other');
-      lines.push('<div class="marker-tooltip-line marker-tooltip-gender">' + escapeHtml(t('profile_gender')) + ': ' + escapeHtml(genderLabel) + '</div>');
-    }
     if (status && String(status).trim()) lines.push('<div class="marker-tooltip-line marker-tooltip-status">' + escapeHtml(String(status).trim()) + '</div>');
     if (tags && tags.length) {
       var tagLabels = tags.map(function (tag) { return t('profile_tag_' + tag); });
@@ -157,7 +156,7 @@
         intList.splice(idx, 1);
       }
       var tip = formatUserTooltip(name, String(age), String(height), tags, bio, interests, '', '', '');
-      marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [12, 0] });
+      marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [28, 34] });
       if (!state.simulatedMarkers) state.simulatedMarkers = [];
       state.simulatedMarkers.push(marker);
     }
@@ -218,7 +217,7 @@
     var marker = L.marker([lat, lng], { icon: icon }).addTo(state.map);
     var prof = data.profile || data;
     var tip = formatUserTooltip(name, prof.age, prof.height, tags, prof.bio, prof.interests, prof.status, prof.mood, prof.gender);
-    marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [12, 0] });
+    marker.bindTooltip(tip, { permanent: false, direction: 'right', className: 'marker-tooltip', offset: [28, 34] });
     marker._pub = pub;
     marker.on('click', function () {
       if (typeof App.openChat === 'function') App.openChat(pub, data);
