@@ -729,14 +729,14 @@ button.mood-current:hover {
   align-content: center;
   justify-content: center;
   gap: 6px 8px;
-  padding: 6px 14px 10px;
-  border-radius: 16px 16px 16px 4px;
+  padding: 5px 10px 8px;
+  border-radius: 14px 14px 14px 4px;
   background: #fff;
   color: #1a1a1a;
   border: 2px solid #333;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.2);
-  width: 160px;
-  max-width: 160px;
+  width: 118px;
+  max-width: 118px;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -780,17 +780,21 @@ button.mood-current:hover {
 }
 
 .user-marker-bubble .user-marker-status-text {
-  font-size: 0.75rem;
+  font-size: 0.7rem;
   color: #1a1a1a;
   font-weight: 600;
   overflow: hidden;
   text-overflow: ellipsis;
   flex: 0 1 auto;
   min-width: 0;
-  max-width: 100%;
+  max-width: 10ch;
   font-family: var(--font-sans);
   word-break: break-word;
   overflow-wrap: break-word;
+}
+
+.user-marker-bubble .user-marker-tag-icon {
+  order: -1;
 }
 
 .user-marker-wrap:hover .user-marker-bubble .user-marker-status-text {
@@ -798,6 +802,7 @@ button.mood-current:hover {
   overflow: visible;
   text-overflow: clip;
   flex-basis: 100%;
+  max-width: none;
 }
 
 .user-marker-bubble .user-marker-tag-icon,
@@ -809,6 +814,7 @@ button.mood-current:hover {
 }
 
 .user-marker-wrap:hover .user-marker-bubble .user-marker-tag-icon {
+  order: 0;
   flex-basis: 100%;
   margin-top: 2px;
   max-width: 100%;
