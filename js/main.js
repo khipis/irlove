@@ -255,7 +255,7 @@
     var height = 160 + Math.floor(Math.random() * 31);
     var avatar = randomAvatar();
     var mood = randomMood();
-    var tagOpts = ['chat', 'date', 'beer', 'coffee'];
+    var tagOpts = ['chat', 'date', 'beer', 'coffee', 'walk', 'sport'];
     var nTags = 1 + Math.floor(Math.random() * 3);
     var tags = [];
     for (var i = 0; i < nTags; i++) {
