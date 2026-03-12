@@ -183,14 +183,22 @@ body {
 
 .gender-buttons {
   display: flex;
-  gap: 0.3rem;
+  gap: 0.35rem;
   margin-top: 0.2rem;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  min-height: 56px;
 }
 
 .gender-block .btn-gender {
-  padding: 0.35rem 0.6rem;
-  font-size: 0.75rem;
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem 0.4rem;
+  font-size: 0.875rem;
+  min-height: 56px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .btn-gender {
@@ -230,9 +238,9 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  font-size: 1.65rem;
+  width: 56px;
+  height: 56px;
+  font-size: 1.9rem;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -300,10 +308,10 @@ button.mood-current:hover {
 }
 
 .toolbox-grid .toolbox-btn {
-  width: 52px;
-  height: 52px;
+  width: 58px;
+  height: 58px;
   padding: 0;
-  font-size: 1.75rem;
+  font-size: 2rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.05);
@@ -381,9 +389,9 @@ button.mood-current:hover {
 }
 
 .btn-tag {
-  padding: 0.5rem 0.9rem;
+  padding: 0.55rem 1rem;
   font-family: inherit;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   font-weight: 500;
   color: var(--text-muted);
   background: rgba(255, 255, 255, 0.05);
@@ -429,11 +437,10 @@ button.mood-current:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
+  gap: 0.4rem;
   flex-wrap: wrap;
-  padding: 0.75rem 1rem;
+  padding: 0.85rem 1rem;
   font-family: inherit;
-  font-size: 0.9375rem;
   font-weight: 500;
   color: var(--text-muted);
   background: rgba(255, 255, 255, 0.05);
@@ -441,16 +448,12 @@ button.mood-current:hover {
   border-radius: var(--radius);
   cursor: pointer;
   transition: border-color 0.2s, background 0.2s, color 0.2s;
-  min-height: 2.75rem;
+  min-height: 3rem;
 }
 
 .btn-interests:hover {
   border-color: var(--accent);
   color: var(--text);
-}
-
-.btn-interests .btn-interests-label {
-  flex-shrink: 0;
 }
 
 .btn-interests .interests-selected {
@@ -465,7 +468,7 @@ button.mood-current:hover {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.25rem;
+  font-size: 1.5rem;
   line-height: 1;
 }
 
@@ -987,10 +990,10 @@ button.mood-current:hover {
 
 /* ---- Toolboxy (avatar, zainteresowania – JS) ---- */
 .interest-btn {
-  width: 48px;
-  height: 48px;
+  width: 54px;
+  height: 54px;
   padding: 0;
-  font-size: 1.4rem;
+  font-size: 1.6rem;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.05);
@@ -1080,9 +1083,9 @@ button.mood-current:hover {
   }
 
   .interest-btn {
-    width: 42px;
-    height: 42px;
-    font-size: 1.2rem;
+    width: 46px;
+    height: 46px;
+    font-size: 1.35rem;
   }
 
   .btn-tag {
