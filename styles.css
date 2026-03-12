@@ -720,7 +720,7 @@ button.mood-current:hover {
   gap: 4px;
 }
 
-/* Chmurka komiksowa nad markerem (status) */
+/* Chmurka komiksowa nad markerem (status) – skaluje się do treści */
 .user-marker-bubble {
   position: relative;
   display: inline-flex;
@@ -735,13 +735,13 @@ button.mood-current:hover {
   color: #1a1a1a;
   border: 2px solid #333;
   box-shadow: 2px 2px 0 rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.2);
-  width: 118px;
-  max-width: 118px;
+  width: max-content;
+  max-width: 220px;
   min-width: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: width 0.2s ease, max-width 0.2s ease;
+  transition: max-width 0.2s ease;
 }
 
 .user-marker-bubble::after {
@@ -772,8 +772,8 @@ button.mood-current:hover {
 }
 
 .user-marker-wrap:hover .user-marker-bubble {
-  width: 215px;
-  max-width: 215px;
+  width: max-content;
+  max-width: 280px;
   white-space: normal;
   overflow: visible;
   text-overflow: clip;

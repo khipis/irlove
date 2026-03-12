@@ -1,6 +1,6 @@
-# IRLove / IRLike – Mini Local Dating App
+# IRLove – Mini Local Dating App
 
-Lekka aplikacja w przeglądarce do spontanicznych spotkań IRL: użytkownicy widzą się na mapie w promieniu 2 km, mogą ustawić profil (nick, wiek, avatar, dostępność: pogadać / randka / piwo) i pisać szyfrowane wiadomości.
+Lekka aplikacja w przeglądarce do spontanicznych spotkań IRL: użytkownicy **spawnują się** na mapie w promieniu 2 km, ustawiają profil (nick, wiek, wzrost, płeć ♀♂🌈, avatar i nastrój w emoji, opis, zainteresowania, dostępność) i mogą pisać szyfrowane wiadomości.
 
 **Języki:** PL | EN
 
@@ -11,7 +11,7 @@ Lekka aplikacja w przeglądarce do spontanicznych spotkań IRL: użytkownicy wid
 - **GitHub Pages (auto-deploy):** po pushu na `main` strona jest pod **https://khipis.github.io/irlove/**  
   W repozytorium: **Settings → Pages → Build and deployment → Source: GitHub Actions.**
 
-Aby aplikacja działała w pełni (realtime, czat), potrzebny jest **relay Gun.js**. Wdróż serwer (patrz niżej) i ustaw URL relay w aplikacji:
+Aby aplikacja działała w pełni (realtime, czat), potrzebny jest **relay Gun.js**. Wdróż serwer (patrz niżej) i ustaw URL relay:
 
 ```html
 <script>window.IRLOVE_RELAY_URL = 'https://twoj-relay.example/gun';</script>
@@ -61,18 +61,18 @@ Po wdrożeniu ustaw w aplikacji:
 
 | Funkcja | Opis |
 |--------|------|
-| **Profil** | localStorage: nick, wiek, wzrost, avatar (emoji/URL), tagi: chat / date / beer |
-| **Mapa** | Leaflet + OpenStreetMap, promień 2 km, marker użytkownika i innych „online” |
+| **Profil** | localStorage: nick, wiek, wzrost, płeć (♀♂🌈), avatar i nastrój (emoji), opis (do 110 znaków), zainteresowania (emoji, max 10), dostępność: pogadać, randka, piwo, kawka, spacer, sport |
+| **Statement** | Krótki komunikat publiczny nad markerem (do 55 znaków), znika po 20 s – zostają tylko intencje w chmurce komiksowej |
+| **Mapa** | Leaflet + OpenStreetMap, promień 2 km, marker użytkownika i innych; panel z danymi po najechaniu, chmurka ze statusem rozwijana |
 | **Obecność** | Aktualizacja pozycji co 5 s, widoczni tylko użytkownicy aktywni w ostatnich 15 s |
-| **Czat** | Gun.js SEA – szyfrowanie E2E, wiadomości tylko między wybranymi użytkownikami |
-| **Powiadomienia** | Opcjonalne powiadomienia przeglądarki o nowych osobach w pobliżu |
+| **Czat** | Gun.js SEA – szyfrowanie E2E; klik w inną osobę otwiera czat |
 
 ---
 
 ## Struktura projektu
 
 - `index.html`, `styles.css`, `locales.js` – wejście, style, teksty PL/EN  
-- `js/` – core (config, state), storage (profil), map (Leaflet), services (Gun), main.js  
+- `js/` – core (config, state), storage (profil), map (Leaflet), services (Gun), ui (locale), main.js  
 - `server/` – relay Gun.js (Node.js), do wdrożenia osobno  
 - `.github/workflows/deploy-pages.yml` – auto-deploy na GitHub Pages przy pushu do `main`
 

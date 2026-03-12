@@ -583,6 +583,19 @@
 
     var mapStatusInput = document.getElementById('map-status-input');
     if (mapStatusInput) {
+      var statusClearTimeout;
+      var STATUS_VISIBLE_MS = 20000;
+      function scheduleStatusClear() {
+        clearTimeout(statusClearTimeout);
+        statusClearTimeout = setTimeout(function () {
+          var p = getProfile() || {};
+          p.status = '';
+          setProfile(p);
+          state.profile = p;
+          if (mapStatusInput) mapStatusInput.value = '';
+          if (typeof setUserAvatar === 'function') setUserAvatar(p.avatar, p.tags, '');
+        }, STATUS_VISIBLE_MS);
+      }
       mapStatusInput.addEventListener('input', function () {
         var maxLen = config.STATUS_MAX_LENGTH || 55;
         var val = (this.value || '').substring(0, maxLen);
@@ -592,6 +605,7 @@
         setProfile(p);
         state.profile = p;
         if (typeof setUserAvatar === 'function') setUserAvatar(p.avatar, p.tags, p.status);
+        if (p.status) scheduleStatusClear(); else clearTimeout(statusClearTimeout);
       });
     }
 
