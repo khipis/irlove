@@ -155,10 +155,42 @@ body {
   margin-top: 0;
 }
 
+.gender-avatar-mood-row {
+  display: flex;
+  gap: 0.75rem;
+  align-items: flex-end;
+  margin-top: 0.2rem;
+}
+
+.gender-block,
+.avatar-block,
+.mood-block {
+  flex: 1;
+  min-width: 0;
+}
+
+.gender-block .form-label,
+.avatar-block .form-label,
+.mood-block .form-label {
+  margin-top: 0.7rem;
+}
+
+.gender-block .form-label:first-child,
+.avatar-block .form-label:first-child,
+.mood-block .form-label:first-child {
+  margin-top: 0;
+}
+
 .gender-buttons {
   display: flex;
-  gap: 0.4rem;
+  gap: 0.3rem;
   margin-top: 0.2rem;
+  flex-wrap: wrap;
+}
+
+.gender-block .btn-gender {
+  padding: 0.35rem 0.6rem;
+  font-size: 0.75rem;
 }
 
 .btn-gender {
@@ -198,16 +230,30 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  font-size: 1.4rem;
+  width: 48px;
+  height: 48px;
+  font-size: 1.65rem;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
-.mood-current:empty::after {
-  content: '—';
+button.avatar-current,
+button.mood-current {
+  cursor: pointer;
+  padding: 0;
+  font: inherit;
+  color: inherit;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+button.avatar-current:hover,
+button.mood-current:hover {
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.mood-current.placeholder {
   color: var(--text-muted);
   font-size: 1rem;
 }
@@ -254,10 +300,10 @@ body {
 }
 
 .toolbox-grid .toolbox-btn {
-  width: 44px;
-  height: 44px;
+  width: 52px;
+  height: 52px;
   padding: 0;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
   border: 1px solid var(--border);
   border-radius: var(--radius);
   background: rgba(255, 255, 255, 0.05);
@@ -335,9 +381,9 @@ body {
 }
 
 .btn-tag {
-  padding: 0.4rem 0.75rem;
+  padding: 0.5rem 0.9rem;
   font-family: inherit;
-  font-size: 0.8rem;
+  font-size: 0.875rem;
   font-weight: 500;
   color: var(--text-muted);
   background: rgba(255, 255, 255, 0.05);
@@ -378,28 +424,49 @@ body {
   color: var(--text);
 }
 
-.interests-row {
+.btn-interests {
+  width: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5rem;
   flex-wrap: wrap;
+  padding: 0.75rem 1rem;
+  font-family: inherit;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s, color 0.2s;
+  min-height: 2.75rem;
 }
 
-.interests-selected {
-  display: flex;
+.btn-interests:hover {
+  border-color: var(--accent);
+  color: var(--text);
+}
+
+.btn-interests .btn-interests-label {
+  flex-shrink: 0;
+}
+
+.btn-interests .interests-selected {
+  display: inline-flex;
   flex-wrap: wrap;
   gap: 0.25rem;
   align-items: center;
-  min-height: 2rem;
+  justify-content: center;
 }
 
-.interests-selected .interest-chip {
+.btn-interests .interests-selected .interest-chip {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 1.1rem;
+  font-size: 1.25rem;
   line-height: 1;
-  padding: 0.15rem;
 }
 
 .interests-toolbox {
@@ -920,10 +987,10 @@ body {
 
 /* ---- Toolboxy (avatar, zainteresowania – JS) ---- */
 .interest-btn {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: 48px;
   padding: 0;
-  font-size: 1.2rem;
+  font-size: 1.4rem;
   border: 1px solid var(--border);
   border-radius: 12px;
   background: rgba(255, 255, 255, 0.05);
@@ -1012,11 +1079,10 @@ body {
     margin-top: 0.4rem;
   }
 
-  .avatar-tool-btn,
   .interest-btn {
-    width: 34px;
-    height: 34px;
-    font-size: 1.05rem;
+    width: 42px;
+    height: 42px;
+    font-size: 1.2rem;
   }
 
   .btn-tag {

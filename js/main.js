@@ -64,7 +64,10 @@
     if (avatarPreview) avatarPreview.textContent = av;
     var mo = (p.mood && p.mood.trim()) ? p.mood.trim() : '';
     if (moodEl) moodEl.value = mo;
-    if (moodPreview) moodPreview.textContent = mo;
+    if (moodPreview) {
+      moodPreview.textContent = mo || '—';
+      moodPreview.classList.toggle('placeholder', !mo);
+    }
     if (bioEl) bioEl.value = p.bio || '';
     var gender = (p.gender && p.gender.trim()) ? p.gender.trim() : '';
     document.querySelectorAll('.btn-gender').forEach(function (btn) {
@@ -215,7 +218,7 @@
         var moodEl = $('profile-mood');
         var preview = $('profile-mood-preview');
         if (moodEl) moodEl.value = emoji;
-        if (preview) { preview.textContent = emoji; preview.style.display = ''; }
+        if (preview) { preview.textContent = emoji; preview.classList.remove('placeholder'); }
         if (overlay) overlay.classList.add('hidden');
       });
       grid.appendChild(btn);
@@ -460,14 +463,14 @@
     applyLocale(refreshLabels);
 
     var avatarOverlay = $('avatar-toolbox');
-    var btnToggleAvatar = $('btn-toggle-avatar');
-    if (btnToggleAvatar && avatarOverlay) {
-      btnToggleAvatar.addEventListener('click', function () { avatarOverlay.classList.remove('hidden'); });
+    var avatarPreviewBtn = $('profile-avatar-preview');
+    if (avatarPreviewBtn && avatarOverlay) {
+      avatarPreviewBtn.addEventListener('click', function () { avatarOverlay.classList.remove('hidden'); });
     }
     var moodOverlay = $('mood-toolbox');
-    var btnToggleMood = $('btn-toggle-mood');
-    if (btnToggleMood && moodOverlay) {
-      btnToggleMood.addEventListener('click', function () { moodOverlay.classList.remove('hidden'); });
+    var moodPreviewBtn = $('profile-mood-preview');
+    if (moodPreviewBtn && moodOverlay) {
+      moodPreviewBtn.addEventListener('click', function () { moodOverlay.classList.remove('hidden'); });
     }
     document.querySelectorAll('#avatar-toolbox .toolbox-close, #mood-toolbox .toolbox-close').forEach(function (closeBtn) {
       closeBtn.addEventListener('click', function () {
