@@ -35,12 +35,14 @@
     ],
     /* Buźki – nastrój (5–8 humorów) */
     MOOD_EMOJIS: ['😀', '😊', '😌', '😐', '😕', '😢', '😤', '🥳'],
-    /* Zainteresowania – po jednym emoji na kategorię (książki, muzyka, film, gry, sztuka, jedzenie, sport, natura, podróże, zwierzęta, tech) */
+    /* Prawdziwe zainteresowania (bez duplikatów: jedna nutka, jedna roślinka, jeden aparat itd.) */
     INTEREST_EMOJIS: [
-      '📚', '🎵', '🎬', '🎮', '🎨', '📷', '☕', '🍕', '🍺',
-      '🏃', '⚽', '🏋️', '🧘', '🥋', '🏊', '⛷️', '🎯',
-      '🌸', '🌿', '✈️', '⛺', '🐕', '🐈',
-      '💻', '🔬', '📝', '🚗', '🛵'
+      '📚', '📖', '✍️', '🎵', '🎸', '🎹', '🎤', '🎧', '🎬', '📺',
+      '🎮', '🕹️', '🎲', '🃏', '🧩', '🎨', '🖼️', '📷',
+      '☕', '🍕', '🍺', '🍳', '🥗',
+      '🏃', '🚴', '⚽', '🏀', '🎾', '🏋️', '🧘', '🛹', '🥋', '🥊', '🏊', '⛷️', '🪂', '🎯', '🏍️',
+      '🌸', '🌿', '✈️', '🏖️', '⛺', '🐕', '🐈',
+      '💻', '🔬', '📝', '🚗', '🚴'
     ]
   };
   if (typeof window.IRLOVE_RELAY_URL === 'string' && window.IRLOVE_RELAY_URL) {
